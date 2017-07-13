@@ -1,0 +1,339 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "AWS CloudFormation templates to create AWS Elasticsearch Service domain. **WARNING** This template creates an Amazon Elasticsearch domain. You will be billed for the AWS resources used if you create a stack from this template.",
+    "Parameters": {
+        "ElasticsearchAccessIP": {
+            "Type": "String",
+            "Description": "IP address allowed to access Kibana and Elasticsearch"
+        },
+        "NAT1ElasticIP": {
+            "Type": "String",
+            "Description": "NAT1 elastic IP"
+        },
+        "NAT2ElasticIP": {
+            "Type": "String",
+            "Description": "NAT2 elastic IP"
+        },
+        "SubmissionsBucketARN": {
+            "Type": "String",
+            "Description": "SubmissionsBucket bucket ARN"
+        },
+        "ManagedDatasetsARN": {
+            "Type": "String",
+            "Description": "ManagedDatasets bucket ARN"
+        },
+        "PublishedDataARN": {
+            "Type": "String",
+            "Description": "PublishedData bucket ARN"
+        },
+        "SubmissionsTopicARN": {
+            "Type": "String",
+            "Description": "SubmissionsTopic ARN"
+        },
+        "ManagedTopicARN": {
+            "Type": "String",
+            "Description": "ManagedTopic ARN"
+        },
+        "PublishedTopicARN": {
+            "Type": "String",
+            "Description": "PublishedTopic ARN"
+        },
+        "QSS3BucketName": {
+            "Type": "String",
+            "Description": "Quick Start S3 bucket name"
+        },
+        "QSS3KeyPrefix": {
+            "Type": "String",
+            "Description": "Quick Start S3 key prefix"
+        },
+        "RegionalLambdaBucketName": {
+            "Type": "String",
+            "Description": "RegionalLambdaBucket bucket name"
+        },
+        "CopyLambdaDeploymentRoleARN": {
+            "Type": "String",
+            "Description": "CopyLambdaDeploymentRole ARN"
+        },
+        "LambdaRoleARN": {
+            "Type": "String",
+            "Description": "LambdaRole ARN"
+        }
+    },
+    "Resources": {
+        "ManagedDatasetLambdaPermissions": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "FunctionName": {
+                    "Ref": "ObjectCreatedFunction"
+                },
+                "Principal": "sns.amazonaws.com",
+                "Action": "lambda:invokeFunction",
+                "SourceArn": {
+                    "Ref": "ManagedTopicARN"
+                }
+            }
+        },
+        "ObjectCreatedFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Handler": "lambda_elasticsearch.handler",
+                "Role": {
+                    "Ref": "LambdaRoleARN"
+                },
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "RegionalLambdaBucketName"
+                    },
+                    "S3Key": "lambda-elasticsearch-deployment.zip"
+                },
+                "Timeout": 30,
+                "Runtime": "python3.6",
+                "Environment": {
+                    "Variables": {
+                        "ELASTICSEARCH_ENDPOINT": {
+                            "Fn::GetAtt": [
+                                "ElasticsearchDomain",
+                                "DomainEndpoint"
+                            ]
+                        }
+                    }
+                }
+            },
+            "DependsOn": [
+                "CopyLambdaDeployment"
+            ]
+        },
+        "ElasticsearchDomain": {
+            "Type": "AWS::Elasticsearch::Domain",
+            "Properties": {
+                "DomainName": "datalake-quickstart",
+                "ElasticsearchClusterConfig": {
+                    "DedicatedMasterEnabled": "false",
+                    "InstanceCount": "1",
+                    "ZoneAwarenessEnabled": "false",
+                    "InstanceType": "t2.small.elasticsearch"
+                },
+                "ElasticsearchVersion": "5.1",
+                "AccessPolicies": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": [
+                                "es:ESHttpGet",
+                                "es:ESHttpPut",
+                                "es:ESHttpPost",
+                                "es:ESHttpHead"
+                            ],
+                            "Principal": "*",
+                            "Effect": "Allow",
+                            "Condition": {
+                                "IpAddress": {
+                                    "aws:SourceIp": [
+                                        {
+                                            "Ref": "ElasticsearchAccessIP"
+                                        },
+                                        {
+                                            "Ref": "NAT1ElasticIP"
+                                        },
+                                        {
+                                            "Ref": "NAT2ElasticIP"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                },
+                "EBSOptions": {
+                    "EBSEnabled": true,
+                    "Iops": 0,
+                    "VolumeSize": 10,
+                    "VolumeType": "gp2"
+                },
+                "SnapshotOptions": {
+                    "AutomatedSnapshotStartHour": "0"
+                },
+                "AdvancedOptions": {
+                    "rest.action.multi.allow_explicit_index": "true"
+                }
+            }
+        },
+        "ManagedSubscription": {
+            "Type": "AWS::SNS::Subscription",
+            "Properties": {
+                "Protocol": "lambda",
+                "Endpoint": {
+                    "Fn::GetAtt": [
+                        "ObjectCreatedFunction",
+                        "Arn"
+                    ]
+                },
+                "TopicArn": {
+                    "Ref": "ManagedTopicARN"
+                }
+            },
+            "DependsOn": []
+        },
+        "PublishedSubscription": {
+            "Type": "AWS::SNS::Subscription",
+            "Properties": {
+                "Protocol": "lambda",
+                "Endpoint": {
+                    "Fn::GetAtt": [
+                        "ObjectCreatedFunction",
+                        "Arn"
+                    ]
+                },
+                "TopicArn": {
+                    "Ref": "PublishedTopicARN"
+                }
+            }
+        },
+        "SubmissionsSubscription": {
+            "Type": "AWS::SNS::Subscription",
+            "Properties": {
+                "Protocol": "lambda",
+                "Endpoint": {
+                    "Fn::GetAtt": [
+                        "ObjectCreatedFunction",
+                        "Arn"
+                    ]
+                },
+                "TopicArn": {
+                    "Ref": "SubmissionsTopicARN"
+                }
+            }
+        },
+        "SubmissionsLambdaPermission": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "FunctionName": {
+                    "Ref": "ObjectCreatedFunction"
+                },
+                "Principal": "sns.amazonaws.com",
+                "Action": "lambda:invokeFunction",
+                "SourceArn": {
+                    "Ref": "SubmissionsTopicARN"
+                }
+            }
+        },
+        "PublishedDatasetLambdaPermissions": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "FunctionName": {
+                    "Ref": "ObjectCreatedFunction"
+                },
+                "Principal": "sns.amazonaws.com",
+                "Action": "lambda:invokeFunction",
+                "SourceArn": {
+                    "Ref": "PublishedTopicARN"
+                }
+            }
+        },
+        "CopyLambdaDeploymentFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Code": {
+                    "ZipFile": {
+                        "Fn::Join": [
+                            "\n",
+                            [
+                                "import json",
+                                "import cfnresponse",
+                                "import boto3",
+                                "from botocore.exceptions import ClientError",
+                                "",
+                                "s3 = boto3.client('s3')",
+                                "",
+                                "",
+                                "def handler(event, context):",
+                                "    target_bucket = event['ResourceProperties']['RegionalLambdaBucket']",
+                                "    target_key = 'lambda-elasticsearch-deployment.zip'",
+                                "    source_bucket = event['ResourceProperties']['QSS3BucketName']",
+                                "    source_key = '{0}/lambdas/lambda-elasticsearch-deployment.zip'.format(event['ResourceProperties']['QSS3KeyPrefix'])",
+                                "",
+                                "    if event['RequestType'] == 'Delete':",
+                                "        try:",
+                                "            s3.delete_object(Bucket=target_bucket, Key=target_key)",
+                                "            return cfnresponse.send(event, context, cfnresponse.SUCCESS, {})",
+                                "        except ClientError as e:",
+                                "            print(e)",
+                                "            return cfnresponse.send(event, context, cfnresponse.FAILED, {})",
+                                "    try:",
+                                "        copy_source = {'Bucket': source_bucket, 'Key': source_key}",
+                                "        s3.copy_object(Bucket=target_bucket, Key=target_key, CopySource=copy_source)",
+                                "        return cfnresponse.send(event, context, cfnresponse.SUCCESS, {})",
+                                "    except ClientError as e:",
+                                "        print(e)",
+                                "        return cfnresponse.send(event, context, cfnresponse.FAILED, {})"
+                            ]
+                        ]
+                    }
+                },
+                "Handler": "index.handler",
+                "Role": {
+                    "Ref": "CopyLambdaDeploymentRoleARN"
+                },
+                "Runtime": "python3.6",
+                "Timeout": 30
+            }
+        },
+        "CopyLambdaDeployment": {
+            "Type": "Custom::CopyLambdaDeployment",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "CopyLambdaDeploymentFunction",
+                        "Arn"
+                    ]
+                },
+                "RegionalLambdaBucket": {
+                    "Ref": "RegionalLambdaBucketName"
+                },
+                "QSS3BucketName": {
+                    "Ref": "QSS3BucketName"
+                },
+                "QSS3KeyPrefix": {
+                    "Ref": "QSS3KeyPrefix"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "KibanaURL": {
+            "Description": "Kibana URL",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        {
+                            "Fn::GetAtt": [
+                                "ElasticsearchDomain",
+                                "DomainEndpoint"
+                            ]
+                        },
+                        "/_plugin/kibana/"
+                    ]
+                ]
+            }
+        },
+        "ElasticsearchEndpoint": {
+            "Description": "Elasticsearch domain endpoint",
+            "Value": {
+                "Fn::GetAtt": [
+                    "ElasticsearchDomain",
+                    "DomainEndpoint"
+                ]
+            }
+        },
+        "ElasticsearchDomainARN": {
+            "Description": "Elasticsearch domain ARN",
+            "Value": {
+                "Fn::GetAtt": [
+                    "ElasticsearchDomain",
+                    "DomainArn"
+                ]
+            }
+        }
+    }
+}

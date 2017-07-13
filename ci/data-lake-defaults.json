@@ -1,0 +1,42 @@
+[
+  {
+      "ParameterKey": "AvailabilityZones",
+      "ParameterValue": "$[alfred_genaz_2]"
+  },
+  {
+      "ParameterKey": "KeyPairName",
+      "ParameterValue": "cikey"
+  },
+  {
+      "ParameterKey": "RemoteAccessCIDR",
+      "ParameterValue": "10.1.2.3/32"
+  },
+  {
+      "ParameterKey": "InstanceType",
+      "ParameterValue": "t2.micro"
+  },
+  {
+      "ParameterKey": "WebApplicationUsername",
+      "ParameterValue": "DataLakeUser"
+  },
+  {
+      "ParameterKey": "WebApplicationPassword",
+      "ParameterValue": "$[alfred_genpass_16]"
+  },
+  {
+      "ParameterKey": "RedshiftUsername",
+      "ParameterValue": "datalake"
+  },
+  {
+      "ParameterKey": "RedshiftPassword",
+      "ParameterValue": "$[alfred_genpass_16]"
+  },
+  {
+      "ParameterKey": "DatasetS3BucketName",
+      "ParameterValue": "47lining-datalake-foundation-quick-start-data-us-west-2"
+  },
+  {
+      "ParameterKey": "DatasetS3KeyPrefix",
+      "ParameterValue": "datalake-awsdata/v1"
+  }
+]

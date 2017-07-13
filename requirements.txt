@@ -1,0 +1,5 @@
+flask==0.12.1
+boto3==1.4.4
+awscli==1.11.84
+jinja2==2.9.6
+psycopg2==2.7.1

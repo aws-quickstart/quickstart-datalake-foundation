@@ -1,0 +1,4 @@
+.ipynb_checkpoints
+*.egg-info
+.idea
+__pycache__

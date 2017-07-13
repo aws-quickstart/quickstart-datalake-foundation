@@ -1,0 +1,299 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "AWS CloudFormation templates to create AWS Kinesis Firehose endpoints",
+    "Parameters": {
+        "SubmissionsBucketARN": {
+            "Type": "String",
+            "Description": "Submissions bucket ARN"
+        },
+        "ManagedBucketARN": {
+            "Type": "String",
+            "Description": "Managed bucket ARN"
+        },
+        "RedshiftConnectionURL": {
+            "Type": "String",
+            "Description": "Redshift connection URL"
+        },
+        "RedshiftUsername": {
+            "Description": "Redshift username.",
+            "Type": "String"
+        },
+        "RedshiftPassword": {
+            "NoEcho": "true",
+            "Description": "Redshift password.",
+            "Type": "String"
+        },
+        "ElasticsearchDomainARN": {
+            "Description": "Elasticsearch domain ARN",
+            "Type": "String"
+        },
+        "SubmissionsBucketAccessARN": {
+            "Description": "SubmissionsBucketAccess ARN",
+            "Type": "String"
+        },
+        "ManagedBucketAccessARN": {
+            "Description": "ManagedBucketAccess ARN",
+            "Type": "String"
+        },
+        "ElasticsearchAccessARN": {
+            "Description": "ElasticsearchAccess ARN",
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "CleanOrdersStream": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "RedshiftDestinationConfiguration": {
+                    "ClusterJDBCURL": {
+                        "Ref": "RedshiftConnectionURL"
+                    },
+                    "CopyCommand": {
+                        "CopyOptions": "json 'auto'",
+                        "DataTableName": "orders"
+                    },
+                    "Username": {
+                        "Ref": "RedshiftUsername"
+                    },
+                    "Password": {
+                        "Ref": "RedshiftPassword"
+                    },
+                    "S3Configuration": {
+                        "BucketARN": {
+                            "Ref": "ManagedBucketARN"
+                        },
+                        "BufferingHints": {
+                            "IntervalInSeconds": 60,
+                            "SizeInMBs": 60
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "Prefix": "orders/stream/",
+                        "RoleARN": {
+                            "Ref": "ManagedBucketAccessARN"
+                        }
+                    },
+                    "RoleARN": {
+                        "Ref": "ManagedBucketAccessARN"
+                    }
+                }
+            }
+        },
+        "OrdersStream": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "S3DestinationConfiguration": {
+                    "BucketARN": {
+                        "Ref": "SubmissionsBucketARN"
+                    },
+                    "BufferingHints": {
+                        "IntervalInSeconds": 60,
+                        "SizeInMBs": 60
+                    },
+                    "CompressionFormat": "UNCOMPRESSED",
+                    "Prefix": "orders/stream/",
+                    "RoleARN": {
+                        "Ref": "SubmissionsBucketAccessARN"
+                    }
+                }
+            }
+        },
+        "RevenueByStateStream": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "ElasticsearchDestinationConfiguration": {
+                    "BufferingHints": {
+                        "IntervalInSeconds": 60,
+                        "SizeInMBs": 50
+                    },
+                    "DomainARN": {
+                        "Ref": "ElasticsearchDomainARN"
+                    },
+                    "IndexName": "revenue_by_state",
+                    "IndexRotationPeriod": "NoRotation",
+                    "TypeName": "RevenueByStateStream",
+                    "RetryOptions": {
+                        "DurationInSeconds": "60"
+                    },
+                    "RoleARN": {
+                        "Ref":
+                            "ElasticsearchAccessARN"
+                    },
+                    "S3BackupMode": "AllDocuments",
+                    "S3Configuration": {
+                        "BucketARN": {
+                            "Ref": "ManagedBucketARN"
+                        },
+                        "BufferingHints": {
+                            "IntervalInSeconds": "60",
+                            "SizeInMBs": "50"
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "Prefix": "orders/results/revenueByState",
+                        "RoleARN": {
+                            "Ref": "ManagedBucketAccessARN"
+                        }
+                    }
+                }
+            }
+        },
+        "TopSKUStream": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "ElasticsearchDestinationConfiguration": {
+                    "BufferingHints": {
+                        "IntervalInSeconds": 60,
+                        "SizeInMBs": 50
+                    },
+                    "DomainARN": {
+                        "Ref": "ElasticsearchDomainARN"
+                    },
+                    "IndexName": "top_sku",
+                    "IndexRotationPeriod": "NoRotation",
+                    "TypeName": "TopSKU",
+                    "RetryOptions": {
+                        "DurationInSeconds": "60"
+                    },
+                    "RoleARN": {
+                        "Ref":
+                            "ElasticsearchAccessARN"
+                    },
+                    "S3BackupMode": "AllDocuments",
+                    "S3Configuration": {
+                        "BucketARN": {
+                            "Ref": "ManagedBucketARN"
+                        },
+                        "BufferingHints": {
+                            "IntervalInSeconds": "60",
+                            "SizeInMBs": "50"
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "Prefix": "orders/results/topSKU",
+                        "RoleARN": {
+                            "Ref": "ManagedBucketAccessARN"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "OrdersStreamName": {
+            "Description": "Kinesis orders stream name",
+            "Value": {
+                "Ref": "OrdersStream"
+            }
+        },
+        "OrdersStreamARN": {
+            "Description": "Kinesis orders stream ARN",
+            "Value": {
+                "Fn::Join": [
+                    ":",
+                    [
+                        "arn:aws:firehose",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Ref": "AWS::AccountId"
+                        },
+                        {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "deliverystream/",
+                                    {
+                                        "Ref": "OrdersStream"
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "CleanOrdersStreamARN": {
+            "Description": "Kinesis clean orders stream ARN",
+            "Value": {
+                "Fn::Join": [
+                    ":",
+                    [
+                        "arn:aws:firehose",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Ref": "AWS::AccountId"
+                        },
+                        {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "deliverystream/",
+                                    {
+                                        "Ref": "CleanOrdersStream"
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "RevenueByStateStreamARN": {
+            "Description": "Kinesis revenue by state stream ARN",
+            "Value": {
+                "Fn::Join": [
+                    ":",
+                    [
+                        "arn:aws:firehose",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Ref": "AWS::AccountId"
+                        },
+                        {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "deliverystream/",
+                                    {
+                                        "Ref": "RevenueByStateStream"
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "TopSKUStreamARN": {
+            "Description": "Kinesis SKU stream ARN",
+            "Value": {
+                "Fn::Join": [
+                    ":",
+                    [
+                        "arn:aws:firehose",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Ref": "AWS::AccountId"
+                        },
+                        {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "deliverystream/",
+                                    {
+                                        "Ref": "TopSKUStream"
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
+                ]
+            }
+        }
+    }
+}
