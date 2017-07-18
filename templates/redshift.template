@@ -19,6 +19,29 @@
             "Type": "String",
             "NoEcho": "true"
         },
+        "NodeType": {
+            "Description": "The node type to be provisioned for the redshift cluster",
+            "Type": "String",
+            "Default": "dc1.large",
+            "AllowedValues": [
+                "dw1.xlarge",
+                "dw1.8xlarge",
+                "dw2.large",
+                "dw2.8xlarge",
+                "dc1.large",
+                "dc1.8xlarge",
+                "ds1.xlarge",
+                "ds1.8xlarge",
+                "ds2.xlarge",
+                "ds2.8xlarge"
+            ],
+            "ConstraintDescription": "must be a valid RedShift node type."
+        },
+        "NumberOfNodes": {
+            "Description": "The number of compute nodes in the redshift cluster.",
+            "Type": "Number",
+            "Default": "1"
+        },
         "QSRedshiftRoleARN": {
             "Description": "QSRedshiftRole ARN",
             "Type": "String"
@@ -28,6 +51,24 @@
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
             "Description": "CIDR block that gets access to Redshift",
             "Type": "String"
+        },
+        "DatabasePort": {
+            "Description": "The port that Redshift will listen on and that will be allowed through the Security Group.",
+            "Type": "String",
+            "Default": "5439"
+        },
+        "DatabaseName": {
+            "Description": "Redshift database name",
+            "Type": "String"
+        },
+        "PubliclyAccessible": {
+            "Description": "Indicates whether the cluster can be accessed from a public network.",
+            "Type": "String",
+            "AllowedValues": [
+                "true",
+                "false"
+            ],
+            "Default": "false"
         }
     },
     "Mappings": {
@@ -40,13 +81,50 @@
             }
         }
     },
+    "Conditions": {
+        "IsMultiNodeCluster": {
+            "Fn::Not": [
+                "Fn::Equals": [
+                    {
+                        "Ref": "NumberOfNodes"
+                    },
+                    "1"
+                ]
+            ]
+        },
+        "IsPublic": {
+            "Fn::Equals": [
+                {
+                    "Ref": "PubliclyAccessible"
+                },
+                "true"
+            ]
+        }
+    },
     "Resources": {
         "RedshiftCluster": {
             "Type": "AWS::Redshift::Cluster",
             "Properties": {
-                "ClusterType": "single-node",
-                "NodeType": "dc1.large",
-                "DBName": "quickstart",
+                "ClusterType": {
+                    "Fn::If": [
+                        "IsMultiNodeCluster",
+                        "multi-node",
+                        "single-node"
+                    ]
+                },
+                "NodeType": {"Ref": "NodeType"},
+                "NumberOfNodes": {
+                    "Fn::If": [
+                        "IsMultiNodeCluster",
+                        {
+                            "Ref": "NumberOfNodes"
+                        },
+                        {
+                            "Ref": "AWS::NoValue"
+                        }
+                    ]
+                },
+                "DBName": { "Ref": "DatabaseName"},
                 "IamRoles": [
                     {
                         "Ref":
@@ -67,8 +145,16 @@
                 "ClusterSubnetGroupName": {
                     "Ref": "RedshiftClusterSubnetGroup"
                 },
-                "PubliclyAccessible": "true",
-                "Port": "5439"
+                "PubliclyAccessible": {
+                    "Fn::If": [
+                        "IsPublic",
+                        "true",
+                        {
+                            "Ref": "AWS::NoValue"
+                        }
+                    ]
+                },
+                "Port": { "Ref": "DatabasePort" }
             }
         },
         "RedshiftClusterSubnetGroup": {
@@ -92,16 +178,16 @@
                 "SecurityGroupIngress": [
                     {
                         "IpProtocol": "tcp",
-                        "FromPort": "5439",
-                        "ToPort": "5439",
+                        "FromPort": { "Ref": "DatabasePort" },
+                        "ToPort": { "Ref": "DatabasePort" },
                         "CidrIp": {
                             "Ref": "RedshiftInboundCIDR"
                         }
                     },
                     {
                         "IpProtocol": "tcp",
-                        "FromPort": "5439",
-                        "ToPort": "5439",
+                        "FromPort": { "Ref": "DatabasePort" },
+                        "ToPort": { "Ref": "DatabasePort" },
                         "CidrIp": {
                             "Fn::FindInMap": [
                                 "RegionMap",
@@ -137,7 +223,10 @@
                                 "Endpoint.Port"
                             ]
                         },
-                        "/quickstart"
+                        "/",
+                        {
+                            "Ref": "DatabaseName"
+                        }
                     ]
                 ]
             }

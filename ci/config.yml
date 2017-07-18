@@ -1,14 +1,19 @@
 global:
   marketplace-ami: false
-  owner: quickstart-eng@amazon.com
-  qsname: quickstart-data-lake-foundation-47lining
+  owner: quickstart@amazon.com
+  qsname: quickstart-aws-datalake-foundation
   regions:
     - us-east-1
-    - us-east-2
-    - us-west-1
     - us-west-2
   reporting: true
 tests:
-  defaults:
-    parameter_input: data-lake-defaults.json
+  multi-node-foundation:
+    parameter_input: data-lake-foundation-multi-node.json
     template_file: data-lake-foundation-master.template
+    regions:
+      - us-east-1
+  single-node-demonstration:
+    parameter_input: data-lake-demonstration-single-node.json
+    template_file: data-lake-demonstration-master.template
+    regions:
+      - us-west-2

@@ -89,7 +89,29 @@
                             },
                             "Condition": {
                                 "ArnLike": {
-                                    "AWS:SourceArn": "arn:aws:s3:*:*:*"
+                                    "AWS:SourceArn": {
+                                        "Fn::Sub": [
+                                            "arn:aws:s3:::${BucketName}",
+                                            {
+                                                "BucketName": {
+                                                    "Fn::Join": [
+                                                        "-",
+                                                        [
+                                                            "datalake",
+                                                            "managed",
+                                                            "datasets",
+                                                            {
+                                                                "Ref": "AWS::AccountId"
+                                                            },
+                                                            {
+                                                                "Ref": "AWS::Region"
+                                                            }
+                                                        ]
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
                                 }
                             }
                         }
@@ -121,7 +143,29 @@
                             },
                             "Condition": {
                                 "ArnLike": {
-                                    "AWS:SourceArn": "arn:aws:s3:*:*:*"
+                                    "AWS:SourceArn": {
+                                        "Fn::Sub": [
+                                            "arn:aws:s3:::${BucketName}",
+                                            {
+                                                "BucketName": {
+                                                    "Fn::Join": [
+                                                        "-",
+                                                        [
+                                                            "datalake",
+                                                            "published",
+                                                            "data",
+                                                            {
+                                                                "Ref": "AWS::AccountId"
+                                                            },
+                                                            {
+                                                                "Ref": "AWS::Region"
+                                                            }
+                                                        ]
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
                                 }
                             }
                         }
@@ -199,7 +243,29 @@
                             },
                             "Condition": {
                                 "ArnLike": {
-                                    "AWS:SourceArn": "arn:aws:s3:*:*:*"
+                                    "AWS:SourceArn": {
+                                        "Fn::Sub": [
+                                            "arn:aws:s3:::${BucketName}",
+                                            {
+                                                "BucketName": {
+                                                    "Fn::Join": [
+                                                        "-",
+                                                        [
+                                                            "datalake",
+                                                            "raw",
+                                                            "submissions",
+                                                            {
+                                                                "Ref": "AWS::AccountId"
+                                                            },
+                                                            {
+                                                                "Ref": "AWS::Region"
+                                                            }
+                                                        ]
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
                                 }
                             }
                         }

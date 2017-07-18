@@ -355,6 +355,7 @@
                                             {
                                                 "Fn::Sub": "aws s3 sync s3://${QSS3BucketName}/${QSS3KeyPrefix} ."
                                             },
+                                            "cd /home/ec2-user/assets",
                                             "python3.4 setup.py develop",
                                             "chown -R ec2-user:ec2-user /home/ec2-user",
                                             {
@@ -370,11 +371,10 @@
                         },
                         "commands": {
                             "1_run_bootstrap": {
-                                "command": "sh -x /etc/bootstrap.sh"
+                                "command": "sh -ex /etc/bootstrap.sh"
                             },
                             "9_run_webserver": {
-                                "command": "runuser -l ec2-user -c \"python3.4 web/app.py --config /etc/production.ini > server.log 2>&1 &\"",
-                                "cwd": "/home/ec2-user/"
+                                "command": "runuser -l ec2-user -c \"python3.4 /home/ec2-user/assets/web/app.py --config /etc/production.ini > server.log 2>&1 &\"",
                             }
                         }
                     }
@@ -407,18 +407,18 @@
                 "UserData": {
                     "Fn::Base64": {
                         "Fn::Join": [
-                            "",
+                            "\n",
                             [
-                                "#!/bin/bash -xe\n",
-                                "yum update -y\n",
-                                "yum install -y aws-cfn-bootstrap\n",
-                                "# Install the files and packages from the metadata\n",
+                                "#!/bin/bash",
+                                "yum update -y",
+                                "yum install -y aws-cfn-bootstrap",
+                                "# Install the files and packages from the metadata",
                                 {
-                                    "Fn::Sub": "/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerLaunchConfiguration --region ${AWS::Region}\n"
+                                    "Fn::Sub": "/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerLaunchConfiguration --region ${AWS::Region}"
                                 },
-                                "# Signal the status from cfn-init\n",
+                                "# Signal the status from cfn-init",
                                 {
-                                    "Fn::Sub": "/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerAutoScalingGroup --region ${AWS::Region}\n"
+                                    "Fn::Sub": "/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerAutoScalingGroup --region ${AWS::Region}"
                                 }
                             ]
                         ]
