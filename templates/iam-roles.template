@@ -2,6 +2,199 @@
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "AWS CloudFormation template to create IAM roles",
     "Resources": {
+        "EmptyBucketsRole": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "CreateDemoResources",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "LambdaLogging",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": "arn:aws:logs:*:*:*"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "ListDeleteDataLakeBuckets",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:ListBucket",
+                                        "s3:DeleteObject"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "SubmissionsBucketARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "ManagedDatasetsARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "PublishedDataARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "CopyDataRole": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "CreateDemoResources",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "LambdaLogging",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": "arn:aws:logs:*:*:*"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "SumbissionsBucketAccess",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:AbortMultipartUpload",
+                                        "s3:GetBucketLocation",
+                                        "s3:GetObject",
+                                        "s3:ListBucket",
+                                        "s3:ListBucketMultipartUploads",
+                                        "s3:PutObject"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "SubmissionsBucketARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "ListGetDatasetBucket",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:ListBucket",
+                                        "s3:GetObject"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:s3:::",
+                                                    {
+                                                        "Ref": "DatasetS3BucketName"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
         "LambdaRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
@@ -172,7 +365,7 @@
                         }
                     },
                     {
-                        "PolicyName": "ListGetQSS3Bucket",
+                        "PolicyName": "ListGetQSSBucket",
                         "PolicyDocument": {
                             "Version": "2012-10-17",
                             "Statement": [
@@ -191,7 +384,701 @@
                                                     {
                                                         "Ref": "QSS3BucketName"
                                                     },
-                                                    "/*"
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "SubmissionsBucketAccess": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "CreateDemoResources",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "firehose.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole",
+                            "Condition": {
+                                "StringEquals": {
+                                    "sts:ExternalId": {
+                                        "Ref": "AWS::AccountId"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "AllowS3Access",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:AbortMultipartUpload",
+                                        "s3:GetBucketLocation",
+                                        "s3:GetObject",
+                                        "s3:ListBucket",
+                                        "s3:ListBucketMultipartUploads",
+                                        "s3:PutObject"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Ref": "SubmissionsBucketARN"
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "/",
+                                                [
+                                                    {
+                                                        "Ref": "SubmissionsBucketARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "ManagedBucketAccess": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "CreateDemoResources",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "firehose.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole",
+                            "Condition": {
+                                "StringEquals": {
+                                    "sts:ExternalId": {
+                                        "Ref": "AWS::AccountId"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "AllowS3Access",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:AbortMultipartUpload",
+                                        "s3:GetBucketLocation",
+                                        "s3:GetObject",
+                                        "s3:ListBucket",
+                                        "s3:ListBucketMultipartUploads",
+                                        "s3:PutObject"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Ref": "ManagedDatasetsARN"
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "/",
+                                                [
+                                                    {
+                                                        "Ref": "ManagedDatasetsARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "ElasticsearchAccess": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "CreateDemoResources",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "firehose.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole",
+                            "Condition": {
+                                "StringEquals": {
+                                    "sts:ExternalId": {
+                                        "Ref": "AWS::AccountId"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "ESAccess",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "es:DescribeElasticsearchDomain",
+                                        "es:DescribeElasticsearchDomains",
+                                        "es:DescribeElasticsearchDomainConfig",
+                                        "es:ESHttpPost",
+                                        "es:ESHttpPut",
+                                        "es:ESHttpGet"
+                                    ],
+                                    "Resource": [
+                                        "arn:aws:es:*"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "AnalyticsAccess": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "CreateDemoResources",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "kinesisanalytics.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "Access",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Sid": "WriteOutputFirehose",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "firehose:DescribeDeliveryStream",
+                                        "firehose:PutRecord",
+                                        "firehose:PutRecordBatch"
+                                    ],
+                                    "Resource": [
+                                        "arn:aws:firehose:*"
+                                    ]
+                                },
+                                {
+                                    "Sid": "ReadInputFirehose",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "firehose:DescribeDeliveryStream",
+                                        "firehose:Get*"
+                                    ],
+                                    "Resource": [
+                                        "arn:aws:firehose:*"
+                                    ]
+                                },
+                                {
+                                    "Sid": "ReadS3ReferenceData",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:Get*",
+                                        "s3:List*"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "/",
+                                                [
+                                                    {
+                                                        "Ref": "ManagedDatasetsARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "QSRedshiftRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "redshift.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
+                ],
+                "Policies": [
+                    {
+                        "PolicyName": "S3Access",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:*"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "ManagedDatasetsARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "PublishedDataARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "Path": "/"
+            }
+        },
+        "InstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Condition": "CreateDemoResources",
+            "Properties": {
+                "Roles": [
+                    {
+                        "Ref": "InstanceRole"
+                    }
+                ]
+            }
+        },
+        "InstanceRole": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "CreateDemoResources",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
+                ],
+                "Policies": [
+                    {
+                        "PolicyName": "S3Policy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:*"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "SubmissionsBucketARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "ManagedDatasetsARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "PublishedDataARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "AthenaQueryResultsBucketARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:GetObject"
+                                    ],
+                                    "Resource": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                "arn:aws:s3:::",
+                                                {
+                                                    "Ref": "QSS3BucketName"
+                                                },
+                                                "/*"
+                                            ]
+                                        ]
+                                    }
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:ListBucket",
+                                        "s3:GetBucketLocation"
+                                    ],
+                                    "Resource": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                "arn:aws:s3:::",
+                                                {
+                                                    "Ref": "QSS3BucketName"
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:ListBucket",
+                                        "s3:GetObject"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:s3:::",
+                                                    {
+                                                        "Ref": "DatasetS3BucketName"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "FirehosePolicy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "firehose:PutRecordBatch"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "KinesisAnalyticsPolicy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "kinesisanalytics:CreateApplication",
+                                        "kinesisanalytics:StartApplication",
+                                        "kinesisanalytics:DescribeApplication",
+                                        "kinesisanalytics:ListApplications",
+                                        "kinesisanalytics:AddApplicationReferenceDataSource"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "IAMPassRolePolicy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "iam:GetRole",
+                                        "iam:PassRole"
+                                    ],
+                                    "Resource": "arn:aws:iam::*"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "PublishToSnsDataLakeTopic",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "sns:Publish"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Ref": "SnsLearnMoreTopicArn"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "CleanupResourcesRole": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "CreateDemoResources",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "LambdaLogging",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": "arn:aws:logs:*:*:*"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "ListKinesisAnalyticsApplications",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": "kinesisanalytics:ListApplications",
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "DeleteKinesisAnalyticsApplications",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "kinesisanalytics:DescribeApplication",
+                                        "kinesisanalytics:DeleteApplication"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:kinesisanalytics:",
+                                                    {
+                                                        "Ref": "AWS::Region"
+                                                    },
+                                                    ":",
+                                                    {
+                                                        "Ref": "AWS::AccountId"
+                                                    },
+                                                    ":application/clean-orders-app"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:kinesisanalytics:",
+                                                    {
+                                                        "Ref": "AWS::Region"
+                                                    },
+                                                    ":",
+                                                    {
+                                                        "Ref": "AWS::AccountId"
+                                                    },
+                                                    ":application/aggregate-orders-app"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "ListDeleteDataLakeAndAthenaBuckets",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:ListBucket",
+                                        "s3:DeleteObject"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "SubmissionsBucketARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "ManagedDatasetsARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "PublishedDataARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "AthenaQueryResultsBucketARN"
+                                                    },
+                                                    "*"
                                                 ]
                                             ]
                                         }
@@ -285,70 +1172,28 @@
                     }
                 ]
             }
-        },
-        "QSRedshiftRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": "redshift.amazonaws.com"
-                            },
-                            "Action": "sts:AssumeRole"
-                        }
-                    ]
+        }
+    },
+    "Conditions": {
+        "CreateDemoResources": {
+            "Fn::Equals": [
+                {
+                    "Ref": "CreateDemonstration"
                 },
-                "ManagedPolicyArns": [
-                    "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
-                ],
-                "Policies": [
-                    {
-                        "PolicyName": "S3Access",
-                        "PolicyDocument": {
-                            "Version": "2012-10-17",
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "s3:*"
-                                    ],
-                                    "Resource": [
-                                        {
-                                            "Fn::Join": [
-                                                "",
-                                                [
-                                                    {
-                                                        "Ref": "ManagedDatasetsARN"
-                                                    },
-                                                    "*"
-                                                ]
-                                            ]
-                                        },
-                                        {
-                                            "Fn::Join": [
-                                                "",
-                                                [
-                                                    {
-                                                        "Ref": "PublishedDataARN"
-                                                    },
-                                                    "*"
-                                                ]
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    }
-                ],
-                "Path": "/"
-            }
+                "yes"
+            ]
         }
     },
     "Parameters": {
+        "CreateDemonstration": {
+            "Description": "Create EC2 instance with Datalake walk-through guide and load sample data into Redshift cluster and Kinesis streams",
+            "Type": "String",
+            "Default": "yes",
+            "AllowedValues": [
+                "yes",
+                "no"
+            ]
+        },
         "SubmissionsBucketARN": {
             "Type": "String",
             "Description": "SubmissionsBucket bucket ARN"
@@ -365,12 +1210,44 @@
             "Type": "String",
             "Description": "RegionalLambdaBucket bucket ARN"
         },
+        "AthenaQueryResultsBucketARN": {
+            "Type": "String",
+            "Description": "RegionalLambdaBucket bucket ARN"
+        },
         "QSS3BucketName": {
             "Type": "String",
             "Description": "Quick Start S3 bucket name"
+        },
+        "DatasetS3BucketName": {
+            "Type": "String",
+            "Description": "Dataset bucket name for the Quick Start dataset"
+        },
+        "SnsLearnMoreTopicArn": {
+            "Type": "String",
+            "Description": "SNS topic ARN for Data Lake learn more"
         }
     },
     "Outputs": {
+        "EmptyBucketsRoleARN": {
+            "Description": "ARN of EmptyBucketsRole",
+            "Condition": "CreateDemoResources",
+            "Value": {
+                "Fn::GetAtt": [
+                    "EmptyBucketsRole",
+                    "Arn"
+                ]
+            }
+        },
+        "CopyDataRoleARN": {
+            "Description": "ARN of CopyDataRole",
+            "Condition": "CreateDemoResources",
+            "Value": {
+                "Fn::GetAtt": [
+                    "CopyDataRole",
+                    "Arn"
+                ]
+            }
+        },
         "LambdaRoleARN": {
             "Description": "ARN of LambdaRole",
             "Value": {
@@ -389,11 +1266,42 @@
                 ]
             }
         },
-        "RegisterKibanaDashboardRoleARN": {
-            "Description": "ARN of RegisterKibanaDashboardRole",
+        "SubmissionsBucketAccessARN": {
+            "Description": "ARN of SubmissionsBucketAccess",
+            "Condition": "CreateDemoResources",
             "Value": {
                 "Fn::GetAtt": [
-                    "RegisterKibanaDashboardRole",
+                    "SubmissionsBucketAccess",
+                    "Arn"
+                ]
+            }
+        },
+        "ManagedBucketAccessARN": {
+            "Description": "ARN of ManagedBucketAccess",
+            "Condition": "CreateDemoResources",
+            "Value": {
+                "Fn::GetAtt": [
+                    "ManagedBucketAccess",
+                    "Arn"
+                ]
+            }
+        },
+        "ElasticsearchAccessARN": {
+            "Description": "ARN of ElasticsearchAccess",
+            "Condition": "CreateDemoResources",
+            "Value": {
+                "Fn::GetAtt": [
+                    "ElasticsearchAccess",
+                    "Arn"
+                ]
+            }
+        },
+        "AnalyticsAccessARN": {
+            "Description": "ARN of AnalyticsAccess",
+            "Condition": "CreateDemoResources",
+            "Value": {
+                "Fn::GetAtt": [
+                    "AnalyticsAccess",
                     "Arn"
                 ]
             }
@@ -403,6 +1311,52 @@
             "Value": {
                 "Fn::GetAtt": [
                     "QSRedshiftRole",
+                    "Arn"
+                ]
+            }
+        },
+        "InstanceProfileARN": {
+            "Description": "ARN of InstanceProfile",
+            "Condition": "CreateDemoResources",
+            "Value": {
+                "Fn::GetAtt": [
+                    "InstanceProfile",
+                    "Arn"
+                ]
+            }
+        },
+        "InstanceProfileName": {
+            "Description": "Name of InstanceProfile",
+            "Condition": "CreateDemoResources",
+            "Value": {
+                "Ref": "InstanceProfile"
+            }
+        },
+        "InstanceRoleARN": {
+            "Description": "ARN of InstanceRole",
+            "Condition": "CreateDemoResources",
+            "Value": {
+                "Fn::GetAtt": [
+                    "InstanceRole",
+                    "Arn"
+                ]
+            }
+        },
+        "CleanupResourcesRoleARN": {
+            "Description": "ARN of CleanupResourcesRole",
+            "Condition": "CreateDemoResources",
+            "Value": {
+                "Fn::GetAtt": [
+                    "CleanupResourcesRole",
+                    "Arn"
+                ]
+            }
+        },
+        "RegisterKibanaDashboardRoleARN": {
+            "Description": "ARN of RegisterKibanaDashboardRole",
+            "Value": {
+                "Fn::GetAtt": [
+                    "RegisterKibanaDashboardRole",
                     "Arn"
                 ]
             }

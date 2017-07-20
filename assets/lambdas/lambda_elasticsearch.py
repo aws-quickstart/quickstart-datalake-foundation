@@ -77,13 +77,12 @@ def create_metadata_visualizations(elasticsearch_endpoint):
     with open(TMP_KIBANA_JSON_PATH) as visualizations_file:
         visualizations = json.load(visualizations_file)
     for visualization in visualizations:
-        if 'metadata' in visualization['_source']['kibanaSavedObjectMeta']['searchSourceJSON']:
-            es_client.index(
-                index='.kibana',
-                doc_type=visualization['_type'],
-                id=visualization['_id'],
-                body=json.dumps(visualization['_source'])
-            )
+        es_client.index(
+            index='.kibana',
+            doc_type=visualization['_type'],
+            id=visualization['_id'],
+            body=json.dumps(visualization['_source'])
+        )
 
 
 def register_metadata_dashboard(event, context):
@@ -92,7 +91,7 @@ def register_metadata_dashboard(event, context):
     quickstart_bucket = s3_resource.Bucket(event['ResourceProperties']['QSS3BucketName'])
     kibana_dashboards_key = os.path.join(
         event['ResourceProperties']['QSS3KeyPrefix'],
-        'assets/kibana/kibana-visualizations.json'
+        'assets/kibana/kibana_metadata_visualizations.json'
     )
     elasticsearch_endpoint = event['ResourceProperties']['ElasticsearchEndpoint']
     try:

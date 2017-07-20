@@ -1,0 +1,581 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Data Lake Foundation is a QuickStart that provides a Data Lake architecture, Redshift cluster, Elasticsearch domain, Data Lake walk-through web application running on AWS EC2 instance, in the same VPC through Cloudformation templates that provision and configure the required resources, including related QuickStarts. This template provisions all of the resources that are specific to the Quick Start.  Leveraged Quick Starts (VPC, LinuxBastion), if needed, can be provisioned by using the data-lake-foundation-master template. **WARNING** You will be billed for the AWS resources used if you create a stack from this template.",
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
+                    "Parameters": [
+                        "AvailabilityZones",
+                        "VPCDefinition",
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Elasticsearch Configuration"
+                    },
+                    "Parameters": [
+                        "RemoteAccessCIDR",
+                        "ElasticsearchNodeType",
+                        "ElasticsearchNodeCount"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Redshift Configuration"
+                    },
+                    "Parameters": [
+                        "RedshiftUsername",
+                        "RedshiftPassword",
+                        "RedshiftNumberOfNodes",
+                        "RedshiftNodeType",
+                        "RedshiftDatabaseName",
+                        "RedshiftDatabasePort"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "AWS Quick Start Configuration"
+                    },
+                    "Parameters": [
+                        "QSS3BucketName",
+                        "QSS3KeyPrefix",
+                        "KeyPairName"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Demonstration Configuration"
+                    },
+                    "Parameters": [
+                        "CreateDemonstration",
+                        "InstanceType",
+                        "WebApplicationUsername",
+                        "WebApplicationPassword",
+                        "DatasetS3BucketName",
+                        "DatasetS3KeyPrefix"
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "AvailabilityZones": {
+                    "default": "Availability Zones"
+                },
+                "KeyPairName": {
+                    "default": "Key Pair Name"
+                },
+                "RemoteAccessCIDR": {
+                    "default": "Remote Access CIDR"
+                },
+                "ElasticsearchNodeType": {
+                    "default": "Elasticsearch Instance Type"
+                },
+                "ElasticsearchNodeCount": {
+                    "default": "Elasticsearch Node Count"
+                },
+                "CreateDemonstration": {
+                    "default": "Create Demonstration"
+                },
+                "InstanceType": {
+                    "default": "Instance Type"
+                },
+                "WebApplicationUsername": {
+                    "default": "Web Application User Name"
+                },
+                "WebApplicationPassword": {
+                    "default": "Web Application Password"
+                },
+                "RedshiftUsername": {
+                    "default": "Redshift User Name"
+                },
+                "RedshiftPassword": {
+                    "default": "Redshift Password"
+                },
+                "RedshiftNumberOfNodes": {
+                    "default": "Redshift Number Of Nodes"
+                },
+                "RedshiftNodeType": {
+                    "default": "Redshift Node Type"
+                },
+                "RedshiftDatabaseName": {
+                    "default": "Redshift Database Name"
+                },
+                "RedshiftDatabasePort": {
+                    "default": "Redshift Database Port"
+                },
+                "QSS3BucketName": {
+                    "default": "Quick Start S3 Bucket Name"
+                },
+                "QSS3KeyPrefix": {
+                    "default": "Quick Start S3 Key Prefix"
+                },
+                "DatasetS3BucketName": {
+                    "default": "Dataset S3 Bucket Name"
+                },
+                "DatasetS3KeyPrefix": {
+                    "default": "Dataset S3 Key Prefix"
+                },
+                "VPCDefinition": {
+                    "default": "VPC Definition"
+                }
+            }
+        }
+    },
+    "Mappings": {
+        "VPCDefinitions": {
+            "QuickstartDefault": {
+                "VPCCIDR": "10.0.0.0/16",
+                "PublicSubnet1CIDR": "10.0.128.0/20",
+                "PrivateSubnet1CIDR": "10.0.0.0/19",
+                "PublicSubnet2CIDR": "10.0.144.0/20",
+                "PrivateSubnet2CIDR": "10.0.32.0/19",
+                "NumberOfAZs": "2"
+            }
+        }
+    },
+    "Conditions": {
+        "CreateDemoResources": {
+            "Fn::Equals": [
+                {
+                    "Ref": "CreateDemonstration"
+                },
+                "yes"
+            ]
+        }
+    },
+    "Parameters": {
+        "AvailabilityZones": {
+            "Description": "List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved and 2 AZs MUST be used for this deployment",
+            "Type": "List<AWS::EC2::AvailabilityZone::Name>"
+        },
+        "KeyPairName": {
+            "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+            "Type": "AWS::EC2::KeyPair::KeyName"
+        },
+        "CreateDemonstration": {
+            "Description": "Create EC2 instance with Datalake walk-through guide and load sample data into Redshift cluster and Kinesis streams",
+            "Type": "String",
+            "Default": "yes",
+            "AllowedValues": [
+                "yes",
+                "no"
+            ]
+        },
+        "InstanceType": {
+            "Description": "Web server EC2 instance type",
+            "Type": "String",
+            "Default": "t2.micro",
+            "AllowedValues": [
+                "t2.nano",
+                "t2.micro",
+                "t2.small",
+                "t2.medium",
+                "t2.large",
+                "m3.large",
+                "m3.xlarge",
+                "m3.2xlarge"
+            ],
+            "ConstraintDescription": "must be a valid EC2 instance type."
+        },
+        "WebApplicationUsername": {
+            "AllowedPattern": "^[\\x00-\\x7F]*$",
+            "MinLength": "1",
+            "MaxLength": "64",
+            "Default": "DataLakeUser",
+            "ConstraintDescription": "User name must contain 1 to 64 ASCII characters.",
+            "Description": "The user name for web application. User name must contain 1 to 64 ASCII characters.",
+            "Type": "String"
+        },
+        "WebApplicationPassword": {
+            "AllowedPattern": "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[\\x00-\\x7F]*$",
+            "MinLength": "8",
+            "MaxLength": "64",
+            "ConstraintDescription": "Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
+            "Description": "The password for web application. Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
+            "Type": "String",
+            "Default": "Password1",
+            "NoEcho": "true"
+        },
+        "RedshiftUsername": {
+            "AllowedPattern": "^[a-z][a-z0-9_]*$",
+            "MinLength": "1",
+            "MaxLength": "128",
+            "Default": "datalake",
+            "ConstraintDescription": "User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
+            "Description": "The user name that is associated with the master user account for the Redshift cluster that is being created. User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
+            "Type": "String"
+        },
+        "RedshiftPassword": {
+            "AllowedPattern": "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[A-Za-z0-9!#$%&()*+,.:;<=>?\\[\\]^_`{|}~-]*$",
+            "MinLength": "8",
+            "MaxLength": "64",
+            "ConstraintDescription": "Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
+            "Description": "The password that is associated with the master user account for the Redshift cluster that is being created. Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
+            "Type": "String",
+            "NoEcho": "true"
+        },
+        "RedshiftNodeType": {
+            "Description": "The node type to be provisioned for the redshift cluster",
+            "Type": "String",
+            "Default": "dc1.large",
+            "AllowedValues": [
+                "dw1.xlarge",
+                "dw1.8xlarge",
+                "dw2.large",
+                "dw2.8xlarge",
+                "dc1.large",
+                "dc1.8xlarge",
+                "ds1.xlarge",
+                "ds1.8xlarge",
+                "ds2.xlarge",
+                "ds2.8xlarge"
+            ],
+            "ConstraintDescription": "must be a valid RedShift node type."
+        },
+        "RedshiftNumberOfNodes": {
+            "Description": "The number of compute nodes in the redshift cluster.",
+            "Type": "Number",
+            "Default": "1"
+        },
+        "RedshiftDatabaseName": {
+            "Description": "The name of the first database to be created when the redshift cluster is created",
+            "Type": "String",
+            "Default": "quickstart",
+            "AllowedPattern": "([a-z]|[0-9])+",
+            "ConstraintDescription": "must contain a-z or 0-9 only."
+        },
+        "RedshiftDatabasePort": {
+            "Description": "The port that Redshift will listen on and that will be allowed through the Security Group.",
+            "Type": "String",
+            "Default": "5439"
+        },
+        "QSS3BucketName": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Default": "aws-hosted-bucket",
+            "Description": "S3 Bucket where the Quick Start templates and scripts are installed. Use this parameter to specify the S3 Bucket name you’ve created for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. The Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens, but should not start or end with a hyphen.",
+            "Type": "String"
+        },
+        "QSS3KeyPrefix": {
+            "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
+            "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+            "Default": "datalake-quickstart",
+            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash (which is automatically added).",
+            "Type": "String"
+        },
+        "DatasetS3BucketName": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "ConstraintDescription": "Dataset bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Default": "47lining-datalake-foundation-quick-start-data-us-west-2",
+            "Description": "S3 Bucket where the Quick Start data are. Use this parameter to specify the S3 Bucket name you’ve created for your copy of Quick Start data, if you decide to provide your own dataset. The Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens, but should not start or end with a hyphen.",
+            "Type": "String"
+        },
+        "DatasetS3KeyPrefix": {
+            "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
+            "ConstraintDescription": "Dataset key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+            "Default": "datalake-awsdata/v1",
+            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start sample dataset, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash (which is automatically added).",
+            "Type": "String"
+        },
+        "ElasticsearchNodeType": {
+            "Description": "The node type to be provisioned for the Elasticsearch cluster",
+            "Type": "String",
+            "Default": "t2.small.elasticsearch",
+            "AllowedValues": [
+                "t2.small.elasticsearch",
+                "m4.large.elasticsearch",
+                "m4.xlarge.elasticsearch",
+                "c4.large.elasticsearch",
+                "c4.xlarge.elasticsearch",
+                "r4.large.elasticsearch",
+                "r4.xlarge.elasticsearch"
+            ],
+            "ConstraintDescription": "must be a valid Elasticsearch node type."
+        },
+        "ElasticsearchNodeCount": {
+            "Description": "The number of nodes in the Elasticsearch cluster.",
+            "Type": "Number",
+            "Default": "1"
+        },
+        "RemoteAccessCIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/x",
+            "Description": "CIDR block allowed to access Elasticsearch and SSH into bastion instance. You can use http://checkip.amazonaws.com/ to check your IP address. CIDR block parameter must be in the form x.x.x.x/x (e.g., 96.127.8.12/32, YOUR_IP/32)",
+            "Type": "String"
+        },
+        "VPCDefinition": {
+            "Default": "QuickstartDefault",
+            "Description": "VPC Definition name from Map maintained in this Quick Start's master template.  You can support multiple VPC Definitions by extending this Map and choosing the appropriate name.  If you do not need to change the VPC Definition, simply choose the default.",
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "VPCStack": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}/submodules/quickstart-aws-vpc/templates/aws-vpc.template"
+                },
+                "Parameters": {
+                    "AvailabilityZones": {
+                        "Fn::Join": [
+                            ",",
+                            {
+                                "Ref": "AvailabilityZones"
+                            }
+                        ]
+                    },
+                    "KeyPairName": {
+                        "Ref": "KeyPairName"
+                    },
+                    "NumberOfAZs": {
+                        "Fn::FindInMap": [
+                            "VPCDefinitions",
+                            {
+                                "Ref": "VPCDefinition"
+                            },
+                            "NumberOfAZs"
+                        ]
+                    },
+                    "PrivateSubnet1ACIDR": {
+                        "Fn::FindInMap": [
+                            "VPCDefinitions",
+                            {
+                                "Ref": "VPCDefinition"
+                            },
+                            "PrivateSubnet1CIDR"
+                        ]
+                    },
+                    "PrivateSubnet2ACIDR": {
+                        "Fn::FindInMap": [
+                            "VPCDefinitions",
+                            {
+                                "Ref": "VPCDefinition"
+                            },
+                            "PrivateSubnet2CIDR"
+                        ]
+                    },
+                    "PublicSubnet1CIDR": {
+                        "Fn::FindInMap": [
+                            "VPCDefinitions",
+                            {
+                                "Ref": "VPCDefinition"
+                            },
+                            "PublicSubnet1CIDR"
+                        ]
+                    },
+                    "PublicSubnet2CIDR": {
+                        "Fn::FindInMap": [
+                            "VPCDefinitions",
+                            {
+                                "Ref": "VPCDefinition"
+                            },
+                            "PublicSubnet2CIDR"
+                        ]
+                    },
+                    "VPCCIDR": {
+                        "Fn::FindInMap": [
+                            "VPCDefinitions",
+                            {
+                                "Ref": "VPCDefinition"
+                            },
+                            "VPCCIDR"
+                        ]
+                    }
+                }
+            }
+        },
+        "DataLakeFoundationStack": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}/templates/data-lake.template"
+                },
+                "Parameters": {
+                    "CreateDemonstration": {
+                        "Ref": "CreateDemonstration"
+                    },
+                    "InstanceType": {
+                        "Ref": "InstanceType"
+                    },
+                    "KeyPairName": {
+                        "Ref": "KeyPairName"
+                    },
+                    "AvailabilityZones": {
+                        "Fn::Join": [
+                            ",",
+                            {
+                                "Ref": "AvailabilityZones"
+                            }
+                        ]
+                    },
+                    "VPCID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.VPCID"
+                        ]
+                    },
+                    "VPCCIDR": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.VPCCIDR"
+                        ]
+                    },
+                    "PublicSubnet1ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet1ID"
+                        ]
+                    },
+                    "PublicSubnet2ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet2ID"
+                        ]
+                    },
+                    "PrivateSubnet1ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet1AID"
+                        ]
+                    },
+                    "PrivateSubnet2ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet2AID"
+                        ]
+                    },
+                    "NAT1ElasticIP": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.NAT1EIP"
+                        ]
+                    },
+                    "NAT2ElasticIP": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.NAT2EIP"
+                        ]
+                    },
+                    "ElasticsearchNodeType": {
+                        "Ref": "ElasticsearchNodeType"
+                    },
+                    "ElasticsearchNodeCount": {
+                        "Ref": "ElasticsearchNodeCount"
+                    },
+                    "RemoteAccessCIDR": {
+                        "Ref": "RemoteAccessCIDR"
+                    },
+                    "WebApplicationUsername": {
+                        "Ref": "WebApplicationUsername"
+                    },
+                    "WebApplicationPassword": {
+                        "Ref": "WebApplicationPassword"
+                    },
+                    "RedshiftUsername": {
+                        "Ref": "RedshiftUsername"
+                    },
+                    "RedshiftPassword": {
+                        "Ref": "RedshiftPassword"
+                    },
+                    "RedshiftNodeType": {
+                        "Ref": "RedshiftNodeType"
+                    },
+                    "RedshiftNumberOfNodes": {
+                        "Ref": "RedshiftNumberOfNodes"
+                    },
+                    "RedshiftDatabaseName": {
+                        "Ref": "RedshiftDatabaseName"
+                    },
+                    "RedshiftDatabasePort": {
+                        "Ref": "RedshiftDatabasePort"
+                    },
+                    "QSS3BucketName": {
+                        "Ref": "QSS3BucketName"
+                    },
+                    "QSS3KeyPrefix": {
+                        "Ref": "QSS3KeyPrefix"
+                    },
+                    "DatasetS3BucketName": {
+                        "Ref": "DatasetS3BucketName"
+                    },
+                    "DatasetS3KeyPrefix": {
+                        "Ref": "DatasetS3KeyPrefix"
+                    },
+                    "BastionSecurityGroupID": {
+                        "Fn::GetAtt": [
+                            "BastionStack",
+                            "Outputs.BastionSecurityGroupID"
+                        ]
+                    }
+                }
+            },
+            "DependsOn": [
+                "VPCStack"
+            ]
+        },
+        "BastionStack": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}/submodules/quickstart-linux-bastion/templates/linux-bastion.template"
+                },
+                "Parameters": {
+                    "KeyPairName": {
+                        "Ref": "KeyPairName"
+                    },
+                    "PublicSubnet1ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet1ID"
+                        ]
+                    },
+                    "PublicSubnet2ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet2ID"
+                        ]
+                    },
+                    "QSS3BucketName": {
+                        "Ref": "QSS3BucketName"
+                    },
+                    "QSS3KeyPrefix": {
+                        "Fn::Sub": [
+                            "${Prefix}/submodules/quickstart-linux-bastion/",
+                            {
+                                "Prefix": {
+                                    "Ref": "QSS3KeyPrefix"
+                                }
+                            }
+                        ]
+                    },
+                    "RemoteAccessCIDR": {
+                        "Ref": "RemoteAccessCIDR"
+                    },
+                    "VPCID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.VPCID"
+                        ]
+                    },
+                    "EnableTCPForwarding": "true"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "DataLakeWizardWebAppURL": {
+            "Description": "Data Lake wizard walk-through web application URL",
+            "Condition": "CreateDemoResources",
+            "Value": {
+                "Fn::GetAtt": [
+                    "DataLakeFoundationStack",
+                    "Outputs.DataLakeWizardWebAppURL"
+                ]
+            }
+        }
+    }
+}

@@ -7,13 +7,13 @@ global:
     - us-west-2
   reporting: true
 tests:
-  multi-node-foundation:
-    parameter_input: data-lake-foundation-multi-node.json
-    template_file: data-lake-foundation-master.template
+  multi-node-without-demonstration:
+    parameter_input: data-lake-without-demonstration-multi-node.json
+    template_file: data-lake-master.template
     regions:
       - us-east-1
-  single-node-demonstration:
-    parameter_input: data-lake-demonstration-single-node.json
-    template_file: data-lake-demonstration-master.template
+  single-node-with-wizard:
+    parameter_input: data-lake-with-demonstration-single-node.json
+    template_file: data-lake-master.template
     regions:
       - us-west-2

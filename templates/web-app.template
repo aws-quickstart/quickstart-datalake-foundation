@@ -359,7 +359,7 @@
                                             "python3.4 setup.py develop",
                                             "chown -R ec2-user:ec2-user /home/ec2-user",
                                             {
-                                                "Fn::Sub": "python3.4 kibana/import_dashboards.py --elasticsearch-endpoint ${ElasticsearchEndpoint}"
+                                                "Fn::Sub": "python3.4 kibana/import_analysis_dashboard.py --elasticsearch-endpoint ${ElasticsearchEndpoint}"
                                             }
                                         ]
                                     ]

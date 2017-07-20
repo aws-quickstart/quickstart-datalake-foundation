@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "AWS CloudFormation template to register dashboards in Kibana",
+    "Description": "AWS CloudFormation template to register metadata dashboard in Kibana",
     "Resources": {
         "RegisterDashboard": {
             "Type": "AWS::CloudFormation::CustomResource",
