@@ -371,7 +371,7 @@
                         },
                         "commands": {
                             "1_run_bootstrap": {
-                                "command": "sh -ex /etc/bootstrap.sh"
+                                "command": "sh -e /etc/bootstrap.sh"
                             },
                             "9_run_webserver": {
                                 "command": "runuser -l ec2-user -c \"python3.4 /home/ec2-user/assets/web/app.py --config /etc/production.ini > server.log 2>&1 &\"",

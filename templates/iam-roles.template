@@ -668,7 +668,10 @@
                                 {
                                     "Effect": "Allow",
                                     "Action": [
-                                        "s3:*"
+                                        "s3:PutObject",
+                                        "s3:GetObject",
+                                        "s3:ListBucket",
+                                        "s3:GetBucketLocation"
                                     ],
                                     "Resource": [
                                         {
@@ -745,7 +748,10 @@
                                 {
                                     "Effect": "Allow",
                                     "Action": [
-                                        "s3:*"
+                                        "s3:PutObject",
+                                        "s3:GetObject",
+                                        "s3:ListBucket",
+                                        "s3:GetBucketLocation"
                                     ],
                                     "Resource": [
                                         {
@@ -1172,6 +1178,63 @@
                     }
                 ]
             }
+        },
+        "KinesisDataStreamRole": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "CreateKinesisDataStreamRole",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "firehose.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole",
+                            "Condition": {
+                                "StringEquals": {
+                                    "sts:ExternalId": {
+                                        "Ref": "AWS::AccountId"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "KinesisBucketAccess",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:AbortMultipartUpload",
+                                        "s3:GetBucketLocation",
+                                        "s3:GetObject",
+                                        "s3:ListBucket",
+                                        "s3:ListBucketMultipartUploads",
+                                        "s3:PutObject"
+                                    ],
+                                    "Resource": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                {
+                                                    "Ref": "SubmissionsBucketARN"
+                                                },
+                                                "*"
+                                            ]
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
         }
     },
     "Conditions": {
@@ -1181,6 +1244,14 @@
                     "Ref": "CreateDemonstration"
                 },
                 "yes"
+            ]
+        },
+        "CreateKinesisDataStreamRole": {
+            "Fn::Equals": [
+                {
+                    "Ref": "CreateDemonstration"
+                },
+                "no"
             ]
         }
     },
@@ -1357,6 +1428,16 @@
             "Value": {
                 "Fn::GetAtt": [
                     "RegisterKibanaDashboardRole",
+                    "Arn"
+                ]
+            }
+        },
+        "KinesisDataStreamRoleARN": {
+            "Description": "ARN of KinesisDataStreamRole",
+            "Condition": "CreateKinesisDataStreamRole",
+            "Value": {
+                "Fn::GetAtt": [
+                    "KinesisDataStreamRole",
                     "Arn"
                 ]
             }

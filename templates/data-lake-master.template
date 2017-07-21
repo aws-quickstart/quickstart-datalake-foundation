@@ -48,6 +48,15 @@
                 },
                 {
                     "Label": {
+                        "default": "Kinesis configuration"
+                    },
+                    "Parameters": [
+                        "KinesisDataStreamName",
+                        "KinesisDataStreamS3Prefix"
+                    ]
+                },
+                {
+                    "Label": {
                         "default": "Demonstration Configuration"
                     },
                     "Parameters": [
@@ -120,6 +129,12 @@
                 },
                 "VPCDefinition": {
                     "default": "VPC Definition"
+                },
+                "KinesisDataStreamName": {
+                    "default": "Kinesis Data Stream Name"
+                },
+                "KinesisDataStreamS3Prefix": {
+                    "default": "Kinesis Data Stream S3 Prefix"
                 }
             }
         }
@@ -144,6 +159,14 @@
                 },
                 "yes"
             ]
+        },
+        "CreateKinesisDataStream": {
+            "Fn::Equals": [
+                {
+                    "Ref": "CreateDemonstration"
+                },
+                "no"
+            ]
         }
     },
     "Parameters": {
@@ -165,7 +188,7 @@
             ]
         },
         "InstanceType": {
-            "Description": "Web server EC2 instance type",
+            "Description": "Web server EC2 instance type. Required only if Create Demonstration is set to \"yes\"",
             "Type": "String",
             "Default": "t2.micro",
             "AllowedValues": [
@@ -186,7 +209,7 @@
             "MaxLength": "64",
             "Default": "DataLakeUser",
             "ConstraintDescription": "User name must contain 1 to 64 ASCII characters.",
-            "Description": "The user name for web application. User name must contain 1 to 64 ASCII characters.",
+            "Description": "The user name for web application. User name must contain 1 to 64 ASCII characters. Required only if Create Demonstration is set to \"yes\"",
             "Type": "String"
         },
         "WebApplicationPassword": {
@@ -194,7 +217,7 @@
             "MinLength": "8",
             "MaxLength": "64",
             "ConstraintDescription": "Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
-            "Description": "The password for web application. Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
+            "Description": "The password for web application. Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number. Required only if Create Demonstration is set to \"yes\"",
             "Type": "String",
             "Default": "Password1",
             "NoEcho": "true"
@@ -263,21 +286,21 @@
             "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
             "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
             "Default": "datalake-quickstart",
-            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash (which is automatically added).",
+            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash (which is automatically added). Required only if Create Demonstration is set to \"yes\"",
             "Type": "String"
         },
         "DatasetS3BucketName": {
             "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
             "ConstraintDescription": "Dataset bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
             "Default": "47lining-datalake-foundation-quick-start-data-us-west-2",
-            "Description": "S3 Bucket where the Quick Start data are. Use this parameter to specify the S3 Bucket name you’ve created for your copy of Quick Start data, if you decide to provide your own dataset. The Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens, but should not start or end with a hyphen.",
+            "Description": "S3 Bucket where the Quick Start data are. Use this parameter to specify the S3 Bucket name you’ve created for your copy of Quick Start data, if you decide to provide your own dataset. The Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens, but should not start or end with a hyphen. Required only if Create Demonstration is set to \"yes\"",
             "Type": "String"
         },
         "DatasetS3KeyPrefix": {
             "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
             "ConstraintDescription": "Dataset key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
             "Default": "datalake-awsdata/v1",
-            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start sample dataset, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash (which is automatically added).",
+            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start sample dataset, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash (which is automatically added). Required only if Create Demonstration is set to \"yes\"",
             "Type": "String"
         },
         "ElasticsearchNodeType": {
@@ -309,6 +332,17 @@
         "VPCDefinition": {
             "Default": "QuickstartDefault",
             "Description": "VPC Definition name from Map maintained in this Quick Start's master template.  You can support multiple VPC Definitions by extending this Map and choosing the appropriate name.  If you do not need to change the VPC Definition, simply choose the default.",
+            "Type": "String"
+        },
+        "KinesisDataStreamName": {
+            "Description": "Kinesis data stream name. Required only if Create Demonstration is set to \"no\"",
+            "Default": "MyKinesisDataStream",
+            "Type": "String"
+        },
+        "KinesisDataStreamS3Prefix": {
+            "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
+            "Description": "Kinesis data stream S3 prefix for your streaming data stored in Datalake submissions bucket. Required only if Create Demonstration is set to \"no\"",
+            "Default": "mydata",
             "Type": "String"
         }
     },
@@ -510,6 +544,12 @@
                             "BastionStack",
                             "Outputs.BastionSecurityGroupID"
                         ]
+                    },
+                    "KinesisDataStreamName": {
+                        "Ref": "KinesisDataStreamName"
+                    },
+                    "KinesisDataStreamS3Prefix": {
+                        "Ref": "KinesisDataStreamS3Prefix"
                     }
                 }
             },
@@ -574,6 +614,61 @@
                 "Fn::GetAtt": [
                     "DataLakeFoundationStack",
                     "Outputs.DataLakeWizardWebAppURL"
+                ]
+            }
+        },
+        "SubmissionsBucketName": {
+            "Description": "Submissions bucket name",
+            "Value": {
+                "Fn::GetAtt": [
+                    "DataLakeFoundationStack",
+                    "Outputs.SubmissionsBucketName"
+                ]
+            }
+        },
+        "ManagedBucketName": {
+            "Description": "Managed bucket name",
+            "Value": {
+                "Fn::GetAtt": [
+                    "DataLakeFoundationStack",
+                    "Outputs.ManagedBucketName"
+                ]
+            }
+        },
+        "PublishedBucketName": {
+            "Description": "Published bucket name",
+            "Value": {
+                "Fn::GetAtt": [
+                    "DataLakeFoundationStack",
+                    "Outputs.PublishedBucketName"
+                ]
+            }
+        },
+        "RedshiftJdbcUrl": {
+            "Description": "Redshift JDBC url",
+            "Value": {
+                "Fn::GetAtt": [
+                    "DataLakeFoundationStack",
+                    "Outputs.RedshiftJdbcUrl"
+                ]
+            }
+        },
+        "ElasticsearchEndpoint": {
+            "Description": "Elasticsearch endpoint",
+            "Value": {
+                "Fn::GetAtt": [
+                    "DataLakeFoundationStack",
+                    "Outputs.ElasticsearchEndpoint"
+                ]
+            }
+        },
+        "KinesisDataStreamName": {
+            "Description": "Kinesis data stream name",
+            "Condition": "CreateKinesisDataStream",
+            "Value": {
+                "Fn::GetAtt": [
+                    "DataLakeFoundationStack",
+                    "Outputs.KinesisDataStreamName"
                 ]
             }
         }

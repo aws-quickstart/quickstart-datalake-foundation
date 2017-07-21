@@ -58,5 +58,13 @@
   {
       "ParameterKey": "VPCDefinition",
       "ParameterValue": "QuickstartDefault"
+  },
+  {
+      "ParameterKey": "KinesisDataStreamName",
+      "ParameterValue": "MyDataStream"
+  },
+  {
+      "ParameterKey": "KinesisDataStreamS3Prefix",
+      "ParameterValue": "mydata"
   }
 ]

@@ -4,6 +4,7 @@
     "Resources": {
         "EmptyBuckets": {
             "Type": "AWS::CloudFormation::CustomResource",
+            "Condition": "CreateDemoResources",
             "Properties": {
                 "ServiceToken": {
                     "Fn::GetAtt": [
@@ -24,6 +25,7 @@
         },
         "EmptyBucketsFunction": {
             "Type": "AWS::Lambda::Function",
+            "Condition": "CreateDemoResources",
             "Properties": {
                 "Code": {
                     "ZipFile": {
@@ -65,7 +67,26 @@
             }
         }
     },
+    "Conditions": {
+        "CreateDemoResources": {
+            "Fn::Equals": [
+                {
+                    "Ref": "CreateDemonstration"
+                },
+                "yes"
+            ]
+        }
+    },
     "Parameters": {
+        "CreateDemonstration": {
+            "Description": "Create EC2 instance with Datalake walk-through guide and load sample data into Redshift cluster and Kinesis streams",
+            "Type": "String",
+            "Default": "no",
+            "AllowedValues": [
+                "yes",
+                "no"
+            ]
+        },
         "SubmissionsBucketName": {
             "Type": "String",
             "Description": "SubmissionsBucket bucket name"

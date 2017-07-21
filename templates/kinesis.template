@@ -2,6 +2,15 @@
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "AWS CloudFormation templates to create AWS Kinesis Firehose endpoints",
     "Parameters": {
+        "CreateDemonstration": {
+            "Description": "Create EC2 instance with Datalake walk-through guide and load sample data into Redshift cluster and Kinesis streams",
+            "Type": "String",
+            "Default": "yes",
+            "AllowedValues": [
+                "yes",
+                "no"
+            ]
+        },
         "SubmissionsBucketARN": {
             "Type": "String",
             "Description": "Submissions bucket ARN"
@@ -38,11 +47,42 @@
         "ElasticsearchAccessARN": {
             "Description": "ElasticsearchAccess ARN",
             "Type": "String"
+        },
+        "KinesisDataStreamName": {
+            "Description": "Kinesis data stream name",
+            "Type": "String"
+        },
+        "KinesisDataStreamS3Prefix": {
+            "Description": "Kinesis data stream S3 prefix",
+            "Type": "String"
+        },
+        "KinesisDataStreamRoleARN": {
+            "Description": "Kinesis data stream role ARN",
+            "Type": "String"
+        }
+    },
+    "Conditions": {
+        "CreateDemoResources": {
+            "Fn::Equals": [
+                {
+                    "Ref": "CreateDemonstration"
+                },
+                "yes"
+            ]
+        },
+        "CreateKinesisDataStream": {
+            "Fn::Equals": [
+                {
+                    "Ref": "CreateDemonstration"
+                },
+                "no"
+            ]
         }
     },
     "Resources": {
         "CleanOrdersStream": {
             "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Condition": "CreateDemoResources",
             "Properties": {
                 "RedshiftDestinationConfiguration": {
                     "ClusterJDBCURL": {
@@ -80,6 +120,7 @@
         },
         "OrdersStream": {
             "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Condition": "CreateDemoResources",
             "Properties": {
                 "S3DestinationConfiguration": {
                     "BucketARN": {
@@ -99,6 +140,7 @@
         },
         "RevenueByStateStream": {
             "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Condition": "CreateDemoResources",
             "Properties": {
                 "ElasticsearchDestinationConfiguration": {
                     "BufferingHints": {
@@ -138,6 +180,7 @@
         },
         "TopSKUStream": {
             "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Condition": "CreateDemoResources",
             "Properties": {
                 "ElasticsearchDestinationConfiguration": {
                     "BufferingHints": {
@@ -174,17 +217,38 @@
                     }
                 }
             }
+        },
+        "KinesisDataStream": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Condition": "CreateKinesisDataStream",
+            "Properties": {
+                "DeliveryStreamName": {"Ref": "KinesisDataStreamName"},
+                "S3DestinationConfiguration": {
+                    "BucketARN": { "Ref": "SubmissionsBucketARN"},
+                    "BufferingHints": {
+                        "IntervalInSeconds": 60,
+                        "SizeInMBs": 60
+                    },
+                    "CompressionFormat": "UNCOMPRESSED",
+                    "Prefix": { "Fn::Sub": "${KinesisDataStreamS3Prefix}/" },
+                    "RoleARN": {
+                        "Ref": "KinesisDataStreamRoleARN"
+                    }
+                }
+            }
         }
     },
     "Outputs": {
         "OrdersStreamName": {
             "Description": "Kinesis orders stream name",
+            "Condition": "CreateDemoResources",
             "Value": {
                 "Ref": "OrdersStream"
             }
         },
         "OrdersStreamARN": {
             "Description": "Kinesis orders stream ARN",
+            "Condition": "CreateDemoResources",
             "Value": {
                 "Fn::Join": [
                     ":",
@@ -213,6 +277,7 @@
         },
         "CleanOrdersStreamARN": {
             "Description": "Kinesis clean orders stream ARN",
+            "Condition": "CreateDemoResources",
             "Value": {
                 "Fn::Join": [
                     ":",
@@ -241,6 +306,7 @@
         },
         "RevenueByStateStreamARN": {
             "Description": "Kinesis revenue by state stream ARN",
+            "Condition": "CreateDemoResources",
             "Value": {
                 "Fn::Join": [
                     ":",
@@ -269,6 +335,7 @@
         },
         "TopSKUStreamARN": {
             "Description": "Kinesis SKU stream ARN",
+            "Condition": "CreateDemoResources",
             "Value": {
                 "Fn::Join": [
                     ":",
@@ -293,6 +360,13 @@
                         }
                     ]
                 ]
+            }
+        },
+        "KinesisDataStreamName": {
+            "Description": "Kinesis data stream name",
+            "Condition": "CreateKinesisDataStream",
+            "Value": {
+                "Ref": "KinesisDataStream"
             }
         }
     }
