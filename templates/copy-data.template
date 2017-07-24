@@ -15,7 +15,7 @@
                     "Ref": "SubmissionsBucketName"
                 },
                 "DatasetBucket": {
-                    "Ref": "DatasetS3BucketName",
+                    "Ref": "DatasetS3BucketName"
                 },
                 "DatasetBucketPrefix": {
                     "Ref": "DatasetS3KeyPrefix"

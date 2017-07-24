@@ -27,6 +27,10 @@
             "Description": "Web server VPC",
             "Type": "AWS::EC2::VPC::Id"
         },
+        "VPCCIDR": {
+            "Description": "CIDR block for the VPC",
+            "Type": "String"
+        },
         "PrivateSubnet1ID": {
             "Description": "Web server subnet 1",
             "Type": "AWS::EC2::Subnet::Id"
@@ -136,10 +140,6 @@
         "DatasetS3KeyPrefix": {
             "Description": "S3 key prefix for the Quick Start dataset. Dataset key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
             "Type": "String"
-        },
-        "BastionSecurityGroupID": {
-            "Description": "Bastion security group",
-            "Type": "AWS::EC2::SecurityGroup::Id"
         },
         "AthenaQueryResultsBucketName": {
             "Description": "Athena query results bucket name for the Quick Start Athena query results. Athena query results bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
@@ -374,7 +374,7 @@
                                 "command": "sh -e /etc/bootstrap.sh"
                             },
                             "9_run_webserver": {
-                                "command": "runuser -l ec2-user -c \"python3.4 /home/ec2-user/assets/web/app.py --config /etc/production.ini > server.log 2>&1 &\"",
+                                "command": "runuser -l ec2-user -c \"python3.4 /home/ec2-user/assets/web/app.py --config /etc/production.ini > server.log 2>&1 &\""
                             }
                         }
                     }
@@ -438,8 +438,8 @@
                         "IpProtocol": "tcp",
                         "FromPort": "22",
                         "ToPort": "22",
-                        "SourceSecurityGroupId": {
-                            "Ref": "BastionSecurityGroupID"
+                        "CidrIp": {
+                            "Ref": "VPCCIDR"
                         }
                     },
                     {

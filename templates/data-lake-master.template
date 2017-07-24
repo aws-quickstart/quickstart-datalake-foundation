@@ -10,7 +10,7 @@
                     },
                     "Parameters": [
                         "AvailabilityZones",
-                        "VPCDefinition",
+                        "VPCDefinition"
                     ]
                 },
                 {
@@ -538,12 +538,6 @@
                     },
                     "DatasetS3KeyPrefix": {
                         "Ref": "DatasetS3KeyPrefix"
-                    },
-                    "BastionSecurityGroupID": {
-                        "Fn::GetAtt": [
-                            "BastionStack",
-                            "Outputs.BastionSecurityGroupID"
-                        ]
                     },
                     "KinesisDataStreamName": {
                         "Ref": "KinesisDataStreamName"

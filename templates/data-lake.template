@@ -17,8 +17,7 @@
                         "PublicSubnet1ID",
                         "PublicSubnet2ID",
                         "NAT1ElasticIP",
-                        "NAT2ElasticIP",
-                        "BastionSecurityGroupID"
+                        "NAT2ElasticIP"
                     ]
                 },
                 {
@@ -370,10 +369,6 @@
             "Description": "IP of NAT 2, which will have allowed access to ElasticSearch",
             "Type": "String"
         },
-        "BastionSecurityGroupID": {
-            "Description": "Bastion security group ID to enable ingress access to Data Lake wizard web-application",
-            "Type": "AWS::EC2::SecurityGroup::Id"
-        },
         "PrivateSubnet1ID": {
             "Description": "ID of the private subnet 1 in Availability Zone 1 (e.g., subnet-a0246dcd)",
             "Type": "AWS::EC2::Subnet::Id"
@@ -679,6 +674,9 @@
                     "VpcId": {
                         "Ref": "VPCID"
                     },
+                    "VPCCIDR": {
+                        "Ref": "VPCCIDR"
+                    },
                     "PublicSubnet1ID": {
                         "Ref": "PublicSubnet1ID"
                     },
@@ -804,9 +802,6 @@
                     },
                     "DatasetS3KeyPrefix": {
                         "Ref": "DatasetS3KeyPrefix"
-                    },
-                    "BastionSecurityGroupID": {
-                        "Ref": "BastionSecurityGroupID"
                     },
                     "AthenaQueryResultsBucketName": {
                         "Fn::GetAtt": [
