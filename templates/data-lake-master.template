@@ -48,7 +48,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Kinesis configuration"
+                        "default": "Kinesis Configuration"
                     },
                     "Parameters": [
                         "KinesisDataStreamName",
@@ -80,7 +80,7 @@
                     "default": "Remote Access CIDR"
                 },
                 "ElasticsearchNodeType": {
-                    "default": "Elasticsearch Instance Type"
+                    "default": "Elasticsearch Node Type"
                 },
                 "ElasticsearchNodeCount": {
                     "default": "Elasticsearch Node Count"
@@ -228,7 +228,7 @@
             "MaxLength": "128",
             "Default": "datalake",
             "ConstraintDescription": "User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
-            "Description": "The user name that is associated with the master user account for the Redshift cluster that is being created. User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
+            "Description": "The user name that is associated with the master user account for Redshift cluster that is being created. User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
             "Type": "String"
         },
         "RedshiftPassword": {
@@ -236,12 +236,12 @@
             "MinLength": "8",
             "MaxLength": "64",
             "ConstraintDescription": "Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
-            "Description": "The password that is associated with the master user account for the Redshift cluster that is being created. Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
+            "Description": "The password that is associated with the master user account for Redshift cluster that is being created. Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
             "Type": "String",
             "NoEcho": "true"
         },
         "RedshiftNodeType": {
-            "Description": "The node type to be provisioned for the redshift cluster",
+            "Description": "The node type to be provisioned for Redshift cluster.",
             "Type": "String",
             "Default": "dc1.large",
             "AllowedValues": [
@@ -256,15 +256,15 @@
                 "ds2.xlarge",
                 "ds2.8xlarge"
             ],
-            "ConstraintDescription": "must be a valid RedShift node type."
+            "ConstraintDescription": "must be a valid Redshift node type."
         },
         "RedshiftNumberOfNodes": {
-            "Description": "The number of compute nodes in the redshift cluster.",
+            "Description": "The number of compute nodes in Redshift cluster.",
             "Type": "Number",
             "Default": "1"
         },
         "RedshiftDatabaseName": {
-            "Description": "The name of the first database to be created when the redshift cluster is created",
+            "Description": "The name of the first database to be created when Redshift cluster is created.",
             "Type": "String",
             "Default": "quickstart",
             "AllowedPattern": "([a-z]|[0-9])+",
@@ -286,7 +286,7 @@
             "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
             "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
             "Default": "datalake-quickstart",
-            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash (which is automatically added). Required only if Create Demonstration is set to \"yes\"",
+            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash (which is automatically added).",
             "Type": "String"
         },
         "DatasetS3BucketName": {
@@ -304,7 +304,7 @@
             "Type": "String"
         },
         "ElasticsearchNodeType": {
-            "Description": "The node type to be provisioned for the Elasticsearch cluster",
+            "Description": "The node type to be provisioned for the Elasticsearch cluster.",
             "Type": "String",
             "Default": "t2.small.elasticsearch",
             "AllowedValues": [

@@ -259,7 +259,7 @@
             "MaxLength": "128",
             "Default": "datalake",
             "ConstraintDescription": "User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
-            "Description": "The user name that is associated with the master user account for the Redshift cluster that is being created. User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
+            "Description": "The user name that is associated with the master user account for Redshift cluster that is being created. User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
             "Type": "String"
         },
         "RedshiftPassword": {
@@ -267,12 +267,12 @@
             "MinLength": "8",
             "MaxLength": "64",
             "ConstraintDescription": "Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
-            "Description": "The password that is associated with the master user account for the Redshift cluster that is being created. Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
+            "Description": "The password that is associated with the master user account for Redshift cluster that is being created. Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
             "Type": "String",
             "NoEcho": "true"
         },
         "RedshiftNodeType": {
-            "Description": "The node type to be provisioned for the redshift cluster",
+            "Description": "The node type to be provisioned for Redshift cluster",
             "Type": "String",
             "Default": "dc1.large",
             "AllowedValues": [
@@ -287,15 +287,15 @@
                 "ds2.xlarge",
                 "ds2.8xlarge"
             ],
-            "ConstraintDescription": "must be a valid RedShift node type."
+            "ConstraintDescription": "must be a valid Redshift node type."
         },
         "RedshiftNumberOfNodes": {
-            "Description": "The number of compute nodes in the redshift cluster.",
+            "Description": "The number of compute nodes in Redshift cluster.",
             "Type": "Number",
             "Default": "1"
         },
         "RedshiftDatabaseName": {
-            "Description": "The name of the first database to be created when the redshift cluster is created",
+            "Description": "The name of the first database to be created when Redshift cluster is created",
             "Type": "String",
             "Default": "quickstart",
             "AllowedPattern": "([a-z]|[0-9])+",
