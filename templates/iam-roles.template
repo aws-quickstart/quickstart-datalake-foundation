@@ -280,43 +280,6 @@
                                 }
                             ]
                         }
-                    },
-                    {
-                        "PolicyName": "ElasticsearchLambdaPolicy",
-                        "PolicyDocument": {
-                            "Version": "2012-10-17",
-                            "Statement": [
-                                {
-                                    "Action": [
-                                        "es:DescribeElasticsearchDomain",
-                                        "es:DescribeElasticsearchDomains",
-                                        "es:DescribeElasticsearchDomainConfig",
-                                        "es:ESHttpPost",
-                                        "es:ESHttpPut",
-                                        "es:ESHttpGet"
-                                    ],
-                                    "Effect": "Allow",
-                                    "Resource": {
-                                        "Fn::Join": [
-                                            "",
-                                            [
-                                                "arn:aws:es:",
-                                                {
-                                                    "Ref": "AWS::Region"
-                                                },
-                                                ":",
-                                                {
-                                                    "Ref": "AWS::AccountId"
-                                                },
-                                                ":domain/",
-                                                "datalake-quickstart",
-                                                "/*"
-                                            ]
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
                     }
                 ]
             }
@@ -544,7 +507,6 @@
         },
         "ElasticsearchAccess": {
             "Type": "AWS::IAM::Role",
-            "Condition": "CreateDemoResources",
             "Properties": {
                 "AssumeRolePolicyDocument": {
                     "Version": "2012-10-17",
@@ -564,46 +526,7 @@
                             }
                         }
                     ]
-                },
-                "Policies": [
-                    {
-                        "PolicyName": "ESAccess",
-                        "PolicyDocument": {
-                            "Version": "2012-10-17",
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "es:DescribeElasticsearchDomain",
-                                        "es:DescribeElasticsearchDomains",
-                                        "es:DescribeElasticsearchDomainConfig",
-                                        "es:ESHttpPost",
-                                        "es:ESHttpPut",
-                                        "es:ESHttpGet"
-                                    ],
-                                    "Resource": {
-                                        "Fn::Join": [
-                                            "",
-                                            [
-                                                "arn:aws:es:",
-                                                {
-                                                    "Ref": "AWS::Region"
-                                                },
-                                                ":",
-                                                {
-                                                    "Ref": "AWS::AccountId"
-                                                },
-                                                ":domain/",
-                                                "datalake-quickstart",
-                                                "/*"
-                                            ]
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                ]
+                }
             }
         },
         "AnalyticsAccess": {
@@ -680,6 +603,7 @@
         },
         "QSRedshiftRole": {
             "Type": "AWS::IAM::Role",
+            "Condition": "CreateRedshiftRole",
             "Properties": {
                 "AssumeRolePolicyDocument": {
                     "Version": "2012-10-17",
@@ -1197,50 +1121,13 @@
                                 }
                             ]
                         }
-                    },
-                    {
-                        "PolicyName": "ElasticsearchLambdaPolicy",
-                        "PolicyDocument": {
-                            "Version": "2012-10-17",
-                            "Statement": [
-                                {
-                                    "Action": [
-                                        "es:DescribeElasticsearchDomain",
-                                        "es:DescribeElasticsearchDomains",
-                                        "es:DescribeElasticsearchDomainConfig",
-                                        "es:ESHttpPost",
-                                        "es:ESHttpPut",
-                                        "es:ESHttpGet"
-                                    ],
-                                    "Effect": "Allow",
-                                    "Resource": {
-                                        "Fn::Join": [
-                                            "",
-                                            [
-                                                "arn:aws:es:",
-                                                {
-                                                    "Ref": "AWS::Region"
-                                                },
-                                                ":",
-                                                {
-                                                    "Ref": "AWS::AccountId"
-                                                },
-                                                ":domain/",
-                                                "datalake-quickstart",
-                                                "/*"
-                                            ]
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
                     }
                 ]
             }
         },
-        "KinesisDataStreamRole": {
+        "KinesisStreamBucketRole": {
             "Type": "AWS::IAM::Role",
-            "Condition": "CreateKinesisDataStreamRole",
+            "Condition": "CreateKinesisStreamBucketRole",
             "Properties": {
                 "AssumeRolePolicyDocument": {
                     "Version": "2012-10-17",
@@ -1294,6 +1181,57 @@
                     }
                 ]
             }
+        },
+        "ElasticSearchLambdaIAMPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyName": "ElasticsearchLambdaPolicy",
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": [
+                                "es:DescribeElasticsearchDomain",
+                                "es:DescribeElasticsearchDomains",
+                                "es:DescribeElasticsearchDomainConfig",
+                                "es:ESHttpPost",
+                                "es:ESHttpPut",
+                                "es:ESHttpGet"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:es:",
+                                        {
+                                            "Ref": "AWS::Region"
+                                        },
+                                        ":",
+                                        {
+                                            "Ref": "AWS::AccountId"
+                                        },
+                                        ":domain/",
+                                        "datalake-quickstart",
+                                        "/*"
+                                    ]
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "Roles": [
+                    {
+                        "Ref": "ElasticsearchAccess"
+                    },
+                    {
+                        "Ref": "RegisterKibanaDashboardRole"
+                    },
+                    {
+                        "Ref": "LambdaRole"
+                    }
+                ]
+            }
         }
     },
     "Conditions": {
@@ -1305,12 +1243,37 @@
                 "yes"
             ]
         },
-        "CreateKinesisDataStreamRole": {
-            "Fn::Equals": [
+        "CreateRedshiftRole": {
+            "Fn::Or": [
+                {"Condition": "CreateDemoResources"},
                 {
-                    "Ref": "CreateDemonstration"
+                    "Fn::Equals": [
+                        {
+                            "Ref": "EnableRedshift"
+                        },
+                        "yes"
+                    ]
+                }
+            ]
+        },
+        "CreateKinesisStreamBucketRole": {
+            "Fn::And": [
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "CreateDemonstration"
+                        },
+                        "no"
+                    ]
                 },
-                "no"
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "EnableKinesis"
+                        },
+                        "yes"
+                    ]
+                }
             ]
         }
     },
@@ -1323,6 +1286,24 @@
                 "yes",
                 "no"
             ]
+        },
+        "EnableKinesis": {
+            "AllowedValues": [
+                "yes",
+                "no"
+            ],
+            "Default": "no",
+            "Description": "Enable Kinesis",
+            "Type": "String"
+        },
+        "EnableRedshift": {
+            "AllowedValues": [
+                "yes",
+                "no"
+            ],
+            "Default": "no",
+            "Description": "Enable Redshift",
+            "Type": "String"
         },
         "SubmissionsBucketARN": {
             "Type": "String",
@@ -1438,6 +1419,7 @@
         },
         "QSRedshiftRoleARN": {
             "Description": "ARN of QSRedshiftRole",
+            "Condition": "CreateRedshiftRole",
             "Value": {
                 "Fn::GetAtt": [
                     "QSRedshiftRole",
@@ -1491,12 +1473,12 @@
                 ]
             }
         },
-        "KinesisDataStreamRoleARN": {
-            "Description": "ARN of KinesisDataStreamRole",
-            "Condition": "CreateKinesisDataStreamRole",
+        "KinesisStreamBucketRoleARN": {
+            "Description": "ARN of KinesisStreamBucketRole",
+            "Condition": "CreateKinesisStreamBucketRole",
             "Value": {
                 "Fn::GetAtt": [
-                    "KinesisDataStreamRole",
+                    "KinesisStreamBucketRole",
                     "Arn"
                 ]
             }

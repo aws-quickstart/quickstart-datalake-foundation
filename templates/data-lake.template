@@ -35,6 +35,7 @@
                         "default": "Redshift Configuration"
                     },
                     "Parameters": [
+                        "EnableRedshift",
                         "RedshiftUsername",
                         "RedshiftPassword",
                         "RedshiftNumberOfNodes",
@@ -58,6 +59,7 @@
                         "default": "Kinesis configuration"
                     },
                     "Parameters": [
+                        "EnableKinesis",
                         "KinesisDataStreamName",
                         "KinesisDataStreamS3Prefix"
                     ]
@@ -103,6 +105,9 @@
                 },
                 "WebApplicationPassword": {
                     "default": "Web Application Password"
+                },
+                "EnableRedshift": {
+                    "default": "Enable Redshift"
                 },
                 "RedshiftUsername": {
                     "default": "Redshift User Name"
@@ -158,6 +163,9 @@
                 "VPCCIDR": {
                     "default": "Existing VPC CIDR"
                 },
+                "EnableKinesis": {
+                    "default": "Enable Kinesis"
+                },
                 "KinesisDataStreamName": {
                     "default": "Kinesis Data Stream Name"
                 },
@@ -191,12 +199,37 @@
                 "yes"
             ]
         },
-        "CreateKinesisDataStream": {
-            "Fn::Equals": [
+        "CreateRedshift": {
+            "Fn::Or": [
+                {"Condition": "CreateDemoResources"},
                 {
-                    "Ref": "CreateDemonstration"
+                    "Fn::Equals": [
+                        {
+                            "Ref": "EnableRedshift"
+                        },
+                        "yes"
+                    ]
+                }
+            ]
+        },
+        "CreateKinesisSampleStream": {
+            "Fn::And": [
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "CreateDemonstration"
+                        },
+                        "no"
+                    ]
                 },
-                "no"
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "EnableKinesis"
+                        },
+                        "yes"
+                    ]
+                }
             ]
         }
     },
@@ -251,6 +284,15 @@
             "Description": "The password for web application. Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number. Required only if Create Demonstration is set to \"yes\"",
             "Type": "String",
             "NoEcho": "true"
+        },
+        "EnableRedshift": {
+            "AllowedValues": [
+                "yes",
+                "no"
+            ],
+            "Default": "no",
+            "Description": "Enable Redshift",
+            "Type": "String"
         },
         "RedshiftUsername": {
             "AllowedPattern": "^[a-z][a-z0-9_]*$",
@@ -395,6 +437,15 @@
             "Description": "CIDR block for the VPC",
             "Type": "String"
         },
+        "EnableKinesis": {
+            "AllowedValues": [
+                "yes",
+                "no"
+            ],
+            "Default": "no",
+            "Description": "Enable Kinesis",
+            "Type": "String"
+        },
         "KinesisDataStreamName": {
             "Description": "Kinesis data stream name. Required only if Create Demonstration is set to \"no\"",
             "Default": "MyKinesisDataStream",
@@ -504,6 +555,7 @@
         },
         "RedshiftStack": {
             "Type": "AWS::CloudFormation::Stack",
+            "Condition": "CreateRedshift",
             "Properties": {
                 "TemplateURL": {
                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/redshift.template"
@@ -557,16 +609,14 @@
             },
             "DependsOn": []
         },
-        "KinesisStack": {
+        "KinesisDemonstrationStack": {
             "Type": "AWS::CloudFormation::Stack",
+            "Condition": "CreateDemoResources",
             "Properties": {
                 "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/kinesis.template"
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/kinesis-demonstration.template"
                 },
                 "Parameters": {
-                    "CreateDemonstration": {
-                        "Ref": "CreateDemonstration"
-                    },
                     "SubmissionsBucketARN": {
                         "Fn::GetAtt": [
                             "BucketsStack",
@@ -598,57 +648,21 @@
                         "Ref": "RedshiftPassword"
                     },
                     "SubmissionsBucketAccessARN": {
-                        "Fn::If" : [
-                            "CreateDemoResources",
-                            {
-                                "Fn::GetAtt": [
-                                    "IAMRolesStack",
-                                    "Outputs.SubmissionsBucketAccessARN"
-                                ]
-                            },
-                            ""
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.SubmissionsBucketAccessARN"
                         ]
                     },
                     "ManagedBucketAccessARN": {
-                        "Fn::If" : [
-                            "CreateDemoResources",
-                            {
-                                "Fn::GetAtt": [
-                                    "IAMRolesStack",
-                                    "Outputs.ManagedBucketAccessARN"
-                                ]
-                            },
-                            ""
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.ManagedBucketAccessARN"
                         ]
                     },
                     "ElasticsearchAccessARN": {
-                        "Fn::If" : [
-                            "CreateDemoResources",
-                            {
-                                "Fn::GetAtt": [
-                                    "IAMRolesStack",
-                                    "Outputs.ElasticsearchAccessARN"
-                                ]
-                            },
-                            ""
-                        ]
-                    },
-                    "KinesisDataStreamName": {
-                        "Ref": "KinesisDataStreamName"
-                    },
-                    "KinesisDataStreamS3Prefix": {
-                        "Ref": "KinesisDataStreamS3Prefix"
-                    },
-                    "KinesisDataStreamRoleARN": {
-                        "Fn::If" : [
-                            "CreateKinesisDataStream",
-                            {
-                                "Fn::GetAtt": [
-                                    "IAMRolesStack",
-                                    "Outputs.KinesisDataStreamRoleARN"
-                                ]
-                            },
-                            ""
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.ElasticsearchAccessARN"
                         ]
                     }
                 }
@@ -656,6 +670,35 @@
             "DependsOn": [
                 "EmptyBucketsStack"
             ]
+        },
+        "KinesisSampleStack": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Condition": "CreateKinesisSampleStream",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/kinesis-sample.template"
+                },
+                "Parameters": {
+                    "KinesisStreamBucketName": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.SubmissionsBucketName"
+                        ]
+                    },
+                    "KinesisStreamName": {
+                        "Ref": "KinesisDataStreamName"
+                    },
+                    "KinesisStreamKeyPrefix": {
+                        "Ref": "KinesisDataStreamS3Prefix"
+                    },
+                    "KinesisStreamBucketRoleARN": {
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.KinesisStreamBucketRoleARN"
+                        ]
+                    }
+                }
+            }
         },
         "WebAppStack": {
             "Type": "AWS::CloudFormation::Stack",
@@ -745,31 +788,31 @@
                     },
                     "OrdersStreamName": {
                         "Fn::GetAtt": [
-                            "KinesisStack",
+                            "KinesisDemonstrationStack",
                             "Outputs.OrdersStreamName"
                         ]
                     },
                     "OrdersStreamARN": {
                         "Fn::GetAtt": [
-                            "KinesisStack",
+                            "KinesisDemonstrationStack",
                             "Outputs.OrdersStreamARN"
                         ]
                     },
                     "CleanOrdersStreamARN": {
                         "Fn::GetAtt": [
-                            "KinesisStack",
+                            "KinesisDemonstrationStack",
                             "Outputs.CleanOrdersStreamARN"
                         ]
                     },
                     "RevenueByStateStreamARN": {
                         "Fn::GetAtt": [
-                            "KinesisStack",
+                            "KinesisDemonstrationStack",
                             "Outputs.RevenueByStateStreamARN"
                         ]
                     },
                     "TopSKUStreamARN": {
                         "Fn::GetAtt": [
-                            "KinesisStack",
+                            "KinesisDemonstrationStack",
                             "Outputs.TopSKUStreamARN"
                         ]
                     },
@@ -842,6 +885,12 @@
                 "Parameters": {
                     "CreateDemonstration": {
                         "Ref": "CreateDemonstration"
+                    },
+                    "EnableRedshift": {
+                        "Ref": "EnableRedshift"
+                    },
+                    "EnableKinesis": {
+                        "Ref": "EnableRedshift"
                     },
                     "SubmissionsBucketARN": {
                         "Fn::GetAtt": [
@@ -930,7 +979,8 @@
                         ]
                     }
                 }
-            }
+            },
+            "DependsOn": []
         },
         "CopyDataStack": {
             "Type": "AWS::CloudFormation::Stack",
@@ -996,7 +1046,8 @@
                         ]
                     }
                 }
-            }
+            },
+            "DependsOn": []
         }
     },
     "Outputs": {
@@ -1039,6 +1090,7 @@
         },
         "RedshiftJdbcUrl": {
             "Description": "Redshift JDBC url",
+            "Condition": "CreateRedshift",
             "Value": {
                 "Fn::GetAtt": [
                     "RedshiftStack",
@@ -1057,10 +1109,10 @@
         },
         "KinesisDataStreamName": {
             "Description": "KinesisDataStreamName",
-            "Condition": "CreateKinesisDataStream",
+            "Condition": "CreateKinesisSampleStream",
             "Value": {
                 "Fn::GetAtt": [
-                    "KinesisStack",
+                    "KinesisSampleStack",
                     "Outputs.KinesisDataStreamName"
                 ]
             }

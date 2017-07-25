@@ -509,6 +509,7 @@
                     "WebApplicationPassword": {
                         "Ref": "WebApplicationPassword"
                     },
+                    "EnableRedshift": "yes",
                     "RedshiftUsername": {
                         "Ref": "RedshiftUsername"
                     },
@@ -539,6 +540,7 @@
                     "DatasetS3KeyPrefix": {
                         "Ref": "DatasetS3KeyPrefix"
                     },
+                    "EnableKinesis": "yes",
                     "KinesisDataStreamName": {
                         "Ref": "KinesisDataStreamName"
                     },

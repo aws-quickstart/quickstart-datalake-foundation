@@ -1,0 +1,70 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "AWS CloudFormation templates to create AWS Kinesis Firehose endpoints",
+    "Parameters": {
+        "KinesisStreamBucketName": {
+            "Type": "String",
+            "Description": "Kinesis stream bucket name"
+        },
+        "KinesisStreamKeyPrefix": {
+            "Type": "String",
+            "Description": "Kinesis stream S3 key prefix"
+        },
+        "KinesisStreamName": {
+            "Type": "String",
+            "Description": "Kinesis stream name"
+        },
+        "KinesisStreamBucketRoleARN": {
+            "Type": "String",
+            "Description": "Kinesis stream bucket role ARN"
+        }
+    },
+    "Resources": {
+        "KinesisStream": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "DeliveryStreamName": {"Ref": "KinesisStreamName"},
+                "S3DestinationConfiguration": {
+                    "BucketARN": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "arn:aws:s3:::",
+                                {
+                                    "Ref": "KinesisStreamBucketName"
+                                }
+                            ]
+                        ]
+                    },
+                    "BufferingHints": {
+                        "IntervalInSeconds": 60,
+                        "SizeInMBs": 60
+                    },
+                    "CompressionFormat": "UNCOMPRESSED",
+                    "Prefix": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                {
+                                    "Ref": "KinesisStreamKeyPrefix"
+                                },
+                                "/"
+                            ]
+                        ]
+                    },
+                    "RoleARN": {
+                        "Ref": "KinesisStreamBucketRoleARN"
+                    }
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "KinesisDataStreamName": {
+            "Description": "Kinesis data stream name",
+            "Value": {
+                "Ref": "KinesisStream"
+            }
+        }
+    }
+}
