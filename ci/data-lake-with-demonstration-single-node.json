@@ -16,8 +16,8 @@
       "ParameterValue": "datalake-quickstart"
   },
   {
-    "ParameterKey": "CreateDemonstration",
-    "ParameterValue": "yes"
+      "ParameterKey": "CreateDemonstration",
+      "ParameterValue": "yes"
   },
   {
       "ParameterKey": "InstanceType",

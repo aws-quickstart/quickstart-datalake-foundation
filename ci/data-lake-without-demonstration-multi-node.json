@@ -12,8 +12,8 @@
       "ParameterValue": "$[taskcat_genaz_2]"
   },
   {
-    "ParameterKey": "CreateDemonstration",
-    "ParameterValue": "no"
+      "ParameterKey": "CreateDemonstration",
+      "ParameterValue": "no"
   },
   {
       "ParameterKey": "KeyPairName",
