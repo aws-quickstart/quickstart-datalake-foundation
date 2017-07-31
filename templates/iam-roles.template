@@ -288,10 +288,32 @@
                             "Statement": [
                                 {
                                     "Action": [
-                                        "es:*"
+                                        "es:DescribeElasticsearchDomain",
+                                        "es:DescribeElasticsearchDomains",
+                                        "es:DescribeElasticsearchDomainConfig",
+                                        "es:ESHttpPost",
+                                        "es:ESHttpPut",
+                                        "es:ESHttpGet"
                                     ],
                                     "Effect": "Allow",
-                                    "Resource": "*"
+                                    "Resource": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                "arn:aws:es:",
+                                                {
+                                                    "Ref": "AWS::Region"
+                                                },
+                                                ":",
+                                                {
+                                                    "Ref": "AWS::AccountId"
+                                                },
+                                                ":domain/",
+                                                "datalake-quickstart",
+                                                "/*"
+                                            ]
+                                        ]
+                                    }
                                 }
                             ]
                         }
@@ -559,9 +581,24 @@
                                         "es:ESHttpPut",
                                         "es:ESHttpGet"
                                     ],
-                                    "Resource": [
-                                        "arn:aws:es:*"
-                                    ]
+                                    "Resource": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                "arn:aws:es:",
+                                                {
+                                                    "Ref": "AWS::Region"
+                                                },
+                                                ":",
+                                                {
+                                                    "Ref": "AWS::AccountId"
+                                                },
+                                                ":domain/",
+                                                "datalake-quickstart",
+                                                "/*"
+                                            ]
+                                        ]
+                                    }
                                 }
                             ]
                         }
@@ -1168,10 +1205,32 @@
                             "Statement": [
                                 {
                                     "Action": [
-                                        "es:*"
+                                        "es:DescribeElasticsearchDomain",
+                                        "es:DescribeElasticsearchDomains",
+                                        "es:DescribeElasticsearchDomainConfig",
+                                        "es:ESHttpPost",
+                                        "es:ESHttpPut",
+                                        "es:ESHttpGet"
                                     ],
                                     "Effect": "Allow",
-                                    "Resource": "*"
+                                    "Resource": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                "arn:aws:es:",
+                                                {
+                                                    "Ref": "AWS::Region"
+                                                },
+                                                ":",
+                                                {
+                                                    "Ref": "AWS::AccountId"
+                                                },
+                                                ":domain/",
+                                                "datalake-quickstart",
+                                                "/*"
+                                            ]
+                                        ]
+                                    }
                                 }
                             ]
                         }
