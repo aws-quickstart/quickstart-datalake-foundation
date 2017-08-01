@@ -83,14 +83,14 @@
     },
     "Conditions": {
         "IsMultiNodeCluster": {
-            "Fn::Not": [
+            "Fn::Not": [{
                 "Fn::Equals": [
                     {
                         "Ref": "NumberOfNodes"
                     },
                     "1"
                 ]
-            ]
+            }]
         },
         "IsPublic": {
             "Fn::Equals": [
