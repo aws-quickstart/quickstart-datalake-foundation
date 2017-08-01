@@ -1,7 +1,7 @@
 global:
   marketplace-ami: false
   owner: quickstart@amazon.com
-  qsname: quickstart-aws-datalake-foundation
+  qsname: quickstart-datalake-47lining
   regions:
     - us-east-1
     - us-west-2
