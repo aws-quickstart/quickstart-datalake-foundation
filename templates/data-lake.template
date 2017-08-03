@@ -274,7 +274,7 @@
                 "yes",
                 "no"
             ],
-            "Default": "no",
+            "Default": "yes",
             "Description": "Enable Redshift. If you run this Quick Start without Demonstration, you have an option to not provision Redshift. Redshift is provisioned if Create Demonstration is set to \"yes\".",
             "Type": "String"
         },
