@@ -1257,23 +1257,11 @@
             ]
         },
         "CreateKinesisStreamBucketRole": {
-            "Fn::And": [
+            "Fn::Equals": [
                 {
-                    "Fn::Equals": [
-                        {
-                            "Ref": "CreateDemonstration"
-                        },
-                        "no"
-                    ]
+                    "Ref": "CreateDemonstration"
                 },
-                {
-                    "Fn::Equals": [
-                        {
-                            "Ref": "EnableKinesis"
-                        },
-                        "yes"
-                    ]
-                }
+                "no"
             ]
         }
     },
@@ -1286,15 +1274,6 @@
                 "yes",
                 "no"
             ]
-        },
-        "EnableKinesis": {
-            "AllowedValues": [
-                "yes",
-                "no"
-            ],
-            "Default": "no",
-            "Description": "Enable Kinesis",
-            "Type": "String"
         },
         "EnableRedshift": {
             "AllowedValues": [

@@ -540,7 +540,6 @@
                     "DatasetS3KeyPrefix": {
                         "Ref": "DatasetS3KeyPrefix"
                     },
-                    "EnableKinesis": "yes",
                     "KinesisDataStreamName": {
                         "Ref": "KinesisDataStreamName"
                     },

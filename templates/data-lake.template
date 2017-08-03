@@ -59,7 +59,6 @@
                         "default": "Kinesis configuration"
                     },
                     "Parameters": [
-                        "EnableKinesis",
                         "KinesisDataStreamName",
                         "KinesisDataStreamS3Prefix"
                     ]
@@ -163,9 +162,6 @@
                 "VPCCIDR": {
                     "default": "Existing VPC CIDR"
                 },
-                "EnableKinesis": {
-                    "default": "Enable Kinesis"
-                },
                 "KinesisDataStreamName": {
                     "default": "Kinesis Data Stream Name"
                 },
@@ -213,23 +209,11 @@
             ]
         },
         "CreateKinesisSampleStream": {
-            "Fn::And": [
+            "Fn::Equals": [
                 {
-                    "Fn::Equals": [
-                        {
-                            "Ref": "CreateDemonstration"
-                        },
-                        "no"
-                    ]
+                    "Ref": "CreateDemonstration"
                 },
-                {
-                    "Fn::Equals": [
-                        {
-                            "Ref": "EnableKinesis"
-                        },
-                        "yes"
-                    ]
-                }
+                "no"
             ]
         }
     },
@@ -291,7 +275,7 @@
                 "no"
             ],
             "Default": "no",
-            "Description": "Enable Redshift",
+            "Description": "Enable Redshift. If you run this Quick Start without Demonstration, you have an option to not provision Redshift. Redshift is provisioned if Create Demonstration is set to \"yes\".",
             "Type": "String"
         },
         "RedshiftUsername": {
@@ -435,15 +419,6 @@
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
             "Description": "CIDR block for the VPC",
-            "Type": "String"
-        },
-        "EnableKinesis": {
-            "AllowedValues": [
-                "yes",
-                "no"
-            ],
-            "Default": "no",
-            "Description": "Enable Kinesis",
             "Type": "String"
         },
         "KinesisDataStreamName": {
@@ -894,9 +869,6 @@
                         "Ref": "CreateDemonstration"
                     },
                     "EnableRedshift": {
-                        "Ref": "EnableRedshift"
-                    },
-                    "EnableKinesis": {
                         "Ref": "EnableRedshift"
                     },
                     "SubmissionsBucketARN": {
