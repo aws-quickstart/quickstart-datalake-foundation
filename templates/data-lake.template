@@ -683,7 +683,7 @@
             "Condition": "CreateKinesisSampleStream",
             "Properties": {
                 "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/kinesis-sample.template"
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/kinesis.template"
                 },
                 "Parameters": {
                     "KinesisStreamBucketName": {
