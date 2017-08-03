@@ -15,6 +15,19 @@
                 },
                 {
                     "Label": {
+                        "default": "Demonstration Configuration"
+                    },
+                    "Parameters": [
+                        "CreateDemonstration",
+                        "InstanceType",
+                        "WebApplicationUsername",
+                        "WebApplicationPassword",
+                        "DatasetS3BucketName",
+                        "DatasetS3KeyPrefix"
+                    ]
+                },
+                {
+                    "Label": {
                         "default": "Elasticsearch Configuration"
                     },
                     "Parameters": [
@@ -39,16 +52,6 @@
                 },
                 {
                     "Label": {
-                        "default": "AWS Quick Start Configuration"
-                    },
-                    "Parameters": [
-                        "QSS3BucketName",
-                        "QSS3KeyPrefix",
-                        "KeyPairName"
-                    ]
-                },
-                {
-                    "Label": {
                         "default": "Kinesis Configuration"
                     },
                     "Parameters": [
@@ -58,15 +61,12 @@
                 },
                 {
                     "Label": {
-                        "default": "Demonstration Configuration"
+                        "default": "AWS Quick Start Configuration"
                     },
                     "Parameters": [
-                        "CreateDemonstration",
-                        "InstanceType",
-                        "WebApplicationUsername",
-                        "WebApplicationPassword",
-                        "DatasetS3BucketName",
-                        "DatasetS3KeyPrefix"
+                        "QSS3BucketName",
+                        "QSS3KeyPrefix",
+                        "KeyPairName"
                     ]
                 }
             ],
