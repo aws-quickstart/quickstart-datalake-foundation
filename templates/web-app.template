@@ -163,7 +163,10 @@
         }
     },
     "Mappings": {
-        "RegionMap": {
+        "AWSAMIRegionMap": {
+            "AMI": {
+                "AMZNLINUXHVM": "amzn-ami-hvm-2017.03.0.20170417-x86_64-gp2"
+            },
             "us-east-1": {
                 "AMI": "ami-c58c1dd3"
             },
@@ -389,7 +392,7 @@
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
-                        "RegionMap",
+                        "AWSAMIRegionMap",
                         {
                             "Ref": "AWS::Region"
                         },
