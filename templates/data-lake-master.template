@@ -28,6 +28,7 @@
                         "default": "Redshift Configuration"
                     },
                     "Parameters": [
+                        "EnableRedshift",
                         "RedshiftUsername",
                         "RedshiftPassword",
                         "RedshiftNumberOfNodes",
@@ -96,6 +97,9 @@
                 },
                 "WebApplicationPassword": {
                     "default": "Web Application Password"
+                },
+                "EnableRedshift": {
+                    "default": "Enable Redshift"
                 },
                 "RedshiftUsername": {
                     "default": "Redshift User Name"
@@ -221,6 +225,15 @@
             "Type": "String",
             "Default": "Password1",
             "NoEcho": "true"
+        },
+        "EnableRedshift": {
+            "AllowedValues": [
+                "yes",
+                "no"
+            ],
+            "Default": "no",
+            "Description": "Enable Redshift. If you run this Quick Start without Demonstration, you have an option to not provision Redshift. Redshift is provisioned if Create Demonstration is set to \"yes\".",
+            "Type": "String"
         },
         "RedshiftUsername": {
             "AllowedPattern": "^[a-z][a-z0-9_]*$",
@@ -509,7 +522,9 @@
                     "WebApplicationPassword": {
                         "Ref": "WebApplicationPassword"
                     },
-                    "EnableRedshift": "yes",
+                    "EnableRedshift": {
+                        "Ref": "EnableRedshift"
+                    },
                     "RedshiftUsername": {
                         "Ref": "RedshiftUsername"
                     },
