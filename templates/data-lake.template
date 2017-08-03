@@ -564,11 +564,18 @@
                     "VpcId": {
                         "Ref": "VPCID"
                     },
-                    "SubnetId": {
+                    "SubnetId1": {
                         "Fn::If" : [
                             "RedshiftPubliclyAccessible",
                             { "Ref": "PublicSubnet1ID" },
                             { "Ref": "PrivateSubnet1ID" }
+                        ]
+                    },
+                    "SubnetId2": {
+                        "Fn::If" : [
+                            "RedshiftPubliclyAccessible",
+                            { "Ref": "PublicSubnet2ID" },
+                            { "Ref": "PrivateSubnet2ID" }
                         ]
                     },
                     "RedshiftUsername": {

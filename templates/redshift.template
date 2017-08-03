@@ -6,8 +6,12 @@
             "Description": "VPC id.",
             "Type": "AWS::EC2::VPC::Id"
         },
-        "SubnetId": {
-            "Description": "Redshift subnet id.",
+        "SubnetId1": {
+            "Description": "Redshift subnet id 1.",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+        "SubnetId2": {
+            "Description": "Redshift subnet id 2.",
             "Type": "AWS::EC2::Subnet::Id"
         },
         "RedshiftUsername": {
@@ -163,7 +167,10 @@
                 "Description": "Cluster subnet group",
                 "SubnetIds": [
                     {
-                        "Ref": "SubnetId"
+                        "Ref": "SubnetId1"
+                    },
+                    {
+                        "Ref": "SubnetId2"
                     }
                 ]
             }
