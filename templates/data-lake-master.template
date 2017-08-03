@@ -171,6 +171,19 @@
                 },
                 "no"
             ]
+        },
+        "CreateRedshift": {
+            "Fn::Or": [
+                {"Condition": "CreateDemoResources"},
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "EnableRedshift"
+                        },
+                        "yes"
+                    ]
+                }
+            ]
         }
     },
     "Parameters": {
@@ -656,6 +669,7 @@
         },
         "RedshiftJdbcUrl": {
             "Description": "Redshift JDBC url",
+            "Condition": "CreateRedshift",
             "Value": {
                 "Fn::GetAtt": [
                     "DataLakeFoundationStack",
