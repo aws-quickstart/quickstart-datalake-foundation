@@ -2,31 +2,16 @@
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "Creates a RedShift cluster within a VPC.  **WARNING** This template creates an Amazon Redshift cluster of the size and instance type that you specify. You will be billed for the AWS resources used if you create a stack from this template.",
     "Parameters": {
-        "VpcId": {
-            "Description": "VPC id.",
-            "Type": "AWS::EC2::VPC::Id"
-        },
-        "SubnetId1": {
-            "Description": "Redshift subnet id 1.",
-            "Type": "AWS::EC2::Subnet::Id"
-        },
-        "SubnetId2": {
-            "Description": "Redshift subnet id 2.",
-            "Type": "AWS::EC2::Subnet::Id"
-        },
-        "RedshiftUsername": {
-            "Description": "The user name that is associated with the master user account for the cluster that is being created",
+        "DatabaseName": {
+            "Description": "Redshift database name",
             "Type": "String"
         },
-        "RedshiftPassword": {
-            "Description": "The password that is associated with the master user account for the cluster that is being created.",
-            "Type": "String",
-            "NoEcho": "true"
+        "DatabasePort": {
+            "Default": "5439",
+            "Description": "The port that Redshift will listen on and that will be allowed through the Security Group.",
+            "Type": "String"
         },
         "NodeType": {
-            "Description": "The node type to be provisioned for the redshift cluster",
-            "Type": "String",
-            "Default": "dc1.large",
             "AllowedValues": [
                 "dw1.xlarge",
                 "dw1.8xlarge",
@@ -39,12 +24,24 @@
                 "ds2.xlarge",
                 "ds2.8xlarge"
             ],
-            "ConstraintDescription": "must be a valid RedShift node type."
+            "ConstraintDescription": "must be a valid RedShift node type.",
+            "Default": "dc1.large",
+            "Description": "The node type to be provisioned for the redshift cluster",
+            "Type": "String"
         },
         "NumberOfNodes": {
+            "Default": "1",
             "Description": "The number of compute nodes in the redshift cluster.",
-            "Type": "Number",
-            "Default": "1"
+            "Type": "Number"
+        },
+        "PubliclyAccessible": {
+            "AllowedValues": [
+                "true",
+                "false"
+            ],
+            "Default": "false",
+            "Description": "Indicates whether the cluster can be accessed from a public network.",
+            "Type": "String"
         },
         "QSRedshiftRoleARN": {
             "Description": "QSRedshiftRole ARN",
@@ -56,23 +53,26 @@
             "Description": "CIDR block that gets access to Redshift",
             "Type": "String"
         },
-        "DatabasePort": {
-            "Description": "The port that Redshift will listen on and that will be allowed through the Security Group.",
-            "Type": "String",
-            "Default": "5439"
-        },
-        "DatabaseName": {
-            "Description": "Redshift database name",
+        "RedshiftPassword": {
+            "Description": "The password that is associated with the master user account for the cluster that is being created.",
+            "NoEcho": "true",
             "Type": "String"
         },
-        "PubliclyAccessible": {
-            "Description": "Indicates whether the cluster can be accessed from a public network.",
-            "Type": "String",
-            "AllowedValues": [
-                "true",
-                "false"
-            ],
-            "Default": "false"
+        "RedshiftUsername": {
+            "Description": "The user name that is associated with the master user account for the cluster that is being created",
+            "Type": "String"
+        },
+        "SubnetId1": {
+            "Description": "Redshift subnet id 1.",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+        "SubnetId2": {
+            "Description": "Redshift subnet id 2.",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+        "VpcId": {
+            "Description": "VPC id.",
+            "Type": "AWS::EC2::VPC::Id"
         }
     },
     "Mappings": {
@@ -87,14 +87,16 @@
     },
     "Conditions": {
         "IsMultiNodeCluster": {
-            "Fn::Not": [{
-                "Fn::Equals": [
-                    {
-                        "Ref": "NumberOfNodes"
-                    },
-                    "1"
-                ]
-            }]
+            "Fn::Not": [
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "NumberOfNodes"
+                        },
+                        "1"
+                    ]
+                }
+            ]
         },
         "IsPublic": {
             "Fn::Equals": [
@@ -107,8 +109,10 @@
     },
     "Resources": {
         "RedshiftCluster": {
-            "Type": "AWS::Redshift::Cluster",
             "Properties": {
+                "ClusterSubnetGroupName": {
+                    "Ref": "RedshiftClusterSubnetGroup"
+                },
                 "ClusterType": {
                     "Fn::If": [
                         "IsMultiNodeCluster",
@@ -116,7 +120,23 @@
                         "single-node"
                     ]
                 },
-                "NodeType": {"Ref": "NodeType"},
+                "DBName": {
+                    "Ref": "DatabaseName"
+                },
+                "IamRoles": [
+                    {
+                        "Ref": "QSRedshiftRoleARN"
+                    }
+                ],
+                "MasterUserPassword": {
+                    "Ref": "RedshiftPassword"
+                },
+                "MasterUsername": {
+                    "Ref": "RedshiftUsername"
+                },
+                "NodeType": {
+                    "Ref": "NodeType"
+                },
                 "NumberOfNodes": {
                     "Fn::If": [
                         "IsMultiNodeCluster",
@@ -128,26 +148,8 @@
                         }
                     ]
                 },
-                "DBName": { "Ref": "DatabaseName"},
-                "IamRoles": [
-                    {
-                        "Ref":
-                            "QSRedshiftRoleARN"
-                    }
-                ],
-                "MasterUsername": {
-                    "Ref": "RedshiftUsername"
-                },
-                "MasterUserPassword": {
-                    "Ref": "RedshiftPassword"
-                },
-                "VpcSecurityGroupIds": [
-                    {
-                        "Ref": "RedshiftSecurityGroup"
-                    }
-                ],
-                "ClusterSubnetGroupName": {
-                    "Ref": "RedshiftClusterSubnetGroup"
+                "Port": {
+                    "Ref": "DatabasePort"
                 },
                 "PubliclyAccessible": {
                     "Fn::If": [
@@ -158,11 +160,15 @@
                         }
                     ]
                 },
-                "Port": { "Ref": "DatabasePort" }
-            }
+                "VpcSecurityGroupIds": [
+                    {
+                        "Ref": "RedshiftSecurityGroup"
+                    }
+                ]
+            },
+            "Type": "AWS::Redshift::Cluster"
         },
         "RedshiftClusterSubnetGroup": {
-            "Type": "AWS::Redshift::ClusterSubnetGroup",
             "Properties": {
                 "Description": "Cluster subnet group",
                 "SubnetIds": [
@@ -173,28 +179,26 @@
                         "Ref": "SubnetId2"
                     }
                 ]
-            }
+            },
+            "Type": "AWS::Redshift::ClusterSubnetGroup"
         },
         "RedshiftSecurityGroup": {
-            "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
-                "VpcId": {
-                    "Ref": "VpcId"
-                },
                 "GroupDescription": "Enable JDBC port",
                 "SecurityGroupIngress": [
                     {
-                        "IpProtocol": "tcp",
-                        "FromPort": { "Ref": "DatabasePort" },
-                        "ToPort": { "Ref": "DatabasePort" },
                         "CidrIp": {
                             "Ref": "RedshiftInboundCIDR"
+                        },
+                        "FromPort": {
+                            "Ref": "DatabasePort"
+                        },
+                        "IpProtocol": "tcp",
+                        "ToPort": {
+                            "Ref": "DatabasePort"
                         }
                     },
                     {
-                        "IpProtocol": "tcp",
-                        "FromPort": { "Ref": "DatabasePort" },
-                        "ToPort": { "Ref": "DatabasePort" },
                         "CidrIp": {
                             "Fn::FindInMap": [
                                 "RegionMap",
@@ -203,10 +207,21 @@
                                 },
                                 "KinesisFirehoseCIDR"
                             ]
+                        },
+                        "FromPort": {
+                            "Ref": "DatabasePort"
+                        },
+                        "IpProtocol": "tcp",
+                        "ToPort": {
+                            "Ref": "DatabasePort"
                         }
                     }
-                ]
-            }
+                ],
+                "VpcId": {
+                    "Ref": "VpcId"
+                }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
         }
     },
     "Outputs": {

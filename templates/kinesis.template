@@ -3,27 +3,28 @@
     "Description": "AWS CloudFormation templates to create AWS Kinesis Firehose endpoints",
     "Parameters": {
         "KinesisStreamBucketName": {
-            "Type": "String",
-            "Description": "Kinesis stream bucket name"
-        },
-        "KinesisStreamKeyPrefix": {
-            "Type": "String",
-            "Description": "Kinesis stream S3 key prefix"
-        },
-        "KinesisStreamName": {
-            "Type": "String",
-            "Description": "Kinesis stream name"
+            "Description": "Kinesis stream bucket name",
+            "Type": "String"
         },
         "KinesisStreamBucketRoleARN": {
-            "Type": "String",
-            "Description": "Kinesis stream bucket role ARN"
+            "Description": "Kinesis stream bucket role ARN",
+            "Type": "String"
+        },
+        "KinesisStreamKeyPrefix": {
+            "Description": "Kinesis stream S3 key prefix",
+            "Type": "String"
+        },
+        "KinesisStreamName": {
+            "Description": "Kinesis stream name",
+            "Type": "String"
         }
     },
     "Resources": {
         "KinesisStream": {
-            "Type": "AWS::KinesisFirehose::DeliveryStream",
             "Properties": {
-                "DeliveryStreamName": {"Ref": "KinesisStreamName"},
+                "DeliveryStreamName": {
+                    "Ref": "KinesisStreamName"
+                },
                 "S3DestinationConfiguration": {
                     "BucketARN": {
                         "Fn::Join": [
@@ -56,7 +57,8 @@
                         "Ref": "KinesisStreamBucketRoleARN"
                     }
                 }
-            }
+            },
+            "Type": "AWS::KinesisFirehose::DeliveryStream"
         }
     },
     "Outputs": {

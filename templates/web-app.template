@@ -2,10 +2,44 @@
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "AWS Cloudformation template to create an EC2 instance, installs Data Lake walk-through webapp and creates ELB. **WARNING** This template creates an Amazon EC2 instance. You will be billed for the AWS resources used if you create a stack from this template.",
     "Parameters": {
+        "ApplicationPassword": {
+            "Description": "Web server password",
+            "NoEcho": "true",
+            "Type": "String"
+        },
+        "ApplicationUsername": {
+            "Description": "Web server username",
+            "Type": "String"
+        },
+        "AthenaQueryResultsBucketName": {
+            "Description": "Athena query results bucket name for the Quick Start Athena query results. Athena query results bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Type": "String"
+        },
+        "CleanOrdersStreamARN": {
+            "Description": "Clean orders stream ARN",
+            "Type": "String"
+        },
+        "CleanupResourcesRoleARN": {
+            "Description": "CleanupResourcesRole ARN",
+            "Type": "String"
+        },
+        "DatasetS3BucketName": {
+            "Description": "Dataset bucket name for the Quick Start dataset. Dataset bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Type": "String"
+        },
+        "DatasetS3KeyPrefix": {
+            "Description": "S3 key prefix for the Quick Start dataset. Dataset key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
+            "Type": "String"
+        },
+        "ElasticsearchEndpoint": {
+            "Description": "Elasticsearch endpoint",
+            "Type": "String"
+        },
+        "InstanceProfileName": {
+            "Description": "InstanceProfile Name",
+            "Type": "String"
+        },
         "InstanceType": {
-            "Description": "Web server EC2 instance type",
-            "Type": "String",
-            "Default": "t2.micro",
             "AllowedValues": [
                 "t2.nano",
                 "t2.micro",
@@ -16,19 +50,42 @@
                 "m3.xlarge",
                 "m3.2xlarge"
             ],
-            "ConstraintDescription": "must be a valid EC2 instance type."
+            "ConstraintDescription": "must be a valid EC2 instance type.",
+            "Default": "t2.micro",
+            "Description": "Web server EC2 instance type",
+            "Type": "String"
         },
         "KeyName": {
+            "ConstraintDescription": "Can contain only ASCII characters.",
             "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
-            "Type": "AWS::EC2::KeyPair::KeyName",
-            "ConstraintDescription": "Can contain only ASCII characters."
+            "Type": "AWS::EC2::KeyPair::KeyName"
         },
-        "VpcId": {
-            "Description": "Web server VPC",
-            "Type": "AWS::EC2::VPC::Id"
+        "KibanaURL": {
+            "Description": "Kibana URL",
+            "Type": "String"
         },
-        "VPCCIDR": {
-            "Description": "CIDR block for the VPC",
+        "KinesisAnalyticsRoleARN": {
+            "Description": "Kinesis analytics role ARN",
+            "Type": "String"
+        },
+        "ManagedBucketARN": {
+            "Description": "Managed bucket ARN",
+            "Type": "String"
+        },
+        "ManagedBucketName": {
+            "Description": "Manged bucket name",
+            "Type": "String"
+        },
+        "NumWebServerInstances": {
+            "Description": "Number or web server instances in Auto scaling group",
+            "Type": "Number"
+        },
+        "OrdersStreamARN": {
+            "Description": "Orders stream ARN",
+            "Type": "String"
+        },
+        "OrdersStreamName": {
+            "Description": "Orders stream name",
             "Type": "String"
         },
         "PrivateSubnet1ID": {
@@ -47,82 +104,8 @@
             "Description": "Elastic load balancer subnet 2",
             "Type": "AWS::EC2::Subnet::Id"
         },
-        "ApplicationUsername": {
-            "Description": "Web server username",
-            "Type": "String"
-        },
-        "ApplicationPassword": {
-            "Description": "Web server password",
-            "NoEcho": "true",
-            "Type": "String"
-        },
-        "RedshiftConnectionURL": {
-            "Description": "JDBC redshift connection URL",
-            "Type": "String"
-        },
-        "RedshiftUsername": {
-            "Description": "Redshift username",
-            "Type": "String"
-        },
-        "RedshiftPassword": {
-            "Description": "Redshift password",
-            "Type": "String",
-            "NoEcho": "true"
-        },
-        "RedshiftRoleARN": {
-            "Description": "Redshift role ARN",
-            "Type": "String"
-        },
-        "SubmissionsBucketName": {
-            "Description": "Submissions bucket name",
-            "Type": "String"
-        },
-        "SubmissionsBucketARN": {
-            "Description": "Submissions bucket ARN",
-            "Type": "String"
-        },
-        "ManagedBucketName": {
-            "Description": "Manged bucket name",
-            "Type": "String"
-        },
-        "ManagedBucketARN": {
-            "Description": "Managed bucket ARN",
-            "Type": "String"
-        },
         "PublishedBucketName": {
             "Description": "Published bucket name",
-            "Type": "String"
-        },
-        "OrdersStreamName": {
-            "Description": "Orders stream name",
-            "Type": "String"
-        },
-        "OrdersStreamARN": {
-            "Description": "Orders stream ARN",
-            "Type": "String"
-        },
-        "CleanOrdersStreamARN": {
-            "Description": "Clean orders stream ARN",
-            "Type": "String"
-        },
-        "RevenueByStateStreamARN": {
-            "Description": "Revenue by state stream ARN",
-            "Type": "String"
-        },
-        "TopSKUStreamARN": {
-            "Description": "Top SKU stream ARN",
-            "Type": "String"
-        },
-        "KinesisAnalyticsRoleARN": {
-            "Description": "Kinesis analytics role ARN",
-            "Type": "String"
-        },
-        "ElasticsearchEndpoint": {
-            "Description": "Elasticsearch endpoint",
-            "Type": "String"
-        },
-        "KibanaURL": {
-            "Description": "Kibana URL",
             "Type": "String"
         },
         "QSS3BucketName": {
@@ -133,33 +116,50 @@
             "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
             "Type": "String"
         },
-        "DatasetS3BucketName": {
-            "Description": "Dataset bucket name for the Quick Start dataset. Dataset bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+        "RedshiftConnectionURL": {
+            "Description": "JDBC redshift connection URL",
             "Type": "String"
         },
-        "DatasetS3KeyPrefix": {
-            "Description": "S3 key prefix for the Quick Start dataset. Dataset key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
+        "RedshiftPassword": {
+            "Description": "Redshift password",
+            "NoEcho": "true",
             "Type": "String"
         },
-        "AthenaQueryResultsBucketName": {
-            "Description": "Athena query results bucket name for the Quick Start Athena query results. Athena query results bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+        "RedshiftRoleARN": {
+            "Description": "Redshift role ARN",
             "Type": "String"
         },
-        "CleanupResourcesRoleARN": {
-            "Description": "CleanupResourcesRole ARN",
+        "RedshiftUsername": {
+            "Description": "Redshift username",
             "Type": "String"
         },
-        "InstanceProfileName": {
-            "Description": "InstanceProfile Name",
+        "RevenueByStateStreamARN": {
+            "Description": "Revenue by state stream ARN",
             "Type": "String"
-        },
-        "NumWebServerInstances": {
-            "Description": "Number or web server instances in Auto scaling group",
-            "Type": "Number"
         },
         "SnsLearnMoreTopicArn": {
             "Description": "SNS Topic ARN for Learn More topic",
             "Type": "String"
+        },
+        "SubmissionsBucketARN": {
+            "Description": "Submissions bucket ARN",
+            "Type": "String"
+        },
+        "SubmissionsBucketName": {
+            "Description": "Submissions bucket name",
+            "Type": "String"
+        },
+        "TopSKUStreamARN": {
+            "Description": "Top SKU stream ARN",
+            "Type": "String"
+        },
+        "VPCCIDR": {
+            "Description": "CIDR block for the VPC",
+            "Type": "String"
+        },
+        "VpcId": {
+            "Description": "Web server VPC",
+            "Type": "AWS::EC2::VPC::Id"
         }
     },
     "Mappings": {
@@ -178,43 +178,153 @@
         }
     },
     "Resources": {
-        "WebServerAutoScalingGroup": {
-            "Type": "AWS::AutoScaling::AutoScalingGroup",
+        "CleanupResources": {
             "Properties": {
-                "LaunchConfigurationName": {
-                    "Ref": "WebServerLaunchConfiguration"
+                "AthenaQueryResultsBucket": {
+                    "Ref": "AthenaQueryResultsBucketName"
                 },
-                "VPCZoneIdentifier": [
+                "ManagedDatasets": {
+                    "Ref": "ManagedBucketName"
+                },
+                "PublishedData": {
+                    "Ref": "PublishedBucketName"
+                },
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "CleanupResourcesFunction",
+                        "Arn"
+                    ]
+                },
+                "SubmissionsBucket": {
+                    "Ref": "SubmissionsBucketName"
+                }
+            },
+            "Type": "AWS::CloudFormation::CustomResource"
+        },
+        "CleanupResourcesFunction": {
+            "Properties": {
+                "Code": {
+                    "ZipFile": {
+                        "Fn::Join": [
+                            "\n",
+                            [
+                                "import json",
+                                "import cfnresponse",
+                                "import boto3",
+                                "from time import sleep",
+                                "from botocore.exceptions import ClientError",
+                                "",
+                                "s3 = boto3.resource('s3')",
+                                "ka_client = boto3.client('kinesisanalytics')",
+                                "",
+                                "def handler(event, context):",
+                                "    submissions_bucket = s3.Bucket(event['ResourceProperties']['SubmissionsBucket'])",
+                                "    managed_datasets = s3.Bucket(event['ResourceProperties']['ManagedDatasets'])",
+                                "    published_data = s3.Bucket(event['ResourceProperties']['PublishedData'])",
+                                "    athena_query_results_bucket = s3.Bucket(event['ResourceProperties']['AthenaQueryResultsBucket'])",
+                                "    if event['RequestType'] == 'Delete':",
+                                "        try:",
+                                "           submissions_bucket.objects.all().delete()",
+                                "           managed_datasets.objects.all().delete()",
+                                "           published_data.objects.all().delete()",
+                                "           athena_query_results_bucket.objects.all().delete()",
+                                "           response = ka_client.list_applications()",
+                                "           for app in filter(lambda ap: ap['ApplicationName'] in {'clean-orders-app', 'aggregate-orders-app'}, response['ApplicationSummaries']):",
+                                "              described_app = ka_client.describe_application(ApplicationName=app['ApplicationName'])",
+                                "              delete_response = ka_client.delete_application(ApplicationName=app['ApplicationName'],",
+                                "                  CreateTimestamp=described_app['ApplicationDetail']['CreateTimestamp'])",
+                                "           return cfnresponse.send(event, context, cfnresponse.SUCCESS, {})",
+                                "        except ClientError as e:",
+                                "            print(e)",
+                                "            return cfnresponse.send(event, context, cfnresponse.FAILED, {})",
+                                "    else:",
+                                "        return cfnresponse.send(event, context, cfnresponse.SUCCESS, {})"
+                            ]
+                        ]
+                    }
+                },
+                "Handler": "index.handler",
+                "Role": {
+                    "Ref": "CleanupResourcesRoleARN"
+                },
+                "Runtime": "python3.6",
+                "Timeout": 30
+            },
+            "Type": "AWS::Lambda::Function"
+        },
+        "ELBSecurityGroup": {
+            "Properties": {
+                "GroupDescription": "Enable Elastic Load Balancer access via port 80",
+                "SecurityGroupIngress": [
                     {
-                        "Ref": "PrivateSubnet1ID"
+                        "CidrIp": "0.0.0.0/0",
+                        "FromPort": "80",
+                        "IpProtocol": "tcp",
+                        "ToPort": "80"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "VpcId"
+                }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
+        },
+        "ElasticLoadBalancer": {
+            "Properties": {
+                "ConnectionSettings": {
+                    "IdleTimeout": "180"
+                },
+                "Listeners": [
+                    {
+                        "InstancePort": "2000",
+                        "LoadBalancerPort": "80",
+                        "Protocol": "HTTP"
+                    }
+                ],
+                "SecurityGroups": [
+                    {
+                        "Ref": "ELBSecurityGroup"
+                    }
+                ],
+                "Subnets": [
+                    {
+                        "Ref": "PublicSubnet1ID"
                     },
                     {
-                        "Ref": "PrivateSubnet2ID"
-                    }
-                ],
-                "MinSize": {
-                    "Ref": "NumWebServerInstances"
-                },
-                "MaxSize": {
-                    "Ref": "NumWebServerInstances"
-                },
-                "Cooldown": "300",
-                "DesiredCapacity": {
-                    "Ref": "NumWebServerInstances"
-                },
-                "LoadBalancerNames": [
-                    {
-                        "Ref": "ElasticLoadBalancer"
-                    }
-                ],
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": "DataLakeWalkthroughWebapp",
-                        "PropagateAtLaunch": "true"
+                        "Ref": "PublicSubnet2ID"
                     }
                 ]
             },
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer"
+        },
+        "InstanceSecurityGroup": {
+            "Properties": {
+                "GroupDescription": "Enable SSH access from Bastion via port 22, and from ELB via port range 1024-65535",
+                "SecurityGroupIngress": [
+                    {
+                        "CidrIp": {
+                            "Ref": "VPCCIDR"
+                        },
+                        "FromPort": "22",
+                        "IpProtocol": "tcp",
+                        "ToPort": "22"
+                    },
+                    {
+                        "FromPort": "1024",
+                        "IpProtocol": "tcp",
+                        "SourceSecurityGroupId": {
+                            "Ref": "ELBSecurityGroup"
+                        },
+                        "ToPort": "65535"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "VpcId"
+                }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
+        },
+        "WebServerAutoScalingGroup": {
             "CreationPolicy": {
                 "ResourceSignal": {
                     "Count": {
@@ -222,24 +332,90 @@
                     },
                     "Timeout": "PT15M"
                 }
-            }
+            },
+            "Properties": {
+                "Cooldown": "300",
+                "DesiredCapacity": {
+                    "Ref": "NumWebServerInstances"
+                },
+                "LaunchConfigurationName": {
+                    "Ref": "WebServerLaunchConfiguration"
+                },
+                "LoadBalancerNames": [
+                    {
+                        "Ref": "ElasticLoadBalancer"
+                    }
+                ],
+                "MaxSize": {
+                    "Ref": "NumWebServerInstances"
+                },
+                "MinSize": {
+                    "Ref": "NumWebServerInstances"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "PropagateAtLaunch": "true",
+                        "Value": "DataLakeWalkthroughWebapp"
+                    }
+                ],
+                "VPCZoneIdentifier": [
+                    {
+                        "Ref": "PrivateSubnet1ID"
+                    },
+                    {
+                        "Ref": "PrivateSubnet2ID"
+                    }
+                ]
+            },
+            "Type": "AWS::AutoScaling::AutoScalingGroup"
         },
         "WebServerLaunchConfiguration": {
-            "Type": "AWS::AutoScaling::LaunchConfiguration",
             "Metadata": {
-                "Comment": "Install Flask application",
                 "AWS::CloudFormation::Init": {
                     "config": {
-                        "packages": {
-                            "yum": {
-                                "python34": [],
-                                "python34-pip": [],
-                                "python34-devel": [],
-                                "postgresql93-devel": [],
-                                "gcc": []
+                        "commands": {
+                            "1_run_bootstrap": {
+                                "command": "sh -e /etc/bootstrap.sh"
+                            },
+                            "9_run_webserver": {
+                                "command": "runuser -l ec2-user -c \"python3.4 /home/ec2-user/assets/web/app.py --config /etc/production.ini > server.log 2>&1 &\""
                             }
                         },
                         "files": {
+                            "/etc/bootstrap.sh": {
+                                "content": {
+                                    "Fn::Join": [
+                                        "\n",
+                                        [
+                                            "# Install python requirements",
+                                            "pip-3.4 install flask==0.12.1",
+                                            "pip-3.4 install awscli==1.11.84",
+                                            "pip-3.4 install psycopg2==2.7.1",
+                                            "pip-3.4 install jinja2==2.9.6",
+                                            "pip-3.4 install boto3==1.4.4",
+                                            "pip-3.4 install botocore==1.5.52",
+                                            "alias aws=/usr/local/bin/aws",
+                                            {
+                                                "Fn::Sub": "aws s3 cp s3://${SubmissionsBucketName}/metadata/customers_metadata.json /home/ec2-user/"
+                                            },
+                                            "cd /home/ec2-user",
+                                            {
+                                                "Fn::Sub": "aws s3 sync s3://${QSS3BucketName}/${QSS3KeyPrefix} ."
+                                            },
+                                            "cd /home/ec2-user/assets",
+                                            "python3.4 setup.py develop",
+                                            "chown -R ec2-user:ec2-user /home/ec2-user",
+                                            {
+                                                "Fn::Sub": "python3.4 kibana/import_analysis_dashboard.py --elasticsearch-endpoint ${ElasticsearchEndpoint}"
+                                            }
+                                        ]
+                                    ]
+                                },
+                                "group": "ec2-user",
+                                "mode": "000770",
+                                "owner": "ec2-user"
+                            },
                             "/etc/production.ini": {
                                 "content": {
                                     "Fn::Join": [
@@ -342,59 +518,25 @@
                                         ]
                                     ]
                                 },
+                                "group": "ec2-user",
                                 "mode": "000444",
-                                "owner": "ec2-user",
-                                "group": "ec2-user"
-                            },
-                            "/etc/bootstrap.sh": {
-                                "content": {
-                                    "Fn::Join": [
-                                        "\n",
-                                        [
-                                            "# Install python requirements",
-                                            "pip-3.4 install flask==0.12.1",
-                                            "pip-3.4 install awscli==1.11.84",
-                                            "pip-3.4 install psycopg2==2.7.1",
-                                            "pip-3.4 install jinja2==2.9.6",
-                                            "pip-3.4 install boto3==1.4.4",
-                                            "pip-3.4 install botocore==1.5.52",
-                                            "alias aws=/usr/local/bin/aws",
-                                            {
-                                                "Fn::Sub": "aws s3 cp s3://${SubmissionsBucketName}/metadata/customers_metadata.json /home/ec2-user/"
-                                            },
-                                            "cd /home/ec2-user",
-                                            {
-                                                "Fn::Sub": "aws s3 sync s3://${QSS3BucketName}/${QSS3KeyPrefix} ."
-                                            },
-                                            "cd /home/ec2-user/assets",
-                                            "python3.4 setup.py develop",
-                                            "chown -R ec2-user:ec2-user /home/ec2-user",
-                                            {
-                                                "Fn::Sub": "python3.4 kibana/import_analysis_dashboard.py --elasticsearch-endpoint ${ElasticsearchEndpoint}"
-                                            }
-                                        ]
-                                    ]
-                                },
-                                "mode": "000770",
-                                "owner": "ec2-user",
-                                "group": "ec2-user"
+                                "owner": "ec2-user"
                             }
                         },
-                        "commands": {
-                            "1_run_bootstrap": {
-                                "command": "sh -e /etc/bootstrap.sh"
-                            },
-                            "9_run_webserver": {
-                                "command": "runuser -l ec2-user -c \"python3.4 /home/ec2-user/assets/web/app.py --config /etc/production.ini > server.log 2>&1 &\""
+                        "packages": {
+                            "yum": {
+                                "gcc": [],
+                                "postgresql93-devel": [],
+                                "python34": [],
+                                "python34-devel": [],
+                                "python34-pip": []
                             }
                         }
                     }
-                }
+                },
+                "Comment": "Install Flask application"
             },
             "Properties": {
-                "KeyName": {
-                    "Ref": "KeyName"
-                },
                 "IamInstanceProfile": {
                     "Ref": "InstanceProfileName"
                 },
@@ -407,14 +549,17 @@
                         "AMI"
                     ]
                 },
+                "InstanceType": {
+                    "Ref": "InstanceType"
+                },
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
                 "SecurityGroups": [
                     {
                         "Ref": "InstanceSecurityGroup"
                     }
                 ],
-                "InstanceType": {
-                    "Ref": "InstanceType"
-                },
                 "UserData": {
                     "Fn::Base64": {
                         "Fn::Join": [
@@ -435,153 +580,8 @@
                         ]
                     }
                 }
-            }
-        },
-        "InstanceSecurityGroup": {
-            "Type": "AWS::EC2::SecurityGroup",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VpcId"
-                },
-                "GroupDescription": "Enable SSH access from Bastion via port 22, and from ELB via port range 1024-65535",
-                "SecurityGroupIngress": [
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "22",
-                        "ToPort": "22",
-                        "CidrIp": {
-                            "Ref": "VPCCIDR"
-                        }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "1024",
-                        "ToPort": "65535",
-                        "SourceSecurityGroupId": {
-                            "Ref": "ELBSecurityGroup"
-                        }
-                    }
-                ]
-            }
-        },
-        "ElasticLoadBalancer": {
-            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
-            "Properties": {
-                "Listeners": [
-                    {
-                        "LoadBalancerPort": "80",
-                        "InstancePort": "2000",
-                        "Protocol": "HTTP"
-                    }
-                ],
-                "Subnets": [
-                    {
-                        "Ref": "PublicSubnet1ID"
-                    },
-                    {
-                        "Ref": "PublicSubnet2ID"
-                    }
-                ],
-                "SecurityGroups": [
-                    {
-                        "Ref": "ELBSecurityGroup"
-                    }
-                ],
-                "ConnectionSettings": {
-                    "IdleTimeout": "180"
-                }
-            }
-        },
-        "ELBSecurityGroup": {
-            "Type": "AWS::EC2::SecurityGroup",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VpcId"
-                },
-                "GroupDescription": "Enable Elastic Load Balancer access via port 80",
-                "SecurityGroupIngress": [
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "80",
-                        "ToPort": "80",
-                        "CidrIp": "0.0.0.0/0"
-                    }
-                ]
-            }
-        },
-        "CleanupResources": {
-            "Type": "AWS::CloudFormation::CustomResource",
-            "Properties": {
-                "ServiceToken": {
-                    "Fn::GetAtt": [
-                        "CleanupResourcesFunction",
-                        "Arn"
-                    ]
-                },
-                "AthenaQueryResultsBucket": {
-                    "Ref": "AthenaQueryResultsBucketName"
-                },
-                "SubmissionsBucket": {
-                    "Ref": "SubmissionsBucketName"
-                },
-                "ManagedDatasets": {
-                    "Ref": "ManagedBucketName"
-                },
-                "PublishedData": {
-                    "Ref": "PublishedBucketName"
-                }
-            }
-        },
-        "CleanupResourcesFunction": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-                "Code": {
-                    "ZipFile": {
-                        "Fn::Join": [
-                            "\n",
-                            [
-                                "import json",
-                                "import cfnresponse",
-                                "import boto3",
-                                "from time import sleep",
-                                "from botocore.exceptions import ClientError",
-                                "",
-                                "s3 = boto3.resource('s3')",
-                                "ka_client = boto3.client('kinesisanalytics')",
-                                "",
-                                "def handler(event, context):",
-                                "    submissions_bucket = s3.Bucket(event['ResourceProperties']['SubmissionsBucket'])",
-                                "    managed_datasets = s3.Bucket(event['ResourceProperties']['ManagedDatasets'])",
-                                "    published_data = s3.Bucket(event['ResourceProperties']['PublishedData'])",
-                                "    athena_query_results_bucket = s3.Bucket(event['ResourceProperties']['AthenaQueryResultsBucket'])",
-                                "    if event['RequestType'] == 'Delete':",
-                                "        try:",
-                                "           submissions_bucket.objects.all().delete()",
-                                "           managed_datasets.objects.all().delete()",
-                                "           published_data.objects.all().delete()",
-                                "           athena_query_results_bucket.objects.all().delete()",
-                                "           response = ka_client.list_applications()",
-                                "           for app in filter(lambda ap: ap['ApplicationName'] in {'clean-orders-app', 'aggregate-orders-app'}, response['ApplicationSummaries']):",
-                                "              described_app = ka_client.describe_application(ApplicationName=app['ApplicationName'])",
-                                "              delete_response = ka_client.delete_application(ApplicationName=app['ApplicationName'],",
-                                "                  CreateTimestamp=described_app['ApplicationDetail']['CreateTimestamp'])",
-                                "           return cfnresponse.send(event, context, cfnresponse.SUCCESS, {})",
-                                "        except ClientError as e:",
-                                "            print(e)",
-                                "            return cfnresponse.send(event, context, cfnresponse.FAILED, {})",
-                                "    else:",
-                                "        return cfnresponse.send(event, context, cfnresponse.SUCCESS, {})"
-                            ]
-                        ]
-                    }
-                },
-                "Handler": "index.handler",
-                "Role": {
-                    "Ref": "CleanupResourcesRoleARN"
-                },
-                "Runtime": "python3.6",
-                "Timeout": 30
-            }
+            },
+            "Type": "AWS::AutoScaling::LaunchConfiguration"
         }
     },
     "Outputs": {

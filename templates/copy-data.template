@@ -104,21 +104,21 @@
         }
     },
     "Parameters": {
-        "SubmissionsBucketName": {
-            "Type": "String",
-            "Description": "SubmissionsBucket bucket name"
+        "CopyDataRoleARN": {
+            "Description": "CopyDataRole ARN",
+            "Type": "String"
         },
         "DatasetS3BucketName": {
-            "Type": "String",
-            "Description": "Dataset bucket name for the Quick Start dataset."
+            "Description": "Dataset bucket name for the Quick Start dataset.",
+            "Type": "String"
         },
         "DatasetS3KeyPrefix": {
-            "Type": "String",
-            "Description": "S3 key prefix for the Quick Start dataset."
+            "Description": "S3 key prefix for the Quick Start dataset.",
+            "Type": "String"
         },
-        "CopyDataRoleARN": {
-            "Type": "String",
-            "Description": "CopyDataRole ARN"
+        "SubmissionsBucketName": {
+            "Description": "SubmissionsBucket bucket name",
+            "Type": "String"
         }
     }
 }

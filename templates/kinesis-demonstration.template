@@ -2,47 +2,46 @@
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "AWS CloudFormation templates to create AWS Kinesis Firehose endpoints",
     "Parameters": {
-        "SubmissionsBucketARN": {
-            "Type": "String",
-            "Description": "Submissions bucket ARN"
-        },
-        "ManagedBucketARN": {
-            "Type": "String",
-            "Description": "Managed bucket ARN"
-        },
-        "RedshiftConnectionURL": {
-            "Type": "String",
-            "Description": "Redshift connection URL"
-        },
-        "RedshiftUsername": {
-            "Description": "Redshift username.",
-            "Type": "String"
-        },
-        "RedshiftPassword": {
-            "NoEcho": "true",
-            "Description": "Redshift password.",
+        "ElasticsearchAccessARN": {
+            "Description": "ElasticsearchAccess ARN",
             "Type": "String"
         },
         "ElasticsearchDomainARN": {
             "Description": "Elasticsearch domain ARN",
             "Type": "String"
         },
-        "SubmissionsBucketAccessARN": {
-            "Description": "SubmissionsBucketAccess ARN",
+        "ManagedBucketARN": {
+            "Description": "Managed bucket ARN",
             "Type": "String"
         },
         "ManagedBucketAccessARN": {
             "Description": "ManagedBucketAccess ARN",
             "Type": "String"
         },
-        "ElasticsearchAccessARN": {
-            "Description": "ElasticsearchAccess ARN",
+        "RedshiftConnectionURL": {
+            "Description": "Redshift connection URL",
+            "Type": "String"
+        },
+        "RedshiftPassword": {
+            "Description": "Redshift password.",
+            "NoEcho": "true",
+            "Type": "String"
+        },
+        "RedshiftUsername": {
+            "Description": "Redshift username.",
+            "Type": "String"
+        },
+        "SubmissionsBucketARN": {
+            "Description": "Submissions bucket ARN",
+            "Type": "String"
+        },
+        "SubmissionsBucketAccessARN": {
+            "Description": "SubmissionsBucketAccess ARN",
             "Type": "String"
         }
     },
     "Resources": {
         "CleanOrdersStream": {
-            "Type": "AWS::KinesisFirehose::DeliveryStream",
             "Properties": {
                 "RedshiftDestinationConfiguration": {
                     "ClusterJDBCURL": {
@@ -52,11 +51,11 @@
                         "CopyOptions": "json 'auto'",
                         "DataTableName": "orders"
                     },
-                    "Username": {
-                        "Ref": "RedshiftUsername"
-                    },
                     "Password": {
                         "Ref": "RedshiftPassword"
+                    },
+                    "RoleARN": {
+                        "Ref": "ManagedBucketAccessARN"
                     },
                     "S3Configuration": {
                         "BucketARN": {
@@ -72,14 +71,14 @@
                             "Ref": "ManagedBucketAccessARN"
                         }
                     },
-                    "RoleARN": {
-                        "Ref": "ManagedBucketAccessARN"
+                    "Username": {
+                        "Ref": "RedshiftUsername"
                     }
                 }
-            }
+            },
+            "Type": "AWS::KinesisFirehose::DeliveryStream"
         },
         "OrdersStream": {
-            "Type": "AWS::KinesisFirehose::DeliveryStream",
             "Properties": {
                 "S3DestinationConfiguration": {
                     "BucketARN": {
@@ -95,10 +94,10 @@
                         "Ref": "SubmissionsBucketAccessARN"
                     }
                 }
-            }
+            },
+            "Type": "AWS::KinesisFirehose::DeliveryStream"
         },
         "RevenueByStateStream": {
-            "Type": "AWS::KinesisFirehose::DeliveryStream",
             "Properties": {
                 "ElasticsearchDestinationConfiguration": {
                     "BufferingHints": {
@@ -110,13 +109,11 @@
                     },
                     "IndexName": "revenue_by_state",
                     "IndexRotationPeriod": "NoRotation",
-                    "TypeName": "RevenueByStateStream",
                     "RetryOptions": {
                         "DurationInSeconds": "60"
                     },
                     "RoleARN": {
-                        "Ref":
-                            "ElasticsearchAccessARN"
+                        "Ref": "ElasticsearchAccessARN"
                     },
                     "S3BackupMode": "AllDocuments",
                     "S3Configuration": {
@@ -132,12 +129,13 @@
                         "RoleARN": {
                             "Ref": "ManagedBucketAccessARN"
                         }
-                    }
+                    },
+                    "TypeName": "RevenueByStateStream"
                 }
-            }
+            },
+            "Type": "AWS::KinesisFirehose::DeliveryStream"
         },
         "TopSKUStream": {
-            "Type": "AWS::KinesisFirehose::DeliveryStream",
             "Properties": {
                 "ElasticsearchDestinationConfiguration": {
                     "BufferingHints": {
@@ -149,13 +147,11 @@
                     },
                     "IndexName": "top_sku",
                     "IndexRotationPeriod": "NoRotation",
-                    "TypeName": "TopSKU",
                     "RetryOptions": {
                         "DurationInSeconds": "60"
                     },
                     "RoleARN": {
-                        "Ref":
-                            "ElasticsearchAccessARN"
+                        "Ref": "ElasticsearchAccessARN"
                     },
                     "S3BackupMode": "AllDocuments",
                     "S3Configuration": {
@@ -171,9 +167,11 @@
                         "RoleARN": {
                             "Ref": "ManagedBucketAccessARN"
                         }
-                    }
+                    },
+                    "TypeName": "TopSKU"
                 }
-            }
+            },
+            "Type": "AWS::KinesisFirehose::DeliveryStream"
         }
     },
     "Outputs": {

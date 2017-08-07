@@ -197,7 +197,9 @@
         },
         "CreateRedshift": {
             "Fn::Or": [
-                {"Condition": "CreateDemoResources"},
+                {
+                    "Condition": "CreateDemoResources"
+                },
                 {
                     "Fn::Equals": [
                         {
@@ -222,52 +224,48 @@
             "Description": "List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved and 2 AZs MUST be used for this deployment",
             "Type": "List<AWS::EC2::AvailabilityZone::Name>"
         },
-        "KeyPairName": {
-            "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
-            "Type": "AWS::EC2::KeyPair::KeyName"
-        },
         "CreateDemonstration": {
-            "Description": "Create EC2 instance with Datalake walk-through guide and load sample data into Redshift cluster and Kinesis streams",
-            "Type": "String",
-            "Default": "no",
             "AllowedValues": [
                 "yes",
                 "no"
-            ]
-        },
-        "InstanceType": {
-            "Description": "Web server EC2 instance type. Required only if Create Demonstration is set to \"yes\"",
-            "Type": "String",
-            "Default": "t2.micro",
-            "AllowedValues": [
-                "t2.nano",
-                "t2.micro",
-                "t2.small",
-                "t2.medium",
-                "t2.large",
-                "m3.large",
-                "m3.xlarge",
-                "m3.2xlarge"
             ],
-            "ConstraintDescription": "must be a valid EC2 instance type."
-        },
-        "WebApplicationUsername": {
-            "AllowedPattern": "^[\\x00-\\x7F]*$",
-            "MinLength": "1",
-            "MaxLength": "64",
-            "Default": "DataLakeUser",
-            "ConstraintDescription": "User name must contain 1 to 64 ASCII characters.",
-            "Description": "The user name for web application. User name must contain 1 to 64 ASCII characters. Required only if Create Demonstration is set to \"yes\"",
+            "Default": "no",
+            "Description": "Create EC2 instance with Datalake walk-through guide and load sample data into Redshift cluster and Kinesis streams",
             "Type": "String"
         },
-        "WebApplicationPassword": {
-            "AllowedPattern": "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[\\x00-\\x7F]*$",
-            "MinLength": "8",
-            "MaxLength": "64",
-            "ConstraintDescription": "Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
-            "Description": "The password for web application. Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number. Required only if Create Demonstration is set to \"yes\"",
-            "Type": "String",
-            "NoEcho": "true"
+        "DatasetS3BucketName": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "ConstraintDescription": "Dataset bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Default": "47lining-datalake-foundation-quick-start-data-us-west-2",
+            "Description": "S3 Bucket where the Quick Start data are. Use this parameter to specify the S3 Bucket name you\u2019ve created for your copy of Quick Start data, if you decide to provide your own dataset. The Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens, but should not start or end with a hyphen. Required only if Create Demonstration is set to \"yes\"",
+            "Type": "String"
+        },
+        "DatasetS3KeyPrefix": {
+            "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
+            "ConstraintDescription": "Dataset key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+            "Default": "datalake-awsdata/v1",
+            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start sample dataset, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash (which is automatically added). Required only if Create Demonstration is set to \"yes\"",
+            "Type": "String"
+        },
+        "ElasticsearchNodeCount": {
+            "Default": "1",
+            "Description": "The number of nodes in the Elasticsearch cluster.",
+            "Type": "Number"
+        },
+        "ElasticsearchNodeType": {
+            "AllowedValues": [
+                "t2.small.elasticsearch",
+                "m4.large.elasticsearch",
+                "m4.xlarge.elasticsearch",
+                "c4.large.elasticsearch",
+                "c4.xlarge.elasticsearch",
+                "r4.large.elasticsearch",
+                "r4.xlarge.elasticsearch"
+            ],
+            "ConstraintDescription": "must be a valid Elasticsearch node type.",
+            "Default": "t2.small.elasticsearch",
+            "Description": "The node type to be provisioned for the Elasticsearch cluster",
+            "Type": "String"
         },
         "EnableRedshift": {
             "AllowedValues": [
@@ -278,111 +276,35 @@
             "Description": "Enable Redshift. If you run this Quick Start without Demonstration, you have an option to not provision Redshift. Redshift is provisioned if Create Demonstration is set to \"yes\".",
             "Type": "String"
         },
-        "RedshiftUsername": {
-            "AllowedPattern": "^[a-z][a-z0-9_]*$",
-            "MinLength": "1",
-            "MaxLength": "128",
-            "Default": "datalake",
-            "ConstraintDescription": "User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
-            "Description": "The user name that is associated with the master user account for Redshift cluster that is being created. User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
-            "Type": "String"
-        },
-        "RedshiftPassword": {
-            "AllowedPattern": "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[A-Za-z0-9!#$%&()*+,.:;<=>?\\[\\]^_`{|}~-]*$",
-            "MinLength": "8",
-            "MaxLength": "64",
-            "ConstraintDescription": "Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
-            "Description": "The password that is associated with the master user account for Redshift cluster that is being created. Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
-            "Type": "String",
-            "NoEcho": "true"
-        },
-        "RedshiftNodeType": {
-            "Description": "The node type to be provisioned for Redshift cluster",
-            "Type": "String",
-            "Default": "dc1.large",
+        "InstanceType": {
             "AllowedValues": [
-                "dw1.xlarge",
-                "dw1.8xlarge",
-                "dw2.large",
-                "dw2.8xlarge",
-                "dc1.large",
-                "dc1.8xlarge",
-                "ds1.xlarge",
-                "ds1.8xlarge",
-                "ds2.xlarge",
-                "ds2.8xlarge"
+                "t2.nano",
+                "t2.micro",
+                "t2.small",
+                "t2.medium",
+                "t2.large",
+                "m3.large",
+                "m3.xlarge",
+                "m3.2xlarge"
             ],
-            "ConstraintDescription": "must be a valid Redshift node type."
-        },
-        "RedshiftNumberOfNodes": {
-            "Description": "The number of compute nodes in Redshift cluster.",
-            "Type": "Number",
-            "Default": "1"
-        },
-        "RedshiftDatabaseName": {
-            "Description": "The name of the first database to be created when Redshift cluster is created",
-            "Type": "String",
-            "Default": "quickstart",
-            "AllowedPattern": "([a-z]|[0-9])+",
-            "ConstraintDescription": "must contain a-z or 0-9 only."
-        },
-        "RedshiftDatabasePort": {
-            "Description": "The port that Redshift will listen on and that will be allowed through the Security Group.",
-            "Type": "String",
-            "Default": "5439"
-        },
-        "QSS3BucketName": {
-            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
-            "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
-            "Default": "quickstart-reference",
-            "Description": "S3 Bucket where the Quick Start templates and scripts are installed. Use this parameter to specify the S3 Bucket name you’ve created for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. The Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens, but should not start or end with a hyphen.",
+            "ConstraintDescription": "must be a valid EC2 instance type.",
+            "Default": "t2.micro",
+            "Description": "Web server EC2 instance type. Required only if Create Demonstration is set to \"yes\"",
             "Type": "String"
         },
-        "QSS3KeyPrefix": {
-            "AllowedPattern": "^[0-9a-zA-Z-/]*$",
-			"ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
-            "Default": "datalake/47lining/latest/",
-            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes.",
-			"Type": "String"
+        "KeyPairName": {
+            "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+            "Type": "AWS::EC2::KeyPair::KeyName"
         },
-        "DatasetS3BucketName": {
-            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
-            "ConstraintDescription": "Dataset bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
-            "Default": "47lining-datalake-foundation-quick-start-data-us-west-2",
-            "Description": "S3 Bucket where the Quick Start data are. Use this parameter to specify the S3 Bucket name you’ve created for your copy of Quick Start data, if you decide to provide your own dataset. The Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens, but should not start or end with a hyphen. Required only if Create Demonstration is set to \"yes\"",
+        "KinesisDataStreamName": {
+            "Default": "MyKinesisDataStream",
+            "Description": "Kinesis data stream name. Required only if Create Demonstration is set to \"no\"",
             "Type": "String"
         },
-        "DatasetS3KeyPrefix": {
+        "KinesisDataStreamS3Prefix": {
             "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
-            "ConstraintDescription": "Dataset key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
-            "Default": "datalake-awsdata/v1",
-            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start sample dataset, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash (which is automatically added). Required only if Create Demonstration is set to \"yes\"",
-            "Type": "String"
-        },
-        "ElasticsearchNodeType": {
-            "Description": "The node type to be provisioned for the Elasticsearch cluster",
-            "Type": "String",
-            "Default": "t2.small.elasticsearch",
-            "AllowedValues": [
-                "t2.small.elasticsearch",
-                "m4.large.elasticsearch",
-                "m4.xlarge.elasticsearch",
-                "c4.large.elasticsearch",
-                "c4.xlarge.elasticsearch",
-                "r4.large.elasticsearch",
-                "r4.xlarge.elasticsearch"
-            ],
-            "ConstraintDescription": "must be a valid Elasticsearch node type."
-        },
-        "ElasticsearchNodeCount": {
-            "Description": "The number of nodes in the Elasticsearch cluster.",
-            "Type": "Number",
-            "Default": "1"
-        },
-        "RemoteAccessCIDR": {
-            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
-            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/x",
-            "Description": "CIDR block allowed to access Elasticsearch and SSH into bastion instance. You can use http://checkip.amazonaws.com/ to check your IP address. CIDR block parameter must be in the form x.x.x.x/x (e.g., 96.127.8.12/32, YOUR_IP/32)",
+            "Default": "mydata",
+            "Description": "Kinesis data stream S3 prefix for your streaming data stored in Datalake submissions bucket. Required only if Create Demonstration is set to \"no\"",
             "Type": "String"
         },
         "NAT1ElasticIP": {
@@ -411,9 +333,78 @@
             "Description": "ID of the public subnet 2 in Availability Zone 2 (e.g., subnet-a0246dcd)",
             "Type": "AWS::EC2::Subnet::Id"
         },
-        "VPCID": {
-            "Description": "ID of the VPC (e.g., vpc-0343606e)",
-            "Type": "AWS::EC2::VPC::Id"
+        "QSS3BucketName": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Default": "quickstart-reference",
+            "Description": "S3 Bucket where the Quick Start templates and scripts are installed. Use this parameter to specify the S3 Bucket name you\u2019ve created for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. The Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens, but should not start or end with a hyphen.",
+            "Type": "String"
+        },
+        "QSS3KeyPrefix": {
+            "AllowedPattern": "^[0-9a-zA-Z-/]*$",
+            "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+            "Default": "datalake/47lining/latest/",
+            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes.",
+            "Type": "String"
+        },
+        "RedshiftDatabaseName": {
+            "AllowedPattern": "([a-z]|[0-9])+",
+            "ConstraintDescription": "must contain a-z or 0-9 only.",
+            "Default": "quickstart",
+            "Description": "The name of the first database to be created when Redshift cluster is created",
+            "Type": "String"
+        },
+        "RedshiftDatabasePort": {
+            "Default": "5439",
+            "Description": "The port that Redshift will listen on and that will be allowed through the Security Group.",
+            "Type": "String"
+        },
+        "RedshiftNodeType": {
+            "AllowedValues": [
+                "dw1.xlarge",
+                "dw1.8xlarge",
+                "dw2.large",
+                "dw2.8xlarge",
+                "dc1.large",
+                "dc1.8xlarge",
+                "ds1.xlarge",
+                "ds1.8xlarge",
+                "ds2.xlarge",
+                "ds2.8xlarge"
+            ],
+            "ConstraintDescription": "must be a valid Redshift node type.",
+            "Default": "dc1.large",
+            "Description": "The node type to be provisioned for Redshift cluster",
+            "Type": "String"
+        },
+        "RedshiftNumberOfNodes": {
+            "Default": "1",
+            "Description": "The number of compute nodes in Redshift cluster.",
+            "Type": "Number"
+        },
+        "RedshiftPassword": {
+            "AllowedPattern": "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[A-Za-z0-9!#$%&()*+,.:;<=>?\\[\\]^_`{|}~-]*$",
+            "ConstraintDescription": "Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
+            "Description": "The password that is associated with the master user account for Redshift cluster that is being created. Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
+            "MaxLength": "64",
+            "MinLength": "8",
+            "NoEcho": "true",
+            "Type": "String"
+        },
+        "RedshiftUsername": {
+            "AllowedPattern": "^[a-z][a-z0-9_]*$",
+            "ConstraintDescription": "User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
+            "Default": "datalake",
+            "Description": "The user name that is associated with the master user account for Redshift cluster that is being created. User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
+            "MaxLength": "128",
+            "MinLength": "1",
+            "Type": "String"
+        },
+        "RemoteAccessCIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/x",
+            "Description": "CIDR block allowed to access Elasticsearch and SSH into bastion instance. You can use http://checkip.amazonaws.com/ to check your IP address. CIDR block parameter must be in the form x.x.x.x/x (e.g., 96.127.8.12/32, YOUR_IP/32)",
+            "Type": "String"
         },
         "VPCCIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
@@ -421,53 +412,87 @@
             "Description": "CIDR block for the VPC",
             "Type": "String"
         },
-        "KinesisDataStreamName": {
-            "Description": "Kinesis data stream name. Required only if Create Demonstration is set to \"no\"",
-            "Default": "MyKinesisDataStream",
+        "VPCID": {
+            "Description": "ID of the VPC (e.g., vpc-0343606e)",
+            "Type": "AWS::EC2::VPC::Id"
+        },
+        "WebApplicationPassword": {
+            "AllowedPattern": "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[\\x00-\\x7F]*$",
+            "ConstraintDescription": "Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
+            "Description": "The password for web application. Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number. Required only if Create Demonstration is set to \"yes\"",
+            "MaxLength": "64",
+            "MinLength": "8",
+            "NoEcho": "true",
             "Type": "String"
         },
-        "KinesisDataStreamS3Prefix": {
-            "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
-            "Description": "Kinesis data stream S3 prefix for your streaming data stored in Datalake submissions bucket. Required only if Create Demonstration is set to \"no\"",
-            "Default": "mydata",
+        "WebApplicationUsername": {
+            "AllowedPattern": "^[\\x00-\\x7F]*$",
+            "ConstraintDescription": "User name must contain 1 to 64 ASCII characters.",
+            "Default": "DataLakeUser",
+            "Description": "The user name for web application. User name must contain 1 to 64 ASCII characters. Required only if Create Demonstration is set to \"yes\"",
+            "MaxLength": "64",
+            "MinLength": "1",
             "Type": "String"
         }
     },
     "Resources": {
         "BucketsStack": {
-            "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": {
                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/buckets.template"
                 }
-            }
+            },
+            "Type": "AWS::CloudFormation::Stack"
+        },
+        "CopyDataStack": {
+            "Condition": "CreateDemoResources",
+            "DependsOn": [
+                "ElasticsearchStack"
+            ],
+            "Properties": {
+                "Parameters": {
+                    "CopyDataRoleARN": {
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.CopyDataRoleARN"
+                        ]
+                    },
+                    "DatasetS3BucketName": {
+                        "Ref": "DatasetS3BucketName"
+                    },
+                    "DatasetS3KeyPrefix": {
+                        "Ref": "DatasetS3KeyPrefix"
+                    },
+                    "SubmissionsBucketName": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.SubmissionsBucketName"
+                        ]
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/copy-data.template"
+                }
+            },
+            "Type": "AWS::CloudFormation::Stack"
         },
         "ElasticsearchStack": {
-            "Type": "AWS::CloudFormation::Stack",
+            "DependsOn": [],
             "Properties": {
-                "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/elasticsearch.template"
-                },
                 "Parameters": {
+                    "CopyLambdaDeploymentRoleARN": {
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.CopyLambdaDeploymentRoleARN"
+                        ]
+                    },
                     "ElasticsearchAccessIP": {
                         "Ref": "RemoteAccessCIDR"
                     },
-                    "NodeType": {
-                        "Ref": "ElasticsearchNodeType"
-                    },
-                    "NodeCount": {
-                        "Ref": "ElasticsearchNodeCount"
-                    },
-                    "NAT1ElasticIP": {
-                        "Ref": "NAT1ElasticIP"
-                    },
-                    "NAT2ElasticIP": {
-                        "Ref": "NAT2ElasticIP"
-                    },
-                    "SubmissionsBucketARN": {
+                    "LambdaRoleARN": {
                         "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.SubmissionsBucketARN"
+                            "IAMRolesStack",
+                            "Outputs.LambdaRoleARN"
                         ]
                     },
                     "ManagedDatasetsARN": {
@@ -476,22 +501,28 @@
                             "Outputs.ManagedDatasetsARN"
                         ]
                     },
-                    "PublishedDataARN": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.PublishedDataARN"
-                        ]
-                    },
-                    "SubmissionsTopicARN": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.SubmissionsTopicARN"
-                        ]
-                    },
                     "ManagedTopicARN": {
                         "Fn::GetAtt": [
                             "BucketsStack",
                             "Outputs.ManagedTopicARN"
+                        ]
+                    },
+                    "NAT1ElasticIP": {
+                        "Ref": "NAT1ElasticIP"
+                    },
+                    "NAT2ElasticIP": {
+                        "Ref": "NAT2ElasticIP"
+                    },
+                    "NodeCount": {
+                        "Ref": "ElasticsearchNodeCount"
+                    },
+                    "NodeType": {
+                        "Ref": "ElasticsearchNodeType"
+                    },
+                    "PublishedDataARN": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.PublishedDataARN"
                         ]
                     },
                     "PublishedTopicARN": {
@@ -506,248 +537,48 @@
                     "QSS3KeyPrefix": {
                         "Ref": "QSS3KeyPrefix"
                     },
-                    "CopyLambdaDeploymentRoleARN": {
-                        "Fn::GetAtt": [
-                            "IAMRolesStack",
-                            "Outputs.CopyLambdaDeploymentRoleARN"
-                        ]
-                    },
-                    "LambdaRoleARN": {
-                        "Fn::GetAtt": [
-                            "IAMRolesStack",
-                            "Outputs.LambdaRoleARN"
-                        ]
-                    },
                     "RegionalLambdaBucketName": {
                         "Fn::GetAtt": [
                             "BucketsStack",
                             "Outputs.RegionalLambdaBucketName"
                         ]
-                    }
-                }
-            },
-            "DependsOn": []
-        },
-        "RedshiftStack": {
-            "Type": "AWS::CloudFormation::Stack",
-            "Condition": "CreateRedshift",
-            "Properties": {
-                "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/redshift.template"
-                },
-                "Parameters": {
-                    "VpcId": {
-                        "Ref": "VPCID"
-                    },
-                    "SubnetId1": {
-                        "Fn::If" : [
-                            "RedshiftPubliclyAccessible",
-                            { "Ref": "PublicSubnet1ID" },
-                            { "Ref": "PrivateSubnet1ID" }
-                        ]
-                    },
-                    "SubnetId2": {
-                        "Fn::If" : [
-                            "RedshiftPubliclyAccessible",
-                            { "Ref": "PublicSubnet2ID" },
-                            { "Ref": "PrivateSubnet2ID" }
-                        ]
-                    },
-                    "RedshiftUsername": {
-                        "Ref": "RedshiftUsername"
-                    },
-                    "RedshiftPassword": {
-                        "Ref": "RedshiftPassword"
-                    },
-                    "NodeType": {
-                        "Ref": "RedshiftNodeType"
-                    },
-                    "NumberOfNodes": {
-                        "Ref": "RedshiftNumberOfNodes"
-                    },
-                    "DatabaseName": {
-                        "Ref": "RedshiftDatabaseName"
-                    },
-                    "DatabasePort": {
-                        "Ref": "RedshiftDatabasePort"
-                    },
-                    "QSRedshiftRoleARN": {
-                        "Fn::GetAtt": [
-                            "IAMRolesStack",
-                            "Outputs.QSRedshiftRoleARN"
-                        ]
-                    },
-                    "RedshiftInboundCIDR": {
-                        "Ref": "VPCCIDR"
-                    },
-                    "PubliclyAccessible": {
-                        "Fn::If" : [
-                            "RedshiftPubliclyAccessible",
-                            "true",
-                            "false"
-                        ]
-                    }
-                }
-            },
-            "DependsOn": []
-        },
-        "KinesisDemonstrationStack": {
-            "Type": "AWS::CloudFormation::Stack",
-            "Condition": "CreateDemoResources",
-            "Properties": {
-                "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/kinesis-demonstration.template"
-                },
-                "Parameters": {
-                    "SubmissionsBucketARN": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.SubmissionsBucketARN"
-                        ]
-                    },
-                    "ManagedBucketARN": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.ManagedDatasetsARN"
-                        ]
-                    },
-                    "ElasticsearchDomainARN": {
-                        "Fn::GetAtt": [
-                            "ElasticsearchStack",
-                            "Outputs.ElasticsearchDomainARN"
-                        ]
-                    },
-                    "RedshiftConnectionURL": {
-                        "Fn::GetAtt": [
-                            "RedshiftStack",
-                            "Outputs.ConnectionURL"
-                        ]
-                    },
-                    "RedshiftUsername": {
-                        "Ref": "RedshiftUsername"
-                    },
-                    "RedshiftPassword": {
-                        "Ref": "RedshiftPassword"
-                    },
-                    "SubmissionsBucketAccessARN": {
-                        "Fn::GetAtt": [
-                            "IAMRolesStack",
-                            "Outputs.SubmissionsBucketAccessARN"
-                        ]
-                    },
-                    "ManagedBucketAccessARN": {
-                        "Fn::GetAtt": [
-                            "IAMRolesStack",
-                            "Outputs.ManagedBucketAccessARN"
-                        ]
-                    },
-                    "ElasticsearchAccessARN": {
-                        "Fn::GetAtt": [
-                            "IAMRolesStack",
-                            "Outputs.ElasticsearchAccessARN"
-                        ]
-                    }
-                }
-            },
-            "DependsOn": [
-                "EmptyBucketsStack"
-            ]
-        },
-        "KinesisSampleStack": {
-            "Type": "AWS::CloudFormation::Stack",
-            "Condition": "CreateKinesisSampleStream",
-            "Properties": {
-                "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/kinesis.template"
-                },
-                "Parameters": {
-                    "KinesisStreamBucketName": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.SubmissionsBucketName"
-                        ]
-                    },
-                    "KinesisStreamName": {
-                        "Ref": "KinesisDataStreamName"
-                    },
-                    "KinesisStreamKeyPrefix": {
-                        "Ref": "KinesisDataStreamS3Prefix"
-                    },
-                    "KinesisStreamBucketRoleARN": {
-                        "Fn::GetAtt": [
-                            "IAMRolesStack",
-                            "Outputs.KinesisStreamBucketRoleARN"
-                        ]
-                    }
-                }
-            }
-        },
-        "WebAppStack": {
-            "Type": "AWS::CloudFormation::Stack",
-            "Condition": "CreateDemoResources",
-            "Properties": {
-                "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/web-app.template"
-                },
-                "Parameters": {
-                    "InstanceType": {
-                        "Ref": "InstanceType"
-                    },
-                    "KeyName": {
-                        "Ref": "KeyPairName"
-                    },
-                    "VpcId": {
-                        "Ref": "VPCID"
-                    },
-                    "VPCCIDR": {
-                        "Ref": "VPCCIDR"
-                    },
-                    "PublicSubnet1ID": {
-                        "Ref": "PublicSubnet1ID"
-                    },
-                    "PublicSubnet2ID": {
-                        "Ref": "PublicSubnet2ID"
-                    },
-                    "PrivateSubnet1ID": {
-                        "Ref": "PrivateSubnet1ID"
-                    },
-                    "PrivateSubnet2ID": {
-                        "Ref": "PrivateSubnet2ID"
-                    },
-                    "ApplicationUsername": {
-                        "Ref": "WebApplicationUsername"
-                    },
-                    "ApplicationPassword": {
-                        "Ref": "WebApplicationPassword"
-                    },
-                    "RedshiftConnectionURL": {
-                        "Fn::GetAtt": [
-                            "RedshiftStack",
-                            "Outputs.ConnectionURL"
-                        ]
-                    },
-                    "RedshiftUsername": {
-                        "Ref": "RedshiftUsername"
-                    },
-                    "RedshiftPassword": {
-                        "Ref": "RedshiftPassword"
-                    },
-                    "RedshiftRoleARN": {
-                        "Fn::GetAtt": [
-                            "IAMRolesStack",
-                            "Outputs.QSRedshiftRoleARN"
-                        ]
-                    },
-                    "SubmissionsBucketName": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.SubmissionsBucketName"
-                        ]
                     },
                     "SubmissionsBucketARN": {
                         "Fn::GetAtt": [
                             "BucketsStack",
                             "Outputs.SubmissionsBucketARN"
+                        ]
+                    },
+                    "SubmissionsTopicARN": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.SubmissionsTopicARN"
+                        ]
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/elasticsearch.template"
+                }
+            },
+            "Type": "AWS::CloudFormation::Stack"
+        },
+        "EmptyBucketsStack": {
+            "DependsOn": [],
+            "Properties": {
+                "Parameters": {
+                    "CreateDemonstration": {
+                        "Ref": "CreateDemonstration"
+                    },
+                    "EmptyBucketsRoleARN": {
+                        "Fn::If": [
+                            "CreateDemoResources",
+                            {
+                                "Fn::GetAtt": [
+                                    "IAMRolesStack",
+                                    "Outputs.EmptyBucketsRoleARN"
+                                ]
+                            },
+                            ""
                         ]
                     },
                     "ManagedBucketName": {
@@ -756,126 +587,42 @@
                             "Outputs.ManagedBucketName"
                         ]
                     },
-                    "ManagedBucketARN": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.ManagedDatasetsARN"
-                        ]
-                    },
                     "PublishedBucketName": {
                         "Fn::GetAtt": [
                             "BucketsStack",
                             "Outputs.PublishedBucketName"
                         ]
                     },
-                    "OrdersStreamName": {
+                    "SubmissionsBucketName": {
                         "Fn::GetAtt": [
-                            "KinesisDemonstrationStack",
-                            "Outputs.OrdersStreamName"
+                            "BucketsStack",
+                            "Outputs.SubmissionsBucketName"
+                        ]
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/empty-buckets.template"
+                }
+            },
+            "Type": "AWS::CloudFormation::Stack"
+        },
+        "IAMRolesStack": {
+            "Properties": {
+                "Parameters": {
+                    "AthenaQueryResultsBucketARN": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.AthenaQueryResultsBucketARN"
                         ]
                     },
-                    "OrdersStreamARN": {
-                        "Fn::GetAtt": [
-                            "KinesisDemonstrationStack",
-                            "Outputs.OrdersStreamARN"
-                        ]
-                    },
-                    "CleanOrdersStreamARN": {
-                        "Fn::GetAtt": [
-                            "KinesisDemonstrationStack",
-                            "Outputs.CleanOrdersStreamARN"
-                        ]
-                    },
-                    "RevenueByStateStreamARN": {
-                        "Fn::GetAtt": [
-                            "KinesisDemonstrationStack",
-                            "Outputs.RevenueByStateStreamARN"
-                        ]
-                    },
-                    "TopSKUStreamARN": {
-                        "Fn::GetAtt": [
-                            "KinesisDemonstrationStack",
-                            "Outputs.TopSKUStreamARN"
-                        ]
-                    },
-                    "KinesisAnalyticsRoleARN": {
-                        "Fn::GetAtt": [
-                            "IAMRolesStack",
-                            "Outputs.AnalyticsAccessARN"
-                        ]
-                    },
-                    "ElasticsearchEndpoint": {
-                        "Fn::GetAtt": [
-                            "ElasticsearchStack",
-                            "Outputs.ElasticsearchEndpoint"
-                        ]
-                    },
-                    "KibanaURL": {
-                        "Fn::GetAtt": [
-                            "ElasticsearchStack",
-                            "Outputs.KibanaURL"
-                        ]
-                    },
-                    "QSS3BucketName": {
-                        "Ref": "QSS3BucketName"
-                    },
-                    "QSS3KeyPrefix": {
-                        "Ref": "QSS3KeyPrefix"
+                    "CreateDemonstration": {
+                        "Ref": "CreateDemonstration"
                     },
                     "DatasetS3BucketName": {
                         "Ref": "DatasetS3BucketName"
                     },
-                    "DatasetS3KeyPrefix": {
-                        "Ref": "DatasetS3KeyPrefix"
-                    },
-                    "AthenaQueryResultsBucketName": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.AthenaQueryResultsBucketName"
-                        ]
-                    },
-                    "CleanupResourcesRoleARN": {
-                        "Fn::GetAtt": [
-                            "IAMRolesStack",
-                            "Outputs.CleanupResourcesRoleARN"
-                        ]
-                    },
-                    "InstanceProfileName": {
-                        "Fn::GetAtt": [
-                            "IAMRolesStack",
-                            "Outputs.InstanceProfileName"
-                        ]
-                    },
-                    "NumWebServerInstances": 1,
-                    "SnsLearnMoreTopicArn": {
-                        "Fn::FindInMap": [
-                            "ConstantsMap",
-                            "Constants",
-                            "SnsLearnMoreTopicArn"
-                        ]
-                    }
-                }
-            },
-            "DependsOn": ["CopyDataStack"]
-        },
-        "IAMRolesStack": {
-            "Type": "AWS::CloudFormation::Stack",
-            "Properties": {
-                "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/iam-roles.template"
-                },
-                "Parameters": {
-                    "CreateDemonstration": {
-                        "Ref": "CreateDemonstration"
-                    },
                     "EnableRedshift": {
                         "Ref": "EnableRedshift"
-                    },
-                    "SubmissionsBucketARN": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.SubmissionsBucketARN"
-                        ]
                     },
                     "ManagedDatasetsARN": {
                         "Fn::GetAtt": [
@@ -889,23 +636,14 @@
                             "Outputs.PublishedDataARN"
                         ]
                     },
+                    "QSS3BucketName": {
+                        "Ref": "QSS3BucketName"
+                    },
                     "RegionalLambdaBucketARN": {
                         "Fn::GetAtt": [
                             "BucketsStack",
                             "Outputs.RegionalLambdaBucketARN"
                         ]
-                    },
-                    "AthenaQueryResultsBucketARN": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.AthenaQueryResultsBucketARN"
-                        ]
-                    },
-                    "QSS3BucketName": {
-                        "Ref": "QSS3BucketName"
-                    },
-                    "DatasetS3BucketName": {
-                        "Ref": "DatasetS3BucketName"
                     },
                     "SnsLearnMoreTopicArn": {
                         "Fn::FindInMap": [
@@ -913,99 +651,186 @@
                             "Constants",
                             "SnsLearnMoreTopicArn"
                         ]
+                    },
+                    "SubmissionsBucketARN": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.SubmissionsBucketARN"
+                        ]
                     }
-                }
-            }
-        },
-        "EmptyBucketsStack": {
-            "Type": "AWS::CloudFormation::Stack",
-            "Properties": {
-                "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/empty-buckets.template"
                 },
-                "Parameters": {
-                    "CreateDemonstration": {
-                        "Ref": "CreateDemonstration"
-                    },
-                    "SubmissionsBucketName": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.SubmissionsBucketName"
-                        ]
-                    },
-                    "ManagedBucketName": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.ManagedBucketName"
-                        ]
-                    },
-                    "PublishedBucketName": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.PublishedBucketName"
-                        ]
-                    },
-                    "EmptyBucketsRoleARN": {
-                        "Fn::If" : [
-                            "CreateDemoResources",
-                            {
-                                "Fn::GetAtt": [
-                                    "IAMRolesStack",
-                                    "Outputs.EmptyBucketsRoleARN"
-                                ]
-                            },
-                            ""
-                        ]
-                    }
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/iam-roles.template"
                 }
             },
-            "DependsOn": []
+            "Type": "AWS::CloudFormation::Stack"
         },
-        "CopyDataStack": {
-            "Type": "AWS::CloudFormation::Stack",
+        "KinesisDemonstrationStack": {
             "Condition": "CreateDemoResources",
+            "DependsOn": [
+                "EmptyBucketsStack"
+            ],
             "Properties": {
-                "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/copy-data.template"
-                },
                 "Parameters": {
-                    "SubmissionsBucketName": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.SubmissionsBucketName"
-                        ]
-                    },
-                    "DatasetS3BucketName": {
-                        "Ref": "DatasetS3BucketName"
-                    },
-                    "DatasetS3KeyPrefix": {
-                        "Ref": "DatasetS3KeyPrefix"
-                    },
-                    "CopyDataRoleARN": {
+                    "ElasticsearchAccessARN": {
                         "Fn::GetAtt": [
                             "IAMRolesStack",
-                            "Outputs.CopyDataRoleARN"
-                        ]
-                    }
-                }
-            },
-            "DependsOn": [
-                "ElasticsearchStack"
-            ]
-        },
-        "RegisterKibanaMetadataDashboardLambda": {
-            "Type": "AWS::CloudFormation::Stack",
-            "Properties": {
-                "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/register-dashboard.template"
-                },
-                "Parameters": {
-                    "RegionalLambdaBucketName": {
-                        "Fn::GetAtt": [
-                            "BucketsStack",
-                            "Outputs.RegionalLambdaBucketName"
+                            "Outputs.ElasticsearchAccessARN"
                         ]
                     },
+                    "ElasticsearchDomainARN": {
+                        "Fn::GetAtt": [
+                            "ElasticsearchStack",
+                            "Outputs.ElasticsearchDomainARN"
+                        ]
+                    },
+                    "ManagedBucketARN": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.ManagedDatasetsARN"
+                        ]
+                    },
+                    "ManagedBucketAccessARN": {
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.ManagedBucketAccessARN"
+                        ]
+                    },
+                    "RedshiftConnectionURL": {
+                        "Fn::GetAtt": [
+                            "RedshiftStack",
+                            "Outputs.ConnectionURL"
+                        ]
+                    },
+                    "RedshiftPassword": {
+                        "Ref": "RedshiftPassword"
+                    },
+                    "RedshiftUsername": {
+                        "Ref": "RedshiftUsername"
+                    },
+                    "SubmissionsBucketARN": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.SubmissionsBucketARN"
+                        ]
+                    },
+                    "SubmissionsBucketAccessARN": {
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.SubmissionsBucketAccessARN"
+                        ]
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/kinesis-demonstration.template"
+                }
+            },
+            "Type": "AWS::CloudFormation::Stack"
+        },
+        "KinesisSampleStack": {
+            "Condition": "CreateKinesisSampleStream",
+            "Properties": {
+                "Parameters": {
+                    "KinesisStreamBucketName": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.SubmissionsBucketName"
+                        ]
+                    },
+                    "KinesisStreamBucketRoleARN": {
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.KinesisStreamBucketRoleARN"
+                        ]
+                    },
+                    "KinesisStreamKeyPrefix": {
+                        "Ref": "KinesisDataStreamS3Prefix"
+                    },
+                    "KinesisStreamName": {
+                        "Ref": "KinesisDataStreamName"
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/kinesis.template"
+                }
+            },
+            "Type": "AWS::CloudFormation::Stack"
+        },
+        "RedshiftStack": {
+            "Condition": "CreateRedshift",
+            "DependsOn": [],
+            "Properties": {
+                "Parameters": {
+                    "DatabaseName": {
+                        "Ref": "RedshiftDatabaseName"
+                    },
+                    "DatabasePort": {
+                        "Ref": "RedshiftDatabasePort"
+                    },
+                    "NodeType": {
+                        "Ref": "RedshiftNodeType"
+                    },
+                    "NumberOfNodes": {
+                        "Ref": "RedshiftNumberOfNodes"
+                    },
+                    "PubliclyAccessible": {
+                        "Fn::If": [
+                            "RedshiftPubliclyAccessible",
+                            "true",
+                            "false"
+                        ]
+                    },
+                    "QSRedshiftRoleARN": {
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.QSRedshiftRoleARN"
+                        ]
+                    },
+                    "RedshiftInboundCIDR": {
+                        "Ref": "VPCCIDR"
+                    },
+                    "RedshiftPassword": {
+                        "Ref": "RedshiftPassword"
+                    },
+                    "RedshiftUsername": {
+                        "Ref": "RedshiftUsername"
+                    },
+                    "SubnetId1": {
+                        "Fn::If": [
+                            "RedshiftPubliclyAccessible",
+                            {
+                                "Ref": "PublicSubnet1ID"
+                            },
+                            {
+                                "Ref": "PrivateSubnet1ID"
+                            }
+                        ]
+                    },
+                    "SubnetId2": {
+                        "Fn::If": [
+                            "RedshiftPubliclyAccessible",
+                            {
+                                "Ref": "PublicSubnet2ID"
+                            },
+                            {
+                                "Ref": "PrivateSubnet2ID"
+                            }
+                        ]
+                    },
+                    "VpcId": {
+                        "Ref": "VPCID"
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/redshift.template"
+                }
+            },
+            "Type": "AWS::CloudFormation::Stack"
+        },
+        "RegisterKibanaMetadataDashboardLambda": {
+            "DependsOn": [],
+            "Properties": {
+                "Parameters": {
                     "ElasticsearchEndpoint": {
                         "Fn::GetAtt": [
                             "ElasticsearchStack",
@@ -1018,15 +843,202 @@
                     "QSS3KeyPrefix": {
                         "Ref": "QSS3KeyPrefix"
                     },
+                    "RegionalLambdaBucketName": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.RegionalLambdaBucketName"
+                        ]
+                    },
                     "RegisterDashboardRoleARN": {
                         "Fn::GetAtt": [
                             "IAMRolesStack",
                             "Outputs.RegisterKibanaDashboardRoleARN"
                         ]
                     }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/register-dashboard.template"
                 }
             },
-            "DependsOn": []
+            "Type": "AWS::CloudFormation::Stack"
+        },
+        "WebAppStack": {
+            "Condition": "CreateDemoResources",
+            "DependsOn": [
+                "CopyDataStack"
+            ],
+            "Properties": {
+                "Parameters": {
+                    "ApplicationPassword": {
+                        "Ref": "WebApplicationPassword"
+                    },
+                    "ApplicationUsername": {
+                        "Ref": "WebApplicationUsername"
+                    },
+                    "AthenaQueryResultsBucketName": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.AthenaQueryResultsBucketName"
+                        ]
+                    },
+                    "CleanOrdersStreamARN": {
+                        "Fn::GetAtt": [
+                            "KinesisDemonstrationStack",
+                            "Outputs.CleanOrdersStreamARN"
+                        ]
+                    },
+                    "CleanupResourcesRoleARN": {
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.CleanupResourcesRoleARN"
+                        ]
+                    },
+                    "DatasetS3BucketName": {
+                        "Ref": "DatasetS3BucketName"
+                    },
+                    "DatasetS3KeyPrefix": {
+                        "Ref": "DatasetS3KeyPrefix"
+                    },
+                    "ElasticsearchEndpoint": {
+                        "Fn::GetAtt": [
+                            "ElasticsearchStack",
+                            "Outputs.ElasticsearchEndpoint"
+                        ]
+                    },
+                    "InstanceProfileName": {
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.InstanceProfileName"
+                        ]
+                    },
+                    "InstanceType": {
+                        "Ref": "InstanceType"
+                    },
+                    "KeyName": {
+                        "Ref": "KeyPairName"
+                    },
+                    "KibanaURL": {
+                        "Fn::GetAtt": [
+                            "ElasticsearchStack",
+                            "Outputs.KibanaURL"
+                        ]
+                    },
+                    "KinesisAnalyticsRoleARN": {
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.AnalyticsAccessARN"
+                        ]
+                    },
+                    "ManagedBucketARN": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.ManagedDatasetsARN"
+                        ]
+                    },
+                    "ManagedBucketName": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.ManagedBucketName"
+                        ]
+                    },
+                    "NumWebServerInstances": 1,
+                    "OrdersStreamARN": {
+                        "Fn::GetAtt": [
+                            "KinesisDemonstrationStack",
+                            "Outputs.OrdersStreamARN"
+                        ]
+                    },
+                    "OrdersStreamName": {
+                        "Fn::GetAtt": [
+                            "KinesisDemonstrationStack",
+                            "Outputs.OrdersStreamName"
+                        ]
+                    },
+                    "PrivateSubnet1ID": {
+                        "Ref": "PrivateSubnet1ID"
+                    },
+                    "PrivateSubnet2ID": {
+                        "Ref": "PrivateSubnet2ID"
+                    },
+                    "PublicSubnet1ID": {
+                        "Ref": "PublicSubnet1ID"
+                    },
+                    "PublicSubnet2ID": {
+                        "Ref": "PublicSubnet2ID"
+                    },
+                    "PublishedBucketName": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.PublishedBucketName"
+                        ]
+                    },
+                    "QSS3BucketName": {
+                        "Ref": "QSS3BucketName"
+                    },
+                    "QSS3KeyPrefix": {
+                        "Ref": "QSS3KeyPrefix"
+                    },
+                    "RedshiftConnectionURL": {
+                        "Fn::GetAtt": [
+                            "RedshiftStack",
+                            "Outputs.ConnectionURL"
+                        ]
+                    },
+                    "RedshiftPassword": {
+                        "Ref": "RedshiftPassword"
+                    },
+                    "RedshiftRoleARN": {
+                        "Fn::GetAtt": [
+                            "IAMRolesStack",
+                            "Outputs.QSRedshiftRoleARN"
+                        ]
+                    },
+                    "RedshiftUsername": {
+                        "Ref": "RedshiftUsername"
+                    },
+                    "RevenueByStateStreamARN": {
+                        "Fn::GetAtt": [
+                            "KinesisDemonstrationStack",
+                            "Outputs.RevenueByStateStreamARN"
+                        ]
+                    },
+                    "SnsLearnMoreTopicArn": {
+                        "Fn::FindInMap": [
+                            "ConstantsMap",
+                            "Constants",
+                            "SnsLearnMoreTopicArn"
+                        ]
+                    },
+                    "SubmissionsBucketARN": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.SubmissionsBucketARN"
+                        ]
+                    },
+                    "SubmissionsBucketName": {
+                        "Fn::GetAtt": [
+                            "BucketsStack",
+                            "Outputs.SubmissionsBucketName"
+                        ]
+                    },
+                    "TopSKUStreamARN": {
+                        "Fn::GetAtt": [
+                            "KinesisDemonstrationStack",
+                            "Outputs.TopSKUStreamARN"
+                        ]
+                    },
+                    "VPCCIDR": {
+                        "Ref": "VPCCIDR"
+                    },
+                    "VpcId": {
+                        "Ref": "VPCID"
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/web-app.template"
+                }
+            },
+            "Type": "AWS::CloudFormation::Stack"
         }
     },
     "Outputs": {
