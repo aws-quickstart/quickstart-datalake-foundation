@@ -272,7 +272,7 @@
         "ElasticLoadBalancer": {
             "Properties": {
                 "ConnectionSettings": {
-                    "IdleTimeout": "180"
+                    "IdleTimeout": "300"
                 },
                 "Listeners": [
                     {
