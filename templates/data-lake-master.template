@@ -19,7 +19,7 @@
                     },
                     "Parameters": [
                         "CreateDemonstration",
-                        "InstanceType",
+                        "WizardInstanceType",
                         "WebApplicationUsername",
                         "WebApplicationPassword",
                         "DatasetS3BucketName",
@@ -89,8 +89,8 @@
                 "CreateDemonstration": {
                     "default": "Create Demonstration"
                 },
-                "InstanceType": {
-                    "default": "Instance Type"
+                "WizardInstanceType": {
+                    "default": "Wizard Instance Type"
                 },
                 "WebApplicationUsername": {
                     "default": "Web Application User Name"
@@ -245,7 +245,7 @@
             "Description": "Enable Redshift. If you run this Quick Start without Demonstration, you have an option to not provision Redshift. Redshift is provisioned if Create Demonstration is set to \"yes\".",
             "Type": "String"
         },
-        "InstanceType": {
+        "WizardInstanceType": {
             "AllowedValues": [
                 "t2.nano",
                 "t2.micro",
@@ -357,7 +357,6 @@
         "WebApplicationPassword": {
             "AllowedPattern": "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[\\x00-\\x7F]*$",
             "ConstraintDescription": "Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
-            "Default": "Password1",
             "Description": "The password for web application. Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number. Required only if Create Demonstration is set to \"yes\"",
             "MaxLength": "64",
             "MinLength": "8",
@@ -455,8 +454,8 @@
                     "EnableRedshift": {
                         "Ref": "EnableRedshift"
                     },
-                    "InstanceType": {
-                        "Ref": "InstanceType"
+                    "WizardInstanceType": {
+                        "Ref": "WizardInstanceType"
                     },
                     "KeyPairName": {
                         "Ref": "KeyPairName"

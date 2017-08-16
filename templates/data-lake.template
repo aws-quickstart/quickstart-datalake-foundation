@@ -26,7 +26,7 @@
                     },
                     "Parameters": [
                         "CreateDemonstration",
-                        "InstanceType",
+                        "WizardInstanceType",
                         "WebApplicationUsername",
                         "WebApplicationPassword",
                         "DatasetS3BucketName",
@@ -96,8 +96,8 @@
                 "CreateDemonstration": {
                     "default": "Create demonstration"
                 },
-                "InstanceType": {
-                    "default": "Instance Type"
+                "WizardInstanceType": {
+                    "default": "Wizard Instance Type"
                 },
                 "WebApplicationUsername": {
                     "default": "Web Application User Name"
@@ -276,7 +276,7 @@
             "Description": "Enable Redshift. If you run this Quick Start without Demonstration, you have an option to not provision Redshift. Redshift is provisioned if Create Demonstration is set to \"yes\".",
             "Type": "String"
         },
-        "InstanceType": {
+        "WizardInstanceType": {
             "AllowedValues": [
                 "t2.nano",
                 "t2.micro",
@@ -911,8 +911,8 @@
                             "Outputs.InstanceProfileName"
                         ]
                     },
-                    "InstanceType": {
-                        "Ref": "InstanceType"
+                    "WizardInstanceType": {
+                        "Ref": "WizardInstanceType"
                     },
                     "KeyName": {
                         "Ref": "KeyPairName"

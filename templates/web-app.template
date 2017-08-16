@@ -39,7 +39,7 @@
             "Description": "InstanceProfile Name",
             "Type": "String"
         },
-        "InstanceType": {
+        "WizardInstanceType": {
             "AllowedValues": [
                 "t2.nano",
                 "t2.micro",
@@ -550,7 +550,7 @@
                     ]
                 },
                 "InstanceType": {
-                    "Ref": "InstanceType"
+                    "Ref": "WizardInstanceType"
                 },
                 "KeyName": {
                     "Ref": "KeyName"
