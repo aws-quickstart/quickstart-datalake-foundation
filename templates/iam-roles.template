@@ -465,7 +465,7 @@
                                         },
                                         ":domain/",
                                         "datalake-quickstart",
-                                        "/*"
+                                        "*"
                                     ]
                                 ]
                             }
