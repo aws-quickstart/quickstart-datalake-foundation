@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Data Lake Foundation is a QuickStart that provides a Data Lake architecture, Redshift cluster, Elasticsearch domain, Data Lake walk-through web application running on AWS EC2 instance, in the same VPC through Cloudformation templates that provision and configure the required resources, including related QuickStarts. This template provisions all of the resources that are specific to the Quick Start.  Leveraged Quick Starts (VPC, LinuxBastion), if needed, can be provisioned by using the data-lake-foundation-master template. **WARNING** You will be billed for the AWS resources used if you create a stack from this template.",
+    "Description": "Data Lake Foundation is a QuickStart that provides a Data Lake architecture, Redshift cluster, Elasticsearch domain, Data Lake walk-through wizard running on AWS EC2 instance, in the same VPC through Cloudformation templates that provision and configure the required resources, including related QuickStarts. This template provisions all of the resources that are specific to the Quick Start.  Leveraged Quick Starts (VPC, LinuxBastion), if needed, can be provisioned by using the data-lake-foundation-master template. **WARNING** You will be billed for the AWS resources used if you create a stack from this template.",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
@@ -27,8 +27,8 @@
                     "Parameters": [
                         "CreateDemonstration",
                         "WizardInstanceType",
-                        "WebApplicationUsername",
-                        "WebApplicationPassword",
+                        "WizardUsername",
+                        "WizardPassword",
                         "DatasetS3BucketName",
                         "DatasetS3KeyPrefix"
                     ]
@@ -99,11 +99,11 @@
                 "WizardInstanceType": {
                     "default": "Wizard Instance Type"
                 },
-                "WebApplicationUsername": {
-                    "default": "Web Application User Name"
+                "WizardUsername": {
+                    "default": "Wizard User Name"
                 },
-                "WebApplicationPassword": {
-                    "default": "Web Application Password"
+                "WizardPassword": {
+                    "default": "Wizard Password"
                 },
                 "EnableRedshift": {
                     "default": "Enable Redshift"
@@ -416,20 +416,20 @@
             "Description": "ID of the VPC (e.g., vpc-0343606e)",
             "Type": "AWS::EC2::VPC::Id"
         },
-        "WebApplicationPassword": {
+        "WizardPassword": {
             "AllowedPattern": "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[\\x00-\\x7F]*$",
             "ConstraintDescription": "Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
-            "Description": "The password for web application. Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number. Required only if Create Demonstration is set to \"yes\"",
+            "Description": "The password for wizard. Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number. Required only if Create Demonstration is set to \"yes\"",
             "MaxLength": "64",
             "MinLength": "8",
             "NoEcho": "true",
             "Type": "String"
         },
-        "WebApplicationUsername": {
+        "WizardUsername": {
             "AllowedPattern": "^[\\x00-\\x7F]*$",
             "ConstraintDescription": "User name must contain 1 to 64 ASCII characters.",
             "Default": "DataLakeUser",
-            "Description": "The user name for web application. User name must contain 1 to 64 ASCII characters. Required only if Create Demonstration is set to \"yes\"",
+            "Description": "The user name for wizard. User name must contain 1 to 64 ASCII characters. Required only if Create Demonstration is set to \"yes\"",
             "MaxLength": "64",
             "MinLength": "1",
             "Type": "String"
@@ -870,10 +870,10 @@
             "Properties": {
                 "Parameters": {
                     "ApplicationPassword": {
-                        "Ref": "WebApplicationPassword"
+                        "Ref": "WizardPassword"
                     },
                     "ApplicationUsername": {
-                        "Ref": "WebApplicationUsername"
+                        "Ref": "WizardUsername"
                     },
                     "AthenaQueryResultsBucketName": {
                         "Fn::GetAtt": [

@@ -16,11 +16,11 @@
       "ParameterValue": "t2.micro"
   },
   {
-      "ParameterKey": "WebApplicationUsername",
+      "ParameterKey": "WizardUsername",
       "ParameterValue": "WebAppUser"
   },
   {
-      "ParameterKey": "WebApplicationPassword",
+      "ParameterKey": "WizardPassword",
       "ParameterValue": "$[taskcat_genpass_16]"
   },
   {
