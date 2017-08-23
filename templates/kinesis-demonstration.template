@@ -10,12 +10,12 @@
             "Description": "Elasticsearch domain ARN",
             "Type": "String"
         },
-        "ManagedBucketARN": {
-            "Description": "Managed bucket ARN",
+        "CuratedBucketARN": {
+            "Description": "Curated bucket ARN",
             "Type": "String"
         },
-        "ManagedBucketAccessARN": {
-            "Description": "ManagedBucketAccess ARN",
+        "CuratedBucketAccessARN": {
+            "Description": "CuratedBucketAccess ARN",
             "Type": "String"
         },
         "RedshiftConnectionURL": {
@@ -55,11 +55,11 @@
                         "Ref": "RedshiftPassword"
                     },
                     "RoleARN": {
-                        "Ref": "ManagedBucketAccessARN"
+                        "Ref": "CuratedBucketAccessARN"
                     },
                     "S3Configuration": {
                         "BucketARN": {
-                            "Ref": "ManagedBucketARN"
+                            "Ref": "CuratedBucketARN"
                         },
                         "BufferingHints": {
                             "IntervalInSeconds": 60,
@@ -68,7 +68,7 @@
                         "CompressionFormat": "UNCOMPRESSED",
                         "Prefix": "orders/stream/",
                         "RoleARN": {
-                            "Ref": "ManagedBucketAccessARN"
+                            "Ref": "CuratedBucketAccessARN"
                         }
                     },
                     "Username": {
@@ -118,7 +118,7 @@
                     "S3BackupMode": "AllDocuments",
                     "S3Configuration": {
                         "BucketARN": {
-                            "Ref": "ManagedBucketARN"
+                            "Ref": "CuratedBucketARN"
                         },
                         "BufferingHints": {
                             "IntervalInSeconds": "60",
@@ -127,7 +127,7 @@
                         "CompressionFormat": "UNCOMPRESSED",
                         "Prefix": "orders/results/revenueByState",
                         "RoleARN": {
-                            "Ref": "ManagedBucketAccessARN"
+                            "Ref": "CuratedBucketAccessARN"
                         }
                     },
                     "TypeName": "RevenueByStateStream"
@@ -156,7 +156,7 @@
                     "S3BackupMode": "AllDocuments",
                     "S3Configuration": {
                         "BucketARN": {
-                            "Ref": "ManagedBucketARN"
+                            "Ref": "CuratedBucketARN"
                         },
                         "BufferingHints": {
                             "IntervalInSeconds": "60",
@@ -165,7 +165,7 @@
                         "CompressionFormat": "UNCOMPRESSED",
                         "Prefix": "orders/results/topSKU",
                         "RoleARN": {
-                            "Ref": "ManagedBucketAccessARN"
+                            "Ref": "CuratedBucketAccessARN"
                         }
                     },
                     "TypeName": "TopSKU"

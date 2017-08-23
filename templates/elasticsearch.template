@@ -14,12 +14,12 @@
             "Description": "LambdaRole ARN",
             "Type": "String"
         },
-        "ManagedDatasetsARN": {
-            "Description": "ManagedDatasets bucket ARN",
+        "CuratedDatasetsARN": {
+            "Description": "CuratedDatasets bucket ARN",
             "Type": "String"
         },
-        "ManagedTopicARN": {
-            "Description": "ManagedTopic ARN",
+        "CuratedTopicARN": {
+            "Description": "CuratedTopic ARN",
             "Type": "String"
         },
         "NAT1ElasticIP": {
@@ -208,7 +208,7 @@
             },
             "Type": "AWS::Elasticsearch::Domain"
         },
-        "ManagedDatasetLambdaPermissions": {
+        "CuratedDatasetLambdaPermissions": {
             "Properties": {
                 "Action": "lambda:invokeFunction",
                 "FunctionName": {
@@ -216,12 +216,12 @@
                 },
                 "Principal": "sns.amazonaws.com",
                 "SourceArn": {
-                    "Ref": "ManagedTopicARN"
+                    "Ref": "CuratedTopicARN"
                 }
             },
             "Type": "AWS::Lambda::Permission"
         },
-        "ManagedSubscription": {
+        "CuratedSubscription": {
             "DependsOn": [],
             "Properties": {
                 "Endpoint": {
@@ -232,7 +232,7 @@
                 },
                 "Protocol": "lambda",
                 "TopicArn": {
-                    "Ref": "ManagedTopicARN"
+                    "Ref": "CuratedTopicARN"
                 }
             },
             "Type": "AWS::SNS::Subscription"

@@ -13,7 +13,7 @@
                     and
                     <a target="_blank" href="https://console.aws.amazon.com/redshift/home?region={{ region_name }}">Amazon Redshift Spectrum</a>
                     capabilities to
-                    transform, aggregate and analyze Managed Datasets.
+                    transform, aggregate and analyze Curated Datasets.
                     Redshift Spectrum allows data to be analyzed directly from S3,
                     thus it can scale to support querying exabytes of data.
                 </p>
@@ -31,7 +31,7 @@
         <img class="img-responsive qs-diagram center-block" src="/static/diagrams/redshift-spectrum-architecture.png"/>
 
         <p>
-           Managed Datasets in S3 and Managed Datasets in Redshift can be transformed,
+           Curated Datasets in S3 and Curated Datasets in Redshift can be transformed,
             joined, analyzed using Redshift Spectrum.
             <strong>Partitioned data</strong> on S3 can help optimize query performance by only scanning through partitions of interest.
         </p>
@@ -107,8 +107,8 @@
                 <div class="col-sm-6">
                     <p>When you click this button, the following steps will be performed within your AWS account:</p>
                     <ul>
-                        <li>Orders, Customers and Demographics Managed Datasets are consumed by the analytics process</li>
-                        <li>New Managed Datasets are created and added to the Data Lake:
+                        <li>Orders, Customers and Demographics Curated Datasets are consumed by the analytics process</li>
+                        <li>New Curated Datasets are created and added to the Data Lake:
                             <ul>
                                 <li>Customer Lifetime Value</li>
                                 <li>Spend Distribution</li>
@@ -118,7 +118,7 @@
                                 <li>Orders by Month</li>
                             </ul>
                         </li>
-                        <li>New Managed Datasets are copied from Redshift to a Managed Datasets S3 Bucket</li>
+                        <li>New Curated Datasets are copied from Redshift to a Curated Datasets S3 Bucket</li>
                     </ul>
                 </div>
             </div>
@@ -129,18 +129,18 @@
 <div class="form-actions">
     <div class="row">
         <div class="col-sm-12">
-            <h3>d. Observe analytics output stored as Managed Datasets in S3</h3>
+            <h3>d. Observe analytics output stored as Curated Datasets in S3</h3>
 
             <p>
                 Visit <a target="_blank" href="https://console.aws.amazon.com/s3/home?region={{ region_name }}">S3 in the AWS Management Console</a>
-                to see Spectrum analytics outputs stored as new datasets in <strong>{{ managed_bucket_name }}</strong> Bucket.
+                to see Spectrum analytics outputs stored as new datasets in <strong>{{ curated_bucket_name }}</strong> Bucket.
             </p>
 
             <p>Navigate to
                 <a target="_blank"
                        href="http://{{ kibana_url }}app/kibana#/dashboard/Data-Lake-Quickstart">Elasticsearch in the AWS Management Console</a>
-                and review at Top Managed Datasets Summary
-                chart to see new Managed Datasets resulting from the Redshift Spectrum analytics.</p>
+                and review at Top Curated Datasets Summary
+                chart to see new Curated Datasets resulting from the Redshift Spectrum analytics.</p>
         </div>
     </div>
 </div>

@@ -106,7 +106,7 @@ function showAlert(classSelector) {
 
 function initializeButtonEvents() {
     var buttonIdToEndpoint = {
-        '#managedDatasetsButton': '/create_managed_datasets',  // Managed Datasets are created!
+        '#curatedDatasetsButton': '/create_curated_datasets',  // Curated Datasets are created!
         '#kinesisButton': '/configure_kinesis',  // Kinesis applications created and streams are enabled!
         '#spectrumButton': '/run_spectrum_analytics',  // Successfully ran analytics with Spectrum!
         '#athenaRegisterButton': '/run_configure_athena',  // Successfully registered tables in Athena!

@@ -27,7 +27,7 @@
                     "Parameters": [
                         "CreateDemonstration",
                         "WizardInstanceType",
-                        "WizardUsername",
+                        "WizardUserName",
                         "WizardPassword",
                         "DatasetS3BucketName",
                         "DatasetS3KeyPrefix"
@@ -99,7 +99,7 @@
                 "WizardInstanceType": {
                     "default": "Wizard Instance Type"
                 },
-                "WizardUsername": {
+                "WizardUserName": {
                     "default": "Wizard User Name"
                 },
                 "WizardPassword": {
@@ -297,13 +297,13 @@
             "Type": "AWS::EC2::KeyPair::KeyName"
         },
         "KinesisDataStreamName": {
-            "Default": "MyKinesisDataStream",
+            "Default": "streaming-submissions",
             "Description": "Kinesis data stream name. Required only if Create Demonstration is set to \"no\"",
             "Type": "String"
         },
         "KinesisDataStreamS3Prefix": {
             "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
-            "Default": "mydata",
+            "Default": "streaming-submissions",
             "Description": "Kinesis data stream S3 prefix for your streaming data stored in Datalake submissions bucket. Required only if Create Demonstration is set to \"no\"",
             "Type": "String"
         },
@@ -425,7 +425,7 @@
             "NoEcho": "true",
             "Type": "String"
         },
-        "WizardUsername": {
+        "WizardUserName": {
             "AllowedPattern": "^[\\x00-\\x7F]*$",
             "ConstraintDescription": "User name must contain 1 to 64 ASCII characters.",
             "Default": "DataLakeUser",
@@ -495,16 +495,16 @@
                             "Outputs.LambdaRoleARN"
                         ]
                     },
-                    "ManagedDatasetsARN": {
+                    "CuratedDatasetsARN": {
                         "Fn::GetAtt": [
                             "BucketsStack",
-                            "Outputs.ManagedDatasetsARN"
+                            "Outputs.CuratedDatasetsARN"
                         ]
                     },
-                    "ManagedTopicARN": {
+                    "CuratedTopicARN": {
                         "Fn::GetAtt": [
                             "BucketsStack",
-                            "Outputs.ManagedTopicARN"
+                            "Outputs.CuratedTopicARN"
                         ]
                     },
                     "NAT1ElasticIP": {
@@ -581,10 +581,10 @@
                             ""
                         ]
                     },
-                    "ManagedBucketName": {
+                    "CuratedBucketName": {
                         "Fn::GetAtt": [
                             "BucketsStack",
-                            "Outputs.ManagedBucketName"
+                            "Outputs.CuratedBucketName"
                         ]
                     },
                     "PublishedBucketName": {
@@ -624,10 +624,10 @@
                     "EnableRedshift": {
                         "Ref": "EnableRedshift"
                     },
-                    "ManagedDatasetsARN": {
+                    "CuratedDatasetsARN": {
                         "Fn::GetAtt": [
                             "BucketsStack",
-                            "Outputs.ManagedDatasetsARN"
+                            "Outputs.CuratedDatasetsARN"
                         ]
                     },
                     "PublishedDataARN": {
@@ -684,16 +684,16 @@
                             "Outputs.ElasticsearchDomainARN"
                         ]
                     },
-                    "ManagedBucketARN": {
+                    "CuratedBucketARN": {
                         "Fn::GetAtt": [
                             "BucketsStack",
-                            "Outputs.ManagedDatasetsARN"
+                            "Outputs.CuratedDatasetsARN"
                         ]
                     },
-                    "ManagedBucketAccessARN": {
+                    "CuratedBucketAccessARN": {
                         "Fn::GetAtt": [
                             "IAMRolesStack",
-                            "Outputs.ManagedBucketAccessARN"
+                            "Outputs.CuratedBucketAccessARN"
                         ]
                     },
                     "RedshiftConnectionURL": {
@@ -873,7 +873,7 @@
                         "Ref": "WizardPassword"
                     },
                     "ApplicationUsername": {
-                        "Ref": "WizardUsername"
+                        "Ref": "WizardUserName"
                     },
                     "AthenaQueryResultsBucketName": {
                         "Fn::GetAtt": [
@@ -929,16 +929,16 @@
                             "Outputs.AnalyticsAccessARN"
                         ]
                     },
-                    "ManagedBucketARN": {
+                    "CuratedBucketARN": {
                         "Fn::GetAtt": [
                             "BucketsStack",
-                            "Outputs.ManagedDatasetsARN"
+                            "Outputs.CuratedDatasetsARN"
                         ]
                     },
-                    "ManagedBucketName": {
+                    "CuratedBucketName": {
                         "Fn::GetAtt": [
                             "BucketsStack",
-                            "Outputs.ManagedBucketName"
+                            "Outputs.CuratedBucketName"
                         ]
                     },
                     "NumWebServerInstances": 1,
@@ -1042,8 +1042,8 @@
         }
     },
     "Outputs": {
-        "DataLakeWizardWebAppURL": {
-            "Description": "Web App URL",
+        "DataLakeWizardURL": {
+            "Description": "Data Lake Wizard URL",
             "Condition": "CreateDemoResources",
             "Value": {
                 "Fn::GetAtt": [
@@ -1053,7 +1053,7 @@
             }
         },
         "SubmissionsBucketName": {
-            "Description": "Submissions bucket name",
+            "Description": "Bucket name for submissions",
             "Value": {
                 "Fn::GetAtt": [
                     "BucketsStack",
@@ -1061,17 +1061,17 @@
                 ]
             }
         },
-        "ManagedBucketName": {
-            "Description": "Managed bucket name",
+        "CuratedBucketName": {
+            "Description": "Curated bucket name",
             "Value": {
                 "Fn::GetAtt": [
                     "BucketsStack",
-                    "Outputs.ManagedBucketName"
+                    "Outputs.CuratedBucketName"
                 ]
             }
         },
         "PublishedBucketName": {
-            "Description": "Published bucket name",
+            "Description": "Bucket name for published results",
             "Value": {
                 "Fn::GetAtt": [
                     "BucketsStack",
@@ -1079,8 +1079,8 @@
                 ]
             }
         },
-        "RedshiftJdbcUrl": {
-            "Description": "Redshift JDBC url",
+        "RedshiftJDBCEndpoint": {
+            "Description": "Redshift JDBC Endpoint",
             "Condition": "CreateRedshift",
             "Value": {
                 "Fn::GetAtt": [

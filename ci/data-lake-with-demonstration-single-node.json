@@ -12,11 +12,11 @@
       "ParameterValue": "yes"
   },
   {
-      "ParameterKey": "InstanceType",
+      "ParameterKey": "WizardInstanceType",
       "ParameterValue": "t2.micro"
   },
   {
-      "ParameterKey": "WizardUsername",
+      "ParameterKey": "WizardUserName",
       "ParameterValue": "WebAppUser"
   },
   {

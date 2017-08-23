@@ -81,35 +81,35 @@ def _run_in_parallel(job_generator, max_workers):
 
 def _transform_demographics(config):
     submissions_bucket = _make_bucket(config['submissions_bucket_name'])
-    managed_bucket = _make_bucket(config['managed_bucket_name'])
+    curated_bucket = _make_bucket(config['curated_bucket_name'])
     submissions_bucket.download_file(config['demographics_submission_path'], DEMOGRAPHICS_DATA_DOWNLOAD_PATH)
     with ZipFile(DEMOGRAPHICS_DATA_DOWNLOAD_PATH) as zipped:
         zipped.extract(DEMOGRAPHICS_DATA_EXTRACTED_FILE_NAME, DEMOGRAPHICS_DATA_EXTRACT_DIR)
     extracted_path = os.path.join(DEMOGRAPHICS_DATA_EXTRACT_DIR, DEMOGRAPHICS_DATA_EXTRACTED_FILE_NAME)
-    managed_bucket.upload_file(extracted_path, config['demographics_managed_path'])
+    curated_bucket.upload_file(extracted_path, config['demographics_curated_path'])
 
 
 def _copy_customers(config):
-    managed_bucket = _make_bucket(config['managed_bucket_name'])
+    curated_bucket = _make_bucket(config['curated_bucket_name'])
     copy_source = {
         'Bucket': config['submissions_bucket_name'],
         'Key': config['customers_submission_path']
     }
-    managed_bucket.copy(copy_source, config['customers_managed_path'])
+    curated_bucket.copy(copy_source, config['customers_curated_path'])
 
 
 def _copy_orders(config, bucket_key):
-    managed_bucket = _make_bucket(config['managed_bucket_name'])
+    curated_bucket = _make_bucket(config['curated_bucket_name'])
     copy_source = {
         'Bucket': config['submissions_bucket_name'],
         'Key': bucket_key
     }
-    path = os.path.join(os.path.dirname(config['orders_managed_path']), os.path.basename(bucket_key))
-    managed_bucket.copy(copy_source, path)
+    path = os.path.join(os.path.dirname(config['orders_curated_path']), os.path.basename(bucket_key))
+    curated_bucket.copy(copy_source, path)
 
 
 def _copy_products(config, bucket_key):
-    managed_bucket = _make_bucket(config['managed_bucket_name'])
+    curated_bucket = _make_bucket(config['curated_bucket_name'])
     copy_source = {
         'Bucket': config['submissions_bucket_name'],
         'Key': bucket_key
@@ -117,8 +117,8 @@ def _copy_products(config, bucket_key):
     file_name = os.path.basename(bucket_key)
     year = file_name[-4:]
     partition = 'dt={}-12-31/products.csv'.format(year)
-    destination_path = os.path.join(config['products_managed_dir'], partition)
-    managed_bucket.copy(copy_source, destination_path)
+    destination_path = os.path.join(config['products_curated_dir'], partition)
+    curated_bucket.copy(copy_source, destination_path)
 
 
 def _generate_submission_transformations(config):
@@ -139,18 +139,18 @@ def _generate_submission_transformations(config):
 def _create_customers_table(config):
     redshift_manager = _make_redshift_manager(config)
     redshift_manager.execute_from_file(
-        'create_customers_managed_dataset.sql',
-        managed_bucket_name=config['managed_bucket_name'],
-        customers_managed_path=config['customers_managed_path']
+        'create_customers_curated_dataset.sql',
+        curated_bucket_name=config['curated_bucket_name'],
+        customers_curated_path=config['customers_curated_path']
     )
 
 
 def _create_orders_table(config):
     redshift_manager = _make_redshift_manager(config)
     redshift_manager.execute_from_file(
-        'create_orders_managed_dataset.sql',
-        managed_bucket_name=config['managed_bucket_name'],
-        orders_managed_path=config['orders_managed_path']
+        'create_orders_curated_dataset.sql',
+        curated_bucket_name=config['curated_bucket_name'],
+        orders_curated_path=config['orders_curated_path']
     )
 
 
@@ -164,10 +164,10 @@ def _create_external_tables(config):
     )
     redshift_manager.execute_from_file(
         'create_external_tables.sql',
-        managed_bucket_name=config['managed_bucket_name'],
-        demographics_managed_dir=config['demographics_managed_dir'],
+        curated_bucket_name=config['curated_bucket_name'],
+        demographics_curated_dir=config['demographics_curated_dir'],
         demographics_partition=config['demographics_partition'],
-        products_managed_dir=config['products_managed_dir'],
+        products_curated_dir=config['products_curated_dir'],
         external_schema_name=config['redshift_external_schema_name']
     )
 
@@ -180,7 +180,7 @@ def _generate_load_jobs(config):
     )
 
 
-def create_and_load_managed_datasets(config):
+def create_and_load_curated_datasets(config):
     _run_in_parallel(_generate_submission_transformations(config), max_workers=20)
     _run_in_parallel(_generate_load_jobs(config), max_workers=3)
 
@@ -227,7 +227,7 @@ def _generate_save_analysis_jobs(config):
         yield functools.partial(
             _unload_analysis_table_to_s3,
             config,
-            bucket_name=config['managed_bucket_name'],
+            bucket_name=config['curated_bucket_name'],
             table_name=table_name,
             path=path
         )

@@ -57,6 +57,6 @@
   },
   {
       "ParameterKey": "KinesisDataStreamS3Prefix",
-      "ParameterValue": "mydata"
+      "ParameterValue": "streaming-submissions"
   }
 ]

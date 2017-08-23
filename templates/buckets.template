@@ -10,7 +10,6 @@
                         "-",
                         [
                             "datalake",
-                            "raw",
                             "submissions",
                             {
                                 "Ref": "AWS::AccountId"
@@ -36,7 +35,7 @@
                 "SubmissionsTopicPolicy"
             ]
         },
-        "ManagedDatasets": {
+        "CuratedDatasets": {
             "Type": "AWS::S3::Bucket",
             "Properties": {
                 "BucketName": {
@@ -44,7 +43,7 @@
                         "-",
                         [
                             "datalake",
-                            "managed",
+                            "curated",
                             "datasets",
                             {
                                 "Ref": "AWS::AccountId"
@@ -60,17 +59,17 @@
                         {
                             "Event": "s3:ObjectCreated:*",
                             "Topic": {
-                                "Ref": "ManagedTopic"
+                                "Ref": "CuratedTopic"
                             }
                         }
                     ]
                 }
             },
             "DependsOn": [
-                "ManagedTopicPolicy"
+                "CuratedTopicPolicy"
             ]
         },
-        "ManagedTopicPolicy": {
+        "CuratedTopicPolicy": {
             "Type": "AWS::SNS::TopicPolicy",
             "Properties": {
                 "PolicyDocument": {
@@ -85,7 +84,7 @@
                             },
                             "Action": "sns:Publish",
                             "Resource": {
-                                "Ref": "ManagedTopic"
+                                "Ref": "CuratedTopic"
                             },
                             "Condition": {
                                 "ArnLike": {
@@ -98,7 +97,7 @@
                                                         "-",
                                                         [
                                                             "datalake",
-                                                            "managed",
+                                                            "curated",
                                                             "datasets",
                                                             {
                                                                 "Ref": "AWS::AccountId"
@@ -119,7 +118,7 @@
                 },
                 "Topics": [
                     {
-                        "Ref": "ManagedTopic"
+                        "Ref": "CuratedTopic"
                     }
                 ]
             }
@@ -182,7 +181,7 @@
             "Type": "AWS::SNS::Topic",
             "Properties": {}
         },
-        "ManagedTopic": {
+        "CuratedTopic": {
             "Type": "AWS::SNS::Topic",
             "Properties": {}
         },
@@ -252,7 +251,6 @@
                                                         "-",
                                                         [
                                                             "datalake",
-                                                            "raw",
                                                             "submissions",
                                                             {
                                                                 "Ref": "AWS::AccountId"
@@ -343,25 +341,25 @@
             },
             "Description": "SubmissionsBucket bucket ARN"
         },
-        "ManagedDatasetsARN": {
+        "CuratedDatasetsARN": {
             "Value": {
                 "Fn::Join": [
                     "",
                     [
                         "arn:aws:s3:::",
                         {
-                            "Ref": "ManagedDatasets"
+                            "Ref": "CuratedDatasets"
                         }
                     ]
                 ]
             },
-            "Description": "ManagedDatasets bucket ARN"
+            "Description": "CuratedDatasets bucket ARN"
         },
-        "ManagedBucketName": {
+        "CuratedBucketName": {
             "Value": {
-                "Ref": "ManagedDatasets"
+                "Ref": "CuratedDatasets"
             },
-            "Description": "SubmissionsBucket bucket ARN"
+            "Description": "Curated datasets bucket ARN"
         },
         "PublishedDataARN": {
             "Value": {
@@ -381,7 +379,7 @@
             "Value": {
                 "Ref": "PublishedData"
             },
-            "Description": "Published bucket name"
+            "Description": "Bucket name for published results"
         },
         "RegionalLambdaBucketARN": {
             "Value": {
@@ -429,11 +427,11 @@
             },
             "Description": "SubmissionsTopic ARN"
         },
-        "ManagedTopicARN": {
+        "CuratedTopicARN": {
             "Value": {
-                "Ref": "ManagedTopic"
+                "Ref": "CuratedTopic"
             },
-            "Description": "ManagedTopic ARN"
+            "Description": "CuratedTopic ARN"
         },
         "PublishedTopicARN": {
             "Value": {

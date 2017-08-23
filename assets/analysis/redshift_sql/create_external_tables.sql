@@ -16,11 +16,11 @@ PARTITIONED BY (dt DATE)
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '|'
 STORED AS TEXTFILE
-LOCATION 's3://{{ managed_bucket_name }}/{{ demographics_managed_dir }}';
+LOCATION 's3://{{ curated_bucket_name }}/{{ demographics_curated_dir }}';
 
 ALTER TABLE {{ external_schema_name }}.ext_demographics
 ADD PARTITION(dt='{{ demographics_partition }}')
-LOCATION 's3://{{ managed_bucket_name }}/{{ demographics_managed_dir }}dt={{ demographics_partition }}/';
+LOCATION 's3://{{ curated_bucket_name }}/{{ demographics_curated_dir }}dt={{ demographics_partition }}/';
 
 CREATE EXTERNAL TABLE {{ external_schema_name }}.ext_products (
   sku                     varchar(35),
@@ -34,12 +34,12 @@ PARTITIONED BY (dt DATE)
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
 STORED AS TEXTFILE
-LOCATION 's3://{{ managed_bucket_name }}/{{ products_managed_dir }}';
+LOCATION 's3://{{ curated_bucket_name }}/{{ products_curated_dir }}';
 
 {% for partition in ('2016-12-31', '2015-12-31', '2014-12-31', '2013-12-31') %}
 
 ALTER TABLE {{ external_schema_name }}.ext_products
 ADD PARTITION(dt='{{ partition }}')
-LOCATION 's3://{{ managed_bucket_name }}/{{ products_managed_dir }}dt={{ partition }}/';
+LOCATION 's3://{{ curated_bucket_name }}/{{ products_curated_dir }}dt={{ partition }}/';
 
 {% endfor %}

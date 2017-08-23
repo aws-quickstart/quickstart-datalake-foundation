@@ -12,4 +12,4 @@ PARTITIONED BY (dt DATE)
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
 STORED AS TEXTFILE
-LOCATION 's3://{{ managed_bucket_name }}/{{ customers_managed_dir }}';
+LOCATION 's3://{{ curated_bucket_name }}/{{ customers_curated_dir }}';

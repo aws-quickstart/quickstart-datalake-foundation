@@ -220,8 +220,8 @@ def create_aggregate_orders_app(client, app_name, config):
     reference_data_config = create_customers_reference_table_config(
         app_name=app_name,
         current_app_version=current_app_version,
-        bucket_arn=config['managed_bucket_arn'],
-        bucket_key=config['customers_managed_path'],
+        bucket_arn=config['curated_bucket_arn'],
+        bucket_key=config['customers_curated_path'],
         role_arn=config['kinesis_analytics_role_arn']
     )
     client.add_application_reference_data_source(**reference_data_config)

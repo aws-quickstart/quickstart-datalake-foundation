@@ -56,7 +56,7 @@
                                                 "/",
                                                 [
                                                     {
-                                                        "Ref": "ManagedDatasetsARN"
+                                                        "Ref": "CuratedDatasetsARN"
                                                     },
                                                     "*"
                                                 ]
@@ -199,7 +199,7 @@
                                                 "",
                                                 [
                                                     {
-                                                        "Ref": "ManagedDatasetsARN"
+                                                        "Ref": "CuratedDatasetsARN"
                                                     },
                                                     "*"
                                                 ]
@@ -575,7 +575,7 @@
                                                 "",
                                                 [
                                                     {
-                                                        "Ref": "ManagedDatasetsARN"
+                                                        "Ref": "CuratedDatasetsARN"
                                                     },
                                                     "*"
                                                 ]
@@ -665,7 +665,7 @@
                                                 "",
                                                 [
                                                     {
-                                                        "Ref": "ManagedDatasetsARN"
+                                                        "Ref": "CuratedDatasetsARN"
                                                     },
                                                     "*"
                                                 ]
@@ -948,7 +948,7 @@
                                                 "",
                                                 [
                                                     {
-                                                        "Ref": "ManagedDatasetsARN"
+                                                        "Ref": "CuratedDatasetsARN"
                                                     },
                                                     "/*"
                                                 ]
@@ -976,7 +976,7 @@
             },
             "Type": "AWS::IAM::Role"
         },
-        "ManagedBucketAccess": {
+        "CuratedBucketAccess": {
             "Condition": "CreateDemoResources",
             "Properties": {
                 "AssumeRolePolicyDocument": {
@@ -1014,14 +1014,14 @@
                                     "Effect": "Allow",
                                     "Resource": [
                                         {
-                                            "Ref": "ManagedDatasetsARN"
+                                            "Ref": "CuratedDatasetsARN"
                                         },
                                         {
                                             "Fn::Join": [
                                                 "/",
                                                 [
                                                     {
-                                                        "Ref": "ManagedDatasetsARN"
+                                                        "Ref": "CuratedDatasetsARN"
                                                     },
                                                     "*"
                                                 ]
@@ -1075,7 +1075,7 @@
                                                 "",
                                                 [
                                                     {
-                                                        "Ref": "ManagedDatasetsARN"
+                                                        "Ref": "CuratedDatasetsARN"
                                                     },
                                                     "*"
                                                 ]
@@ -1294,8 +1294,8 @@
             "Description": "Enable Redshift",
             "Type": "String"
         },
-        "ManagedDatasetsARN": {
-            "Description": "ManagedDatasets bucket ARN",
+        "CuratedDatasetsARN": {
+            "Description": "CuratedDatasets bucket ARN",
             "Type": "String"
         },
         "PublishedDataARN": {
@@ -1368,12 +1368,12 @@
                 ]
             }
         },
-        "ManagedBucketAccessARN": {
-            "Description": "ARN of ManagedBucketAccess",
+        "CuratedBucketAccessARN": {
+            "Description": "ARN of CuratedBucketAccess",
             "Condition": "CreateDemoResources",
             "Value": {
                 "Fn::GetAtt": [
-                    "ManagedBucketAccess",
+                    "CuratedBucketAccess",
                     "Arn"
                 ]
             }

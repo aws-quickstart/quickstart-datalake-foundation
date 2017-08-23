@@ -5,8 +5,8 @@
         "EmptyBuckets": {
             "Condition": "CreateDemoResources",
             "Properties": {
-                "ManagedDatasets": {
-                    "Ref": "ManagedBucketName"
+                "CuratedDatasets": {
+                    "Ref": "CuratedBucketName"
                 },
                 "PublishedData": {
                     "Ref": "PublishedBucketName"
@@ -40,12 +40,12 @@
                                 "",
                                 "def handler(event, context):",
                                 "    submissions_bucket = s3.Bucket(event['ResourceProperties']['SubmissionsBucket'])",
-                                "    managed_datasets = s3.Bucket(event['ResourceProperties']['ManagedDatasets'])",
+                                "    curated_datasets = s3.Bucket(event['ResourceProperties']['CuratedDatasets'])",
                                 "    published_data = s3.Bucket(event['ResourceProperties']['PublishedData'])",
                                 "    if event['RequestType'] == 'Delete':",
                                 "        try:",
                                 "            submissions_bucket.objects.all().delete()",
-                                "            managed_datasets.objects.all().delete()",
+                                "            curated_datasets.objects.all().delete()",
                                 "            published_data.objects.all().delete()",
                                 "            return cfnresponse.send(event, context, cfnresponse.SUCCESS, {})",
                                 "        except ClientError as e:",
@@ -91,8 +91,8 @@
             "Description": "EmptyBucketsRole ARN",
             "Type": "String"
         },
-        "ManagedBucketName": {
-            "Description": "ManagedDatasets bucket name",
+        "CuratedBucketName": {
+            "Description": "Bucket name for curated datasets",
             "Type": "String"
         },
         "PublishedBucketName": {

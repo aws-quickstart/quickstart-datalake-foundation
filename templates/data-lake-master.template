@@ -20,7 +20,7 @@
                     "Parameters": [
                         "CreateDemonstration",
                         "WizardInstanceType",
-                        "WizardUsername",
+                        "WizardUserName",
                         "WizardPassword",
                         "DatasetS3BucketName",
                         "DatasetS3KeyPrefix"
@@ -92,7 +92,7 @@
                 "WizardInstanceType": {
                     "default": "Wizard Instance Type"
                 },
-                "WizardUsername": {
+                "WizardUserName": {
                     "default": "Wizard User Name"
                 },
                 "WizardPassword": {
@@ -266,13 +266,13 @@
             "Type": "AWS::EC2::KeyPair::KeyName"
         },
         "KinesisDataStreamName": {
-            "Default": "MyKinesisDataStream",
+            "Default": "streaming-submissions",
             "Description": "Kinesis data stream name. Required only if Create Demonstration is set to \"no\"",
             "Type": "String"
         },
         "KinesisDataStreamS3Prefix": {
             "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
-            "Default": "mydata",
+            "Default": "streaming-submissions",
             "Description": "Kinesis data stream S3 prefix for your streaming data stored in Datalake submissions bucket. Required only if Create Demonstration is set to \"no\"",
             "Type": "String"
         },
@@ -363,7 +363,7 @@
             "NoEcho": "true",
             "Type": "String"
         },
-        "WizardUsername": {
+        "WizardUserName": {
             "AllowedPattern": "^[\\x00-\\x7F]*$",
             "ConstraintDescription": "User name must contain 1 to 64 ASCII characters.",
             "Default": "DataLakeUser",
@@ -544,8 +544,8 @@
                     "WizardPassword": {
                         "Ref": "WizardPassword"
                     },
-                    "WizardUsername": {
-                        "Ref": "WizardUsername"
+                    "WizardUserName": {
+                        "Ref": "WizardUserName"
                     }
                 },
                 "TemplateURL": {
@@ -631,18 +631,18 @@
         }
     },
     "Outputs": {
-        "DataLakeWizardWebAppURL": {
+        "DataLakeWizardURL": {
             "Description": "Data Lake wizard walk-through wizard URL",
             "Condition": "CreateDemoResources",
             "Value": {
                 "Fn::GetAtt": [
                     "DataLakeFoundationStack",
-                    "Outputs.DataLakeWizardWebAppURL"
+                    "Outputs.DataLakeWizardURL"
                 ]
             }
         },
         "SubmissionsBucketName": {
-            "Description": "Submissions bucket name",
+            "Description": "Bucket name for submissions",
             "Value": {
                 "Fn::GetAtt": [
                     "DataLakeFoundationStack",
@@ -650,17 +650,17 @@
                 ]
             }
         },
-        "ManagedBucketName": {
-            "Description": "Managed bucket name",
+        "CuratedBucketName": {
+            "Description": "Curated bucket name",
             "Value": {
                 "Fn::GetAtt": [
                     "DataLakeFoundationStack",
-                    "Outputs.ManagedBucketName"
+                    "Outputs.CuratedBucketName"
                 ]
             }
         },
         "PublishedBucketName": {
-            "Description": "Published bucket name",
+            "Description": "Bucket name for published results",
             "Value": {
                 "Fn::GetAtt": [
                     "DataLakeFoundationStack",
@@ -668,13 +668,13 @@
                 ]
             }
         },
-        "RedshiftJdbcUrl": {
-            "Description": "Redshift JDBC url",
+        "RedshiftJDBCEndpoint": {
+            "Description": "Redshift JDBC Endpoint",
             "Condition": "CreateRedshift",
             "Value": {
                 "Fn::GetAtt": [
                     "DataLakeFoundationStack",
-                    "Outputs.RedshiftJdbcUrl"
+                    "Outputs.RedshiftJDBCEndpoint"
                 ]
             }
         },

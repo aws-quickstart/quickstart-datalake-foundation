@@ -35,11 +35,11 @@ def run_query_on_athena(client, template_loader, query_template, config, with_ex
     query = template_loader.load_from_file(
         query_template,
         database_name=config['athena_database_name'],
-        managed_bucket_name=config['managed_bucket_name'],
-        customers_managed_dir=config['customers_managed_dir'],
-        orders_managed_dir=config['orders_managed_dir'],
-        demographics_managed_dir=config['demographics_managed_dir'],
-        products_managed_dir=config['products_managed_dir']
+        curated_bucket_name=config['curated_bucket_name'],
+        customers_curated_dir=config['customers_curated_dir'],
+        orders_curated_dir=config['orders_curated_dir'],
+        demographics_curated_dir=config['demographics_curated_dir'],
+        products_curated_dir=config['products_curated_dir']
     )
     output_location = 's3://{}/database-setup/{}'.format(
         config['athena_query_results_bucket_name'],

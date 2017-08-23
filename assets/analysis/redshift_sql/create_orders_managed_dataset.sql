@@ -9,7 +9,7 @@ DISTKEY(customer_id)
 SORTKEY(customer_id);
 
 COPY orders
-FROM 's3://{{ managed_bucket_name }}/{{ orders_managed_path }}'
+FROM 's3://{{ curated_bucket_name }}/{{ orders_curated_path }}'
 IAM_ROLE '{{ redshift_role_arn }}'
 DELIMITER ','
 REGION '{{ region_name }}';

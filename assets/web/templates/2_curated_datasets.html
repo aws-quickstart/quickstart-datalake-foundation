@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-sm-12">
-        <h3><strong>Step 2</strong> - Managed Datasets</h3>
+        <h3><strong>Step 2</strong> - Curated Datasets</h3>
     </div>
 </div>
 
@@ -51,7 +51,7 @@
 
         <div class="row">
             <div class="col-sm-12">
-                <h4><i class="qs-italic-header">Managed Datasets</i></h4>
+                <h4><i class="qs-italic-header">Curated Datasets</i></h4>
             </div>
         </div>
         <div class="row">
@@ -61,7 +61,7 @@
             <div class="col-sm-11">
                 <p>Datasets under management are stored in S3 Buckets.</p>
 
-                <p>Managed Datasets are a key concept of Data Lakes. They can include:</p>
+                <p>Curated Datasets are a key concept of Data Lakes. They can include:</p>
                 <ul>
                     <li>Data that has been lightly transformed, so they can be easily consumed by down-stream analytics</li>
                     <li>Results of analytics</li>
@@ -75,24 +75,24 @@
     <div class="col-sm-12">
         <h3>b. Review datasets contributed by Data Providers</h3>
         <p>
-            The diagram below illustrates submissions from ECommCo’s Data Providers and how they are transformed into Managed Datasets.
+            The diagram below illustrates submissions from ECommCo’s Data Providers and how they are transformed into Curated Datasets.
         </p>
-        <img class="img-responsive qs-diagram center-block" src="/static/diagrams/managed-architecture.png"/>
+        <img class="img-responsive qs-diagram center-block" src="/static/diagrams/curated-architecture.png"/>
     </div>
 </div>
 
 <div class="row">
     <div class="col-sm-12">
-        <h3>c. Transform submissions into Managed Datasets</h3>
+        <h3>c. Transform submissions into Curated Datasets</h3>
         <div class="form-actions">
             <div class="row">
                 <div class="col-sm-6">
                     <div class="pull-right">
                         <button type="button"
                                 class="btn btn-primary btn-lg qs-action-button"
-                                id="managedDatasetsButton"
-                                data-loading-text="<i class='fa fa-spinner fa-spin'></i> Creating managed datasets">
-                            Create Managed Datasets
+                                id="curatedDatasetsButton"
+                                data-loading-text="<i class='fa fa-spinner fa-spin'></i> Creating Curated Datasets">
+                            Create Curated Datasets
                         </button>
                     </div>
                 </div>
@@ -101,21 +101,21 @@
                         When you click this button, the following steps will be performed within your AWS account:
                     </p>
                         <ul>
-                            <li>Create Managed Datasets by copying data submissions into Managed Dataset Bucket:
+                            <li>Create Curated Datasets by copying data submissions into Curated Dataset Bucket:
                                 <ul>
                                     <li>Orders</li>
                                     <li>Customers</li>
                                     <li>Products</li>
                                 </ul>
                             </li>
-                            <li>Create Managed Dataset by transforming and copying Demographics data submission into Managed Dataset Bucket</li>
-                            <li>Load Managed Datasets to Redshift tables:
+                            <li>Create Curated Dataset by transforming and copying Demographics data submission into Curated Dataset Bucket</li>
+                            <li>Load Curated Datasets to Redshift tables:
                                 <ul>
                                     <li>Orders to <strong>orders</strong> table</li>
                                     <li>Customers to <strong>customers</strong> table</li>
                                 </ul>
                             </li>
-                            <li>Register Managed Datasets as external tables in Amazon Redshift Spectrum
+                            <li>Register Curated Datasets as external tables in Amazon Redshift Spectrum
                                 <ul>
                                     <li>Demographics</li>
                                     <li>Products</li>
@@ -132,7 +132,7 @@
 
 <div class="row">
     <div class="col-sm-12">
-        <h3>d. Observe Managed Datasets in S3</h3>
+        <h3>d. Observe Curated Datasets in S3</h3>
 
         <p>
             Visit <a target="_blank" href="https://console.aws.amazon.com/s3/home?region={{ region_name }}">S3 in your AWS Management Console</a>
@@ -140,7 +140,7 @@
         </p>
         <ul>
             <li><strong>{{ submissions_bucket_name }}</strong> - S3 Bucket with submissions</li>
-            <li><strong>{{ managed_bucket_name }}</strong> - S3 Bucket with Managed Datasets</li>
+            <li><strong>{{ curated_bucket_name }}</strong> - S3 Bucket with Curated Datasets</li>
         </ul>
     </div>
 </div>

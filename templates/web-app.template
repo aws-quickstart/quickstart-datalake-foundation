@@ -68,12 +68,12 @@
             "Description": "Kinesis analytics role ARN",
             "Type": "String"
         },
-        "ManagedBucketARN": {
-            "Description": "Managed bucket ARN",
+        "CuratedBucketARN": {
+            "Description": "Curated bucket ARN",
             "Type": "String"
         },
-        "ManagedBucketName": {
-            "Description": "Manged bucket name",
+        "CuratedBucketName": {
+            "Description": "Bucket name for curated datasets",
             "Type": "String"
         },
         "NumWebServerInstances": {
@@ -105,7 +105,7 @@
             "Type": "AWS::EC2::Subnet::Id"
         },
         "PublishedBucketName": {
-            "Description": "Published bucket name",
+            "Description": "Bucket name for published results",
             "Type": "String"
         },
         "QSS3BucketName": {
@@ -146,7 +146,7 @@
             "Type": "String"
         },
         "SubmissionsBucketName": {
-            "Description": "Submissions bucket name",
+            "Description": "Bucket name for submissions",
             "Type": "String"
         },
         "TopSKUStreamARN": {
@@ -183,8 +183,8 @@
                 "AthenaQueryResultsBucket": {
                     "Ref": "AthenaQueryResultsBucketName"
                 },
-                "ManagedDatasets": {
-                    "Ref": "ManagedBucketName"
+                "CuratedDatasets": {
+                    "Ref": "CuratedBucketName"
                 },
                 "PublishedData": {
                     "Ref": "PublishedBucketName"
@@ -219,13 +219,13 @@
                                 "",
                                 "def handler(event, context):",
                                 "    submissions_bucket = s3.Bucket(event['ResourceProperties']['SubmissionsBucket'])",
-                                "    managed_datasets = s3.Bucket(event['ResourceProperties']['ManagedDatasets'])",
+                                "    curated_datasets = s3.Bucket(event['ResourceProperties']['CuratedDatasets'])",
                                 "    published_data = s3.Bucket(event['ResourceProperties']['PublishedData'])",
                                 "    athena_query_results_bucket = s3.Bucket(event['ResourceProperties']['AthenaQueryResultsBucket'])",
                                 "    if event['RequestType'] == 'Delete':",
                                 "        try:",
                                 "           submissions_bucket.objects.all().delete()",
-                                "           managed_datasets.objects.all().delete()",
+                                "           curated_datasets.objects.all().delete()",
                                 "           published_data.objects.all().delete()",
                                 "           athena_query_results_bucket.objects.all().delete()",
                                 "           response = ka_client.list_applications()",
@@ -459,26 +459,26 @@
                                                 "Fn::Sub": "submissions_bucket_arn=${SubmissionsBucketARN}"
                                             },
                                             {
-                                                "Fn::Sub": "managed_bucket_name=${ManagedBucketName}"
+                                                "Fn::Sub": "curated_bucket_name=${CuratedBucketName}"
                                             },
                                             {
-                                                "Fn::Sub": "managed_bucket_arn=${ManagedBucketARN}"
+                                                "Fn::Sub": "curated_bucket_arn=${CuratedBucketARN}"
                                             },
                                             {
                                                 "Fn::Sub": "published_bucket_name=${PublishedBucketName}"
                                             },
                                             "demographics_submission_path=demographics/2017/06/02/demographics20170520.zip",
-                                            "demographics_managed_path=demographics/v=20170520/p=csv/dt=2017-06-01/demographics_data.csv",
-                                            "demographics_managed_dir=demographics/v=20170520/p=csv/",
+                                            "demographics_curated_path=demographics/v=20170520/p=csv/dt=2017-06-01/demographics_data.csv",
+                                            "demographics_curated_dir=demographics/v=20170520/p=csv/",
                                             "demographics_partition=2017-06-01",
                                             "customers_submission_path=customers/2017/06/01/customers.csv",
-                                            "customers_managed_path=customers/v=20170601/p=csv/dt=2017-06-01/customers.csv",
-                                            "customers_managed_dir=customers/v=20170601/p=csv/",
+                                            "customers_curated_path=customers/v=20170601/p=csv/dt=2017-06-01/customers.csv",
+                                            "customers_curated_dir=customers/v=20170601/p=csv/",
                                             "orders_submission_path=orders/2017/06/01/orders.csv",
-                                            "orders_managed_path=orders/v=20170601/p=csv/dt=2017-06-01/orders.csv",
-                                            "orders_managed_dir=orders/v=20170601/p=csv/",
+                                            "orders_curated_path=orders/v=20170601/p=csv/dt=2017-06-01/orders.csv",
+                                            "orders_curated_dir=orders/v=20170601/p=csv/",
                                             "products_submission_path=products/2017/06/01/products.csv",
-                                            "products_managed_dir=products/v=20170601/p=csv/",
+                                            "products_curated_dir=products/v=20170601/p=csv/",
                                             "[streams]",
                                             {
                                                 "Fn::Sub": "orders_stream_name=${OrdersStreamName}"

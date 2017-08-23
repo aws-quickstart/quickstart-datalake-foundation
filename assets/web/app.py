@@ -27,7 +27,7 @@ from analysis.athena_database import configure_athena
 from analysis.transformations import (
     run_redshift_analysis,
     publish_analysis_results,
-    create_and_load_managed_datasets
+    create_and_load_curated_datasets
 )
 from analysis.learn_more import learn_more
 from root import PROJECT_DIR
@@ -115,16 +115,16 @@ def wizard():
         region_name=app.config['region_name'],
         athena_database_name=app.config['athena_database_name'],
         published_bucket_name=app.config['published_bucket_name'],
-        managed_bucket_name=app.config['managed_bucket_name'],
+        curated_bucket_name=app.config['curated_bucket_name'],
         submissions_bucket_name=app.config['submissions_bucket_name']
     )
 
 
-@app.route('/create_managed_datasets', methods=['POST'])
+@app.route('/create_curated_datasets', methods=['POST'])
 @login_required
 @mark_step_as_done(step=2)
-def create_managed_datasets():
-    create_and_load_managed_datasets(app.config)
+def create_curated_datasets():
+    create_and_load_curated_datasets(app.config)
 
 
 @app.route('/configure_kinesis', methods=['POST'])
