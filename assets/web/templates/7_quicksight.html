@@ -9,7 +9,7 @@
             <div class="col-sm-11">
                 <p class="lead">EcommCo’s Data Lake leverages
                     <a target="_blank" href="https://quicksight.aws.amazon.com/">AWS QuickSight</a>
-                    for visualizations of published datasets. QuickSight presents compelling data stories that are
+                    for visualizations of published data. QuickSight presents compelling data stories that are
                     consumable by business users.
                 </p>
             </div>
@@ -26,14 +26,14 @@
 
 <div class="row">
     <div class="col-sm-12">
-        <h3>a. Publish datasets to Published Datasets S3 Bucket</h3>
+        <h3>a. Publish Data to Published Data S3 Bucket</h3>
         <div class="form-actions">
             <div class="row">
                 <div class="col-sm-6">
                     <div class="pull-right">
                         <button type="button" class="btn btn-primary btn-lg qs-action-button" id="quicksightPublishButton"
                                 data-loading-text="<i class='fa fa-spinner fa-spin'></i> Running">
-                            Publish datasets
+                            Publish data
                         </button>
                     </div>
                 </div>
@@ -42,9 +42,9 @@
                         When you click this button, the following steps will be performed within your AWS account:
                     </p>
                     <ul>
-                        <li>Curated Datasets derived from Analytics are copied from Redshift to Published Datasets S3 Bucket</li>
+                        <li>Curated Datasets derived from Analytics are copied from Redshift to Published Data S3 Bucket</li>
                         <li>Manifest files, which serve for registration of the
-                            Data Source in Amazon QuickSight are generated and copied to Published Datasets S3 Bucket
+                            Data Source in Amazon QuickSight are generated and copied to Published Data S3 Bucket
                         </li>
                     </ul>
                 </div>
@@ -63,7 +63,7 @@
                 Please follow instructions described <a target="_blank" href="http://docs.aws.amazon.com/quicksight/latest/user/sign-up-existing.html">here</a>.
             </li>
             <li>
-                Allow QuickSight to access the Published Datasets S3 Bucket {{ published_bucket_name }} in the QuickSight UI
+                Allow QuickSight to access the Published Data S3 Bucket {{ published_bucket_name }} in the QuickSight UI
                 <a target="_blank" href="https://us-east-1.quicksight.aws.amazon.com/sn/console/resources">here</a>.
             </li>
 
@@ -85,7 +85,7 @@
                            Use the following procedure to create visualization from it:
                         </p>
                         <ol>
-                            <li>Create an analysis from published results in S3 using instructions from
+                            <li>Create an analysis from published data in S3 using instructions from
                                 <a target="_blank" href="http://docs.aws.amazon.com/quicksight/latest/user/getting-started-create-analysis-s3.html">here</a>.</br>
                                 Manifest file was generated for you and is available in S3: </br>
                                 <strong>https://s3.amazonaws.com/{{ published_bucket_name }}/products/manifest/product_category_distribution.mf</strong>
@@ -114,7 +114,7 @@
                            Use the following procedure to create visualization from it:
                         </p>
                         <ol>
-                            <li>Create an analysis from published results in S3 using instructions from
+                            <li>Create an analysis from published data in S3 using instructions from
                                 <a target="_blank" href="http://docs.aws.amazon.com/quicksight/latest/user/getting-started-create-analysis-s3.html">here</a>.</br>
                                 Manifest file was generated for you and is available in S3: </br>
                                 <strong>https://s3.amazonaws.com/{{ published_bucket_name }}/spend/manifest/spend_distribution.mf</strong>
@@ -151,7 +151,7 @@
                            Use the following procedure to create visualization from it:
                         </p>
                         <ol>
-                            <li>Create an analysis from published results in S3 using instructions from
+                            <li>Create an analysis from published data in S3 using instructions from
                                 <a target="_blank" href="http://docs.aws.amazon.com/quicksight/latest/user/getting-started-create-analysis-s3.html">here</a>.</br>
                                 Manifest file was generated for you and is available in S3: </br>
                                 <strong>https://s3.amazonaws.com/{{ published_bucket_name }}/customer/manifest/customer_lifetime_value.mf</strong>
@@ -180,7 +180,7 @@
                            Use the following procedure to create visualization from it:
                         </p>
                         <ol>
-                            <li>Create an analysis from published results in S3 using instructions from
+                            <li>Create an analysis from published data in S3 using instructions from
                                 <a target="_blank" href="http://docs.aws.amazon.com/quicksight/latest/user/getting-started-create-analysis-s3.html">here</a>.</br>
                                 Manifest file was generated for you and is available in S3: </br>
                                 <strong>https://s3.amazonaws.com/{{ published_bucket_name }}/sku/manifest/sku_distribution.mf</strong>
@@ -210,7 +210,7 @@
                            Use the following procedure to create visualization from it:
                         </p>
                         <ol>
-                            <li>Create an analysis from published results in S3 using instructions from
+                            <li>Create an analysis from published data in S3 using instructions from
                                 <a target="_blank" href="http://docs.aws.amazon.com/quicksight/latest/user/getting-started-create-analysis-s3.html">here</a>.</br>
                                 Manifest file was generated for you and is available in S3: </br>
                                 <strong>https://s3.amazonaws.com/{{ published_bucket_name }}/state/manifest/state_population.mf</strong>
@@ -240,7 +240,7 @@
                            Use the following procedure to create visualization from it:
                         </p>
                         <ol>
-                            <li>Create an analysis from published results in S3 using instructions from
+                            <li>Create an analysis from published data in S3 using instructions from
                                 <a target="_blank" href="http://docs.aws.amazon.com/quicksight/latest/user/getting-started-create-analysis-s3.html">here</a>.</br>
                                 Manifest file was generated for you and is available in S3: </br>
                                 <strong>https://s3.amazonaws.com/{{ published_bucket_name }}/orders/manifest/orders_by_month.mf</strong>
