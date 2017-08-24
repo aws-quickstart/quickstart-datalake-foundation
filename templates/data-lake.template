@@ -1062,7 +1062,7 @@
             }
         },
         "CuratedBucketName": {
-            "Description": "Curated bucket name",
+            "Description": "Bucked name for Curated Datasets",
             "Value": {
                 "Fn::GetAtt": [
                     "BucketsStack",
@@ -1071,7 +1071,7 @@
             }
         },
         "PublishedBucketName": {
-            "Description": "Bucket name for published results",
+            "Description": "Bucket name for Published Data",
             "Value": {
                 "Fn::GetAtt": [
                     "BucketsStack",

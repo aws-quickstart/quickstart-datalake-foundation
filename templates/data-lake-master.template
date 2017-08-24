@@ -651,7 +651,7 @@
             }
         },
         "CuratedBucketName": {
-            "Description": "Curated bucket name",
+            "Description": "Bucket name for Curated Datasets",
             "Value": {
                 "Fn::GetAtt": [
                     "DataLakeFoundationStack",
@@ -660,7 +660,7 @@
             }
         },
         "PublishedBucketName": {
-            "Description": "Bucket name for published results",
+            "Description": "Bucket name for Published Data",
             "Value": {
                 "Fn::GetAtt": [
                     "DataLakeFoundationStack",
