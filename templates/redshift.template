@@ -8,7 +8,7 @@
         },
         "DatabasePort": {
             "Default": "5439",
-            "Description": "The port that Redshift will listen on and that will be allowed through the Security Group.",
+            "Description": "The port that Amazon Redshift will listen on, which will be allowed through the security group.",
             "Type": "String"
         },
         "NodeType": {

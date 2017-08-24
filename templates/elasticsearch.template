@@ -32,7 +32,7 @@
         },
         "NodeCount": {
             "Default": "1",
-            "Description": "The number of nodes in the Elasticsearch cluster.",
+            "Description": "The number of nodes in the Elasticsearch cluster. For guidance, see the Amazon ES documentation.",
             "Type": "Number"
         },
         "NodeType": {
@@ -47,7 +47,7 @@
             ],
             "ConstraintDescription": "must be a valid Elasticsearch node type.",
             "Default": "t2.small.elasticsearch",
-            "Description": "The node type to be provisioned for the Elasticsearch cluster",
+            "Description": "EC2 instance type for the Elasticsearch cluster.",
             "Type": "String"
         },
         "PublishedDataARN": {
