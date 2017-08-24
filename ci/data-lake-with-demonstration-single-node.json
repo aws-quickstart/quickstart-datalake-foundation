@@ -49,11 +49,11 @@
   },
   {
       "ParameterKey": "DatasetS3BucketName",
-      "ParameterValue": "47lining-datalake-foundation-quick-start-data-us-west-2"
+      "ParameterValue": "aws-quickstart-datasets"
   },
   {
       "ParameterKey": "DatasetS3KeyPrefix",
-      "ParameterValue": "datalake-awsdata/v1"
+      "ParameterValue": "datalake-foundation-47lining/ecommco/v1"
   },
   {
       "ParameterKey": "ElasticsearchNodeType",
