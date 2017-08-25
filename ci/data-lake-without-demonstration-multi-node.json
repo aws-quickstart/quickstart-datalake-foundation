@@ -1,7 +1,7 @@
 [
   {
       "ParameterKey": "AvailabilityZones",
-      "ParameterValue": "$[taskcat_genaz_2]"
+      "ParameterValue": "$[alfred_genaz_2]"
   },
   {
       "ParameterKey": "CreateDemonstration",
@@ -17,7 +17,7 @@
   },
   {
       "ParameterKey": "RedshiftPassword",
-      "ParameterValue": "$[taskcat_genpass_16]"
+      "ParameterValue": "$[alfred_genpass_16]"
   },
   {
       "ParameterKey": "RedshiftNodeType",
@@ -58,5 +58,9 @@
   {
       "ParameterKey": "KinesisDataStreamS3Prefix",
       "ParameterValue": "streaming-submissions"
+  },
+  {
+      "ParameterKey": "WizardPassword",
+      "ParameterValue": "$[alfred_genpass_16]"
   }
 ]
