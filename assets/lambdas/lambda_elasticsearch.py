@@ -39,7 +39,7 @@ def make_elasticsearch_client(elasticsearch_endpoint):
 def handle_bucket_event(event, context):
     sns_message = json.loads(event["Records"][0]["Sns"]["Message"])
     bucket = sns_message["Records"][0]["s3"]["bucket"]["name"]
-    key = urllib.parse.unquote(sns_message["Records"][0]["s3"]["object"]["key"])
+    key = urllib.parse.unquote_plus(sns_message["Records"][0]["s3"]["object"]["key"])
     print(bucket, key)
     try:
         response = s3.head_object(Bucket=bucket, Key=key)
