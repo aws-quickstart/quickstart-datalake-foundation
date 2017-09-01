@@ -242,7 +242,7 @@
                 "no"
             ],
             "Default": "yes",
-            "Description": "Controls provisioning of Redshift when the Create Demonstration parameter is set to no.  This parameter is ignored when Create Demonstration is set to yes (Redshift is always provisioned in that case).  Set to no if you’ve set the Create Demonstration parameter to no, and you don’t want to provision the Redshift cluster.",
+            "Description": "Specifies whether Amazon Redshift will be provisioned when the Create Demonstration parameter is set to no.  This parameter is ignored when Create Demonstration is set to yes (in that case, Amazon Redshift is always provisioned).  Set to no if you’ve set the Create Demonstration parameter to no, and you don’t want to provision the Amazon Redshift cluster.",
             "Type": "String"
         },
         "WizardInstanceType": {
@@ -357,7 +357,7 @@
         "WizardPassword": {
             "AllowedPattern": "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[\\x00-\\x7F]*$",
             "ConstraintDescription": "Password must contain 8 to 64 ASCII characters. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
-            "Description": "The password for the wizard, consisting of 8-64 ASCII characters. The password must contain one uppercase letter, one lowercase letter, and one number.  This password is always required, but will only be used when you launch the Quick Start with Create Demonstration set to \"yes\".",
+            "Description": "The password for the wizard, consisting of 8-64 ASCII characters. The password must contain one uppercase letter, one lowercase letter, and one number.  This password is required, but will only be used only when you launch the Quick Start with Create Demonstration set to \"yes\".",
             "MaxLength": "64",
             "MinLength": "8",
             "NoEcho": "true",
