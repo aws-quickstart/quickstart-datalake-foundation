@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Creates a RedShift cluster within a VPC.  **WARNING** This template creates an Amazon Redshift cluster of the size and instance type that you specify. You will be billed for the AWS resources used if you create a stack from this template.",
+    "Description": "Creates a RedShift cluster within a VPC.  **WARNING** This template creates an Amazon Redshift cluster of the size and instance type that you specify. You will be billed for the AWS resources used if you create a stack from this template. (qs-1nlkhq1p3)",
     "Parameters": {
         "DatabaseName": {
             "Description": "Redshift database name",

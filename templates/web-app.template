@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "AWS Cloudformation template to create an EC2 instance, installs Data Lake walk-through webapp and creates ELB. **WARNING** This template creates an Amazon EC2 instance. You will be billed for the AWS resources used if you create a stack from this template.",
+    "Description": "AWS Cloudformation template to create an EC2 instance, installs Data Lake walk-through webapp and creates ELB. **WARNING** This template creates an Amazon EC2 instance. You will be billed for the AWS resources used if you create a stack from this template. (qs-1nlkhq1pd)",
     "Parameters": {
         "ApplicationPassword": {
             "Description": "Web server password",

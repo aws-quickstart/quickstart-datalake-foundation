@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "AWS CloudFormation templates to create AWS Elasticsearch Service domain. **WARNING** This template creates an Amazon Elasticsearch domain. You will be billed for the AWS resources used if you create a stack from this template.",
+    "Description": "AWS CloudFormation templates to create AWS Elasticsearch Service domain. **WARNING** This template creates an Amazon Elasticsearch domain. You will be billed for the AWS resources used if you create a stack from this template. (qs-1nlkhq1o8)",
     "Parameters": {
         "CopyLambdaDeploymentRoleARN": {
             "Description": "CopyLambdaDeploymentRole ARN",

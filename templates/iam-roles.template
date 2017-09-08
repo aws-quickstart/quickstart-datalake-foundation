@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "AWS CloudFormation template to create IAM roles",
+    "Description": "AWS CloudFormation template to create IAM roles. (qs-1nlkhq1oj)",
     "Resources": {
         "AnalyticsAccess": {
             "Condition": "CreateDemoResources",

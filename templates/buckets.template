@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "AWS CloudFormation templates to create S3 buckets. **WARNING** You will be billed for data stored in AWS S3 buckets if you create a stack from this template.",
+    "Description": "AWS CloudFormation templates to create S3 buckets. **WARNING** You will be billed for data stored in AWS S3 buckets if you create a stack from this template. (qs-1nlkhq1nj)",
     "Resources": {
         "SubmissionsBucket": {
             "Type": "AWS::S3::Bucket",

@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "AWS CloudFormation template to copy data to Datalake buckets",
+    "Description": "AWS CloudFormation template to copy data to Datalake buckets (qs-1nlkhq1no)",
     "Resources": {
         "CopyData": {
             "Type": "AWS::CloudFormation::CustomResource",

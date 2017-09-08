@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "AWS CloudFormation template to delete all data from Datalake buckets",
+    "Description": "AWS CloudFormation template to delete all data from Datalake buckets (qs-1nlkhq1oe)",
     "Resources": {
         "EmptyBuckets": {
             "Condition": "CreateDemoResources",

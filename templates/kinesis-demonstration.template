@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "AWS CloudFormation templates to create AWS Kinesis Firehose endpoints",
+    "Description": "AWS CloudFormation templates to create AWS Kinesis Firehose endpoints. (qs-1nlkhq1oo)",
     "Parameters": {
         "ElasticsearchAccessARN": {
             "Description": "ElasticsearchAccess ARN",
