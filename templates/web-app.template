@@ -401,8 +401,10 @@
                                             },
                                             "cd /home/ec2-user",
                                             {
-                                                "Fn::Sub": "aws s3 sync s3://${QSS3BucketName}/${QSS3KeyPrefix} ."
+                                                "Fn::Sub": "aws s3 cp s3://${QSS3BucketName}/${QSS3KeyPrefix}assets/assets.zip ."
                                             },
+                                            "unzip assets.zip",
+                                            "rm assets.zip",
                                             "cd /home/ec2-user/assets",
                                             "python3.4 setup.py develop",
                                             "chown -R ec2-user:ec2-user /home/ec2-user",
