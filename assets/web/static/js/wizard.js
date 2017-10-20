@@ -79,6 +79,7 @@ function moveToStep(step) {
             refreshNavigationSteps();
             navigateToTop();
             resetAllButtons();
+            resetErrorBox();
         });
     }
 }
@@ -86,14 +87,16 @@ function moveToStep(step) {
 function registerLoadingButton(buttonId, endpoint, successMessage) {
     $(buttonId).click(function () {
         var btn = $(this);
+        resetErrorBox();
         btn.button('loading');
         $.post(endpoint, function (data) {
             updateState(data);
             changeNextButtonState();
             btn.text(successMessage);
             btn.removeClass('btn-primary').addClass('btn-success');
-        }).fail(function(){
+        }).fail(function(xhr){
             btn.button('reset');
+            updateErrorBox(xhr);
             btn.removeClass('btn-primary').addClass('btn-danger');
         });
     });
@@ -102,6 +105,41 @@ function registerLoadingButton(buttonId, endpoint, successMessage) {
 function showAlert(classSelector) {
     $(classSelector).removeClass("in").show();
     $(classSelector).delay(200).addClass("in").fadeOut(4000);
+}
+
+function updateErrorBox(xhr) {
+  var errorMessage = 'Internal error';
+  if (xhr.status === 504) {
+      errorMessage = 'Request timed out';
+  }
+  if (xhr.status === 400) {
+      data = JSON.parse(xhr.responseText);
+      errorMessage = data.message;
+      $('.errorDetails').css({display: "block"});
+      $('.exceptionName').text(data.exception);
+      $('.exceptionDescription').text(data.description);
+      $('.exceptionTraceback').text(data.traceback);
+      $('.errorDetails').css({display: "block"});
+      $('.collapse').collapse('hide');
+  } else {
+      $('.errorDetails').css({display: "none"});
+  }
+  $('.errorTitle').text(errorMessage);
+  $('.errorBox').css({display: "block"});
+}
+
+function resetErrorBox() {
+  $('.errorBox').css({display: "none"});
+
+  $('.exceptionName').text('');
+  $('.exceptionDescription').text('');
+  $('.exceptionTraceback').text('');
+}
+
+function initializeCloseErrorBox() {
+    $('.closeErrorBox').on('click', function() {
+        $('.errorBox').css({display: "none"});
+    });
 }
 
 function initializeButtonEvents() {
@@ -143,12 +181,15 @@ function initializeButtonEvents() {
         $.post(url, data, function(data){
             updateState(data);
             showAlert('.learn-more-success');
+        }).fail(function(xhr){
+            updateErrorBox(xhr);
         });
     });
 }
 
 $(document).ready(function() {
     initializeButtonEvents();
+    initializeCloseErrorBox();
     $.get('/step', function(data) {
         updateState(data);
         refreshNavigationSteps();
