@@ -212,7 +212,7 @@
         "DatasetS3KeyPrefix": {
             "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
             "ConstraintDescription": "Dataset key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
-            "Default": "quickstart-datalake-47lining/ecommco/v1",
+            "Default": "quickstart-datalake-47lining/ecommco/v2",
             "Description": "S3 key prefix where the sample dataset is installed. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash, which is automatically added. Use this parameter to specify the location for the dataset you would like the Quick Start to load, if you decide to use a different dataset, or if you decide to customize or extend the Quick Start dataset. (For more information, see Using Your Own Dataset.) Keep the default setting to use the sample dataset included with the Quick Start.",
             "Type": "String"
         },

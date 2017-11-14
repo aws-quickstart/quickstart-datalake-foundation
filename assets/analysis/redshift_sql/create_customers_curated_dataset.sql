@@ -15,5 +15,5 @@ sortkey(customer_id);
 COPY customers
 FROM 's3://{{ curated_bucket_name }}/{{ customers_curated_path }}'
 IAM_ROLE '{{ redshift_role_arn }}'
-DELIMITER ','
+JSON 'auto'
 REGION '{{ region_name }}';

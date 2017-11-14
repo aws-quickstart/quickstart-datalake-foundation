@@ -10,14 +10,13 @@ import itertools
 
 from analysis.template_loader import TemplateLoader
 from analysis.redshift import RedshiftConnection, RedshiftManager
-from analysis.athena_database import drop_spectrum_data_catalog
 from root import PROJECT_DIR
 
 
 REDSHIFT_SQL_DIR = os.path.join(PROJECT_DIR, 'analysis/redshift_sql')
 MANIFEST_TEMPLATES_DIR = os.path.join(PROJECT_DIR, 'analysis/manifests')
 DEMOGRAPHICS_DATA_DOWNLOAD_PATH = '/tmp/demographics.zip'
-DEMOGRAPHICS_DATA_EXTRACTED_FILE_NAME = 'demographics_data.csv'
+DEMOGRAPHICS_DATA_EXTRACTED_FILE_NAME = 'demographics_data.json'
 DEMOGRAPHICS_DATA_EXTRACT_DIR = '/tmp'
 MANIFEST_TMP_DIR = '/tmp/'
 
@@ -117,7 +116,7 @@ def _copy_products(config, bucket_key):
     }
     file_name = os.path.basename(bucket_key)
     year = file_name[-4:]
-    partition = 'dt={}-12-31/products.csv'.format(year)
+    partition = 'dt={}-12-31/products.json'.format(year)
     destination_path = os.path.join(config['products_curated_dir'], partition)
     curated_bucket.copy(copy_source, destination_path)
 
@@ -156,28 +155,18 @@ def _create_orders_table(config):
 
 
 def _create_external_tables(config):
-    drop_spectrum_data_catalog(config)
     redshift_manager = _make_redshift_manager(config)
     redshift_manager.execute_from_file(
         'create_external_schema.sql',
         external_schema_name=config['redshift_external_schema_name'],
-        external_database_name=config['redshift_external_database_name']
-    )
-    redshift_manager.execute_from_file(
-        'create_external_tables.sql',
-        curated_bucket_name=config['curated_bucket_name'],
-        demographics_curated_dir=config['demographics_curated_dir'],
-        demographics_partition=config['demographics_partition'],
-        products_curated_dir=config['products_curated_dir'],
-        external_schema_name=config['redshift_external_schema_name']
+        external_database_name=config['curated_datasets_database_name']
     )
 
 
 def _generate_load_jobs(config):
     yield from (
         functools.partial(_create_customers_table, config),
-        functools.partial(_create_orders_table, config),
-        functools.partial(_create_external_tables, config)
+        functools.partial(_create_orders_table, config)
     )
 
 
@@ -205,7 +194,9 @@ def _generate_analysis_jobs(config):
             _run_query,
             query_file,
             config,
-            external_schema_name=config['redshift_external_schema_name']
+            external_schema_name=config['redshift_external_schema_name'],
+            products_parquet_table_name=config['products_parquet_table_name'],
+            demographics_parquet_table_name=config['demographics_parquet_table_name']
         )
 
 
@@ -235,6 +226,7 @@ def _generate_save_analysis_jobs(config):
 
 
 def run_redshift_analysis(config):
+    _create_external_tables(config)
     _run_in_parallel(_generate_analysis_jobs(config), max_workers=6)
     _run_in_parallel(_generate_save_analysis_jobs(config), max_workers=6)
 

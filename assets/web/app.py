@@ -23,7 +23,7 @@ from flask import url_for
 
 from analysis.generator import generate_data_to_kinesis
 from analysis.kinesis import create_kinesis_apps
-from analysis.athena_database import configure_athena
+from analysis.glue import run_aws_glue_crawler
 from analysis.transformations import (
     run_redshift_analysis,
     publish_analysis_results,
@@ -123,10 +123,12 @@ def wizard():
         'wizard.html',
         kibana_url=app.config['kibana_url'],
         region_name=app.config['region_name'],
-        athena_database_name=app.config['athena_database_name'],
         published_bucket_name=app.config['published_bucket_name'],
         curated_bucket_name=app.config['curated_bucket_name'],
-        submissions_bucket_name=app.config['submissions_bucket_name']
+        submissions_bucket_name=app.config['submissions_bucket_name'],
+        curated_datasets_database_name=app.config['curated_datasets_database_name'],
+        curated_datasets_crawler_name=app.config['curated_datasets_crawler_name'],
+        curated_datasets_job_name=app.config['curated_datasets_job_name']
     )
 
 
@@ -148,9 +150,17 @@ def create_kinesis_applications_and_start_stream():
     process.start()
 
 
-@app.route('/elastic_search', methods=['POST'])
+@app.route('/run_glue_crawler', methods=['POST'])
+@handle_quickstart_exception("Error occured while using AWS Glue service")
 @login_required
 @mark_step_as_done(step=4)
+def run_glue_crawler():
+    run_aws_glue_crawler(app.config)
+
+
+@app.route('/elastic_search', methods=['POST'])
+@login_required
+@mark_step_as_done(step=5)
 def elastic_search():
     pass
 
@@ -158,23 +168,23 @@ def elastic_search():
 @app.route('/run_spectrum_analytics', methods=['POST'])
 @handle_quickstart_exception("Error running analytics with Spectrum")
 @login_required
-@mark_step_as_done(step=5)
+@mark_step_as_done(step=6)
 def run_spectrum_analytics():
     run_redshift_analysis(app.config)
 
 
-@app.route('/run_configure_athena', methods=['POST'])
+@app.route('/amazon_athena', methods=['POST'])
 @handle_quickstart_exception("Error occured while configuring Athena")
 @login_required
-@mark_step_as_done(step=6)
-def run_configure_athena():
-    configure_athena(config)
+@mark_step_as_done(step=7)
+def amazon_athena():
+    pass
 
 
 @app.route('/publish_datasets', methods=['POST'])
 @handle_quickstart_exception("Error occured while publishing data")
 @login_required
-@mark_step_as_done(step=7)
+@mark_step_as_done(step=8)
 def publish_datasets():
     publish_analysis_results(app.config)
 
@@ -182,7 +192,7 @@ def publish_datasets():
 @app.route('/learn_more', methods=['POST'])
 @handle_quickstart_exception("Error occured while sending form")
 @login_required
-@mark_step_as_done(step=8)
+@mark_step_as_done(step=9)
 def learn_more_form():
     learn_more(app.config, request.form)
 
@@ -190,7 +200,7 @@ def learn_more_form():
 @app.route('/faq', methods=['GET'])
 def faq():
     return render_template('faq.html',
-                           athena_database_name=app.config['athena_database_name'])
+                           curated_datasets_database_name=app.config['curated_datasets_database_name'])
 
 
 def parse_command_line_args():
