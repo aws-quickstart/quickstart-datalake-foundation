@@ -165,15 +165,15 @@
     "Mappings": {
         "AWSAMIRegionMap": {
             "AMI": {
-                "AMZNLINUXHVM": "amzn-ami-hvm-2017.09.1.20171103-x86_64-gp2"
+                "AMZNLINUXHVM": "amzn-ami-hvm-2017.09.1.20171120-x86_64-gp2"
             },
             "us-east-1": {
                 "AMI": "ami-c58c1dd3",
-                "AMZNLINUXHVM": "ami-6057e21a"
+                "AMZNLINUXHVM": "ami-55ef662f"
             },
             "us-west-2": {
                 "AMI": "ami-4836a428",
-                "AMZNLINUXHVM": "ami-32d8124a"
+                "AMZNLINUXHVM": "ami-bf4193c7"
             }
         }
     },
