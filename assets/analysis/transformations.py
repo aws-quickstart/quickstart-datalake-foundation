@@ -13,7 +13,6 @@ from analysis.redshift import RedshiftConnection, RedshiftManager
 from analysis.athena_database import drop_spectrum_data_catalog
 from root import PROJECT_DIR
 
-
 REDSHIFT_SQL_DIR = os.path.join(PROJECT_DIR, 'analysis/redshift_sql')
 MANIFEST_TEMPLATES_DIR = os.path.join(PROJECT_DIR, 'analysis/manifests')
 DEMOGRAPHICS_DATA_DOWNLOAD_PATH = '/tmp/demographics.zip'

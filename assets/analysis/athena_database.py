@@ -7,10 +7,11 @@ from time import sleep
 from analysis.template_loader import TemplateLoader
 from root import PROJECT_DIR
 
-from analysis.exceptions import AthenaQueryError
-
-
 ATHENA_QUERIES_DIR = os.path.join(PROJECT_DIR, 'analysis/athena_queries')
+
+
+class AthenaQueryError(Exception):
+    pass
 
 
 def wait_for_query_completion(client, query_execution_id, timeout=20):

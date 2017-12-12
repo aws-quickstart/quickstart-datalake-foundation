@@ -30,7 +30,6 @@ from analysis.transformations import (
     create_and_load_curated_datasets
 )
 from analysis.learn_more import learn_more
-from analysis.exceptions import QuickstartException, handle_quickstart_exception
 from root import PROJECT_DIR
 
 
@@ -39,8 +38,6 @@ app = Flask(
     template_folder=os.path.join(PROJECT_DIR, 'web/templates'),
     static_folder=os.path.join(PROJECT_DIR, 'web/static')
 )
-
-logger = logging.getLogger(__name__)
 
 
 def login_required(fun):
@@ -75,13 +72,6 @@ def mark_step_as_done(step):
         return inner
 
     return outer
-
-
-@app.errorhandler(QuickstartException)
-def quickstart_exception_errorhandler(error):
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
-    return response
 
 
 @app.route('/login', methods=['POST'])
@@ -131,7 +121,6 @@ def wizard():
 
 
 @app.route('/create_curated_datasets', methods=['POST'])
-@handle_quickstart_exception("Error occured while creating curated datasets")
 @login_required
 @mark_step_as_done(step=2)
 def create_curated_datasets():
@@ -139,7 +128,6 @@ def create_curated_datasets():
 
 
 @app.route('/configure_kinesis', methods=['POST'])
-@handle_quickstart_exception("Error occured while creating Kinesis applications")
 @login_required
 @mark_step_as_done(step=3)
 def create_kinesis_applications_and_start_stream():
@@ -156,7 +144,6 @@ def elastic_search():
 
 
 @app.route('/run_spectrum_analytics', methods=['POST'])
-@handle_quickstart_exception("Error running analytics with Spectrum")
 @login_required
 @mark_step_as_done(step=5)
 def run_spectrum_analytics():
@@ -164,7 +151,6 @@ def run_spectrum_analytics():
 
 
 @app.route('/run_configure_athena', methods=['POST'])
-@handle_quickstart_exception("Error occured while configuring Athena")
 @login_required
 @mark_step_as_done(step=6)
 def run_configure_athena():
@@ -172,7 +158,6 @@ def run_configure_athena():
 
 
 @app.route('/publish_datasets', methods=['POST'])
-@handle_quickstart_exception("Error occured while publishing data")
 @login_required
 @mark_step_as_done(step=7)
 def publish_datasets():
@@ -180,7 +165,6 @@ def publish_datasets():
 
 
 @app.route('/learn_more', methods=['POST'])
-@handle_quickstart_exception("Error occured while sending form")
 @login_required
 @mark_step_as_done(step=8)
 def learn_more_form():
