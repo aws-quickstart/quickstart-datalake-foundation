@@ -1,8 +1,9 @@
+import boto3
 import json
 
-import boto3
 
-from analysis.exceptions import PublishTopicException
+class PublishTopicException(Exception):
+    pass
 
 
 def learn_more(config, form):
