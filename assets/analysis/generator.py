@@ -98,12 +98,11 @@ def generate_data_to_kinesis(config):
     chunk_size = int(config['generator_chunk_size'])
     for _ in range(int(config['generator_events_count']) // chunk_size):
         sleep(sleep_interval)
-        records = [{'Data': json.dumps(generate_order())} for _ in range(chunk_size)]
+        records = [{'Data': json.dumps(generate_order()) + '\n'} for _ in range(chunk_size)]
         try:
             firehose_client.put_record_batch(
                 DeliveryStreamName=config['orders_stream_name'],
                 Records=records
             )
-            log.info('Sending {} events'.format(chunk_size))
         except ClientError as e:
             log.error(e.response)

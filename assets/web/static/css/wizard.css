@@ -22,7 +22,7 @@
 .bootstrapWizard li {
     display: block;
     float: left;
-    width: 12.5%;
+    width: 11%;
     text-align: center;
     padding-left: 0
 }
@@ -133,6 +133,22 @@
     top: 20px;
     word-wrap: break-word;
     z-index: 104
+}
+
+.errorBox {
+    display: none
+}
+
+.exceptionTraceback {
+    white-space: pre-line
+}
+
+.errorDetails {
+  margin-top: 10px
+}
+
+.errorDetails .panel-body {
+  background: #FCF8E3
 }
 
 .tab-content.transparent {

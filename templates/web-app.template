@@ -160,6 +160,18 @@
         "VpcId": {
             "Description": "Web server VPC",
             "Type": "AWS::EC2::VPC::Id"
+        },
+        "CuratedDatasetsDatabaseName": {
+            "Description": "Curated Datasets database name",
+            "Type": "String"
+        },
+        "CuratedDatasetsCrawlerName": {
+            "Description": "Curated Datasets crawler name",
+            "Type": "String"
+        },
+        "CuratedDatasetsJobName": {
+            "Description": "Curated Datasets job name",
+            "Type": "String"
         }
     },
     "Mappings": {
@@ -393,8 +405,8 @@
                                             "pip-3.4 install awscli==1.11.84",
                                             "pip-3.4 install psycopg2==2.7.1",
                                             "pip-3.4 install jinja2==2.9.6",
-                                            "pip-3.4 install boto3==1.4.4",
-                                            "pip-3.4 install botocore==1.5.52",
+                                            "pip-3.4 install boto3==1.4.7",
+                                            "pip-3.4 install botocore==1.6.8",
                                             "alias aws=/usr/local/bin/aws",
                                             {
                                                 "Fn::Sub": "aws s3 cp s3://${SubmissionsBucketName}/metadata/customers_metadata.json /home/ec2-user/"
@@ -452,7 +464,6 @@
                                                 "Fn::Sub": "redshift_role_arn=${RedshiftRoleARN}"
                                             },
                                             "redshift_external_schema_name=data_lake",
-                                            "redshift_external_database_name=data_lake_db",
                                             "[buckets]",
                                             {
                                                 "Fn::Sub": "submissions_bucket_name=${SubmissionsBucketName}"
@@ -470,17 +481,17 @@
                                                 "Fn::Sub": "published_bucket_name=${PublishedBucketName}"
                                             },
                                             "demographics_submission_path=demographics/2017/06/02/demographics20170520.zip",
-                                            "demographics_curated_path=demographics/v=20170520/p=csv/dt=2017-06-01/demographics_data.csv",
-                                            "demographics_curated_dir=demographics/v=20170520/p=csv/",
+                                            "demographics_curated_path=demographics_20170520_json/dataset=demographics/v=2017-05-20/p=json/dt=2017-06-01/demographics_data.json",
+                                            "demographics_curated_dir=demographics_20170520_json/dataset=demographics/v=2017-05-20/p=json/",
                                             "demographics_partition=2017-06-01",
-                                            "customers_submission_path=customers/2017/06/01/customers.csv",
-                                            "customers_curated_path=customers/v=20170601/p=csv/dt=2017-06-01/customers.csv",
-                                            "customers_curated_dir=customers/v=20170601/p=csv/",
-                                            "orders_submission_path=orders/2017/06/01/orders.csv",
-                                            "orders_curated_path=orders/v=20170601/p=csv/dt=2017-06-01/orders.csv",
-                                            "orders_curated_dir=orders/v=20170601/p=csv/",
-                                            "products_submission_path=products/2017/06/01/products.csv",
-                                            "products_curated_dir=products/v=20170601/p=csv/",
+                                            "customers_submission_path=customers/2017/06/01/customers.json",
+                                            "customers_curated_path=customers_20170601_json/dataset=customers/v=2017-06-01/p=json/dt=2017-06-01/customers.json",
+                                            "customers_curated_dir=customers_20170601_json/dataset=customers/v=2017-06-01/p=json/",
+                                            "orders_submission_path=orders/2017/06/01/orders.json",
+                                            "orders_curated_path=orders_20170601_json/dataset=orders/v=2017-06-01/p=json/dt=2017-06-01/orders.json",
+                                            "orders_curated_dir=orders_20170601_json/dataset=orders/v=2017-06-01/p=json/",
+                                            "products_submission_path=products/2017/06/01/products.json",
+                                            "products_curated_dir=products_20170601_json/dataset=products/v=2017-06-01/p=json/",
                                             "[streams]",
                                             {
                                                 "Fn::Sub": "orders_stream_name=${OrdersStreamName}"
@@ -509,14 +520,25 @@
                                                 "Fn::Sub": "kibana_url=${KibanaURL}"
                                             },
                                             "[athena]",
-                                            "athena_database_name=athena_db",
                                             {
                                                 "Fn::Sub": "athena_query_results_bucket_name=${AthenaQueryResultsBucketName}"
                                             },
                                             "[sns]",
                                             {
                                                 "Fn::Sub": "sns_learn_more_topic_arn=${SnsLearnMoreTopicArn}"
-                                            }
+                                            },
+                                            "[glue]",
+                                            {
+                                                "Fn::Sub": "curated_datasets_database_name=${CuratedDatasetsDatabaseName}"
+                                            },
+                                            {
+                                                "Fn::Sub": "curated_datasets_crawler_name=${CuratedDatasetsCrawlerName}"
+                                            },
+                                            {
+                                                "Fn::Sub": "curated_datasets_job_name=${CuratedDatasetsJobName}"
+                                            },
+                                            "products_parquet_table_name=products_20170601_parquet",
+                                            "demographics_parquet_table_name=demographics_20170520_parquet"
                                         ]
                                     ]
                                 },

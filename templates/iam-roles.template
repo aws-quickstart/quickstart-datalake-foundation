@@ -299,6 +299,17 @@
                                                     "*"
                                                 ]
                                             ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    {
+                                                        "Ref": "CuratedDatasetsARN"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
                                         }
                                     ]
                                 }
@@ -825,6 +836,24 @@
                             "Version": "2012-10-17"
                         },
                         "PolicyName": "PublishToSnsDataLakeTopic"
+                    },
+                    {
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "glue:StartCrawler",
+                                        "glue:GetCrawler",
+                                        "glue:StartJobRun",
+                                        "glue:GetJobRun"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": "*"
+                                }
+                            ],
+                            "Version": "2012-10-17"
+                        },
+                        "PolicyName": "AWSGluePolicy"
                     }
                 ]
             },
@@ -1054,7 +1083,7 @@
                     "Version": "2012-10-17"
                 },
                 "ManagedPolicyArns": [
-                    "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
+                    "arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess"
                 ],
                 "Path": "/",
                 "Policies": [
@@ -1232,6 +1261,98 @@
                 ]
             },
             "Type": "AWS::IAM::Role"
+        },
+        "AWSGlueCuratedDatasetsCrawlerRole": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "CreateDemoResources",
+            "Properties": {
+                "Path": "/",
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "glue.amazonaws.com"
+                            }
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "AWSGlueCrawlerS3Access",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "s3:PutObject",
+                                        "s3:GetObject"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": [
+                                        {
+                                            "Fn::Sub": "${CuratedDatasetsARN}*"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+                ]
+            }
+        },
+        "AWSGlueJobRole": {
+            "Type": "AWS::IAM::Role",
+            "Condition": "CreateDemoResources",
+            "Properties": {
+                "Path": "/",
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "glue.amazonaws.com"
+                            }
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "AWSGlueJobS3Access",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "s3:PutObject",
+                                        "s3:GetObject",
+                                        "s3:DeleteObject"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": [
+                                        {
+                                            "Fn::Sub": "${CuratedDatasetsARN}*"
+                                        },
+                                        {
+                                            "Fn::Sub": "arn:aws:s3:::${QSS3BucketName}*"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+                ]
+            }
         }
     },
     "Conditions": {
@@ -1462,6 +1583,20 @@
                     "KinesisStreamBucketRole",
                     "Arn"
                 ]
+            }
+        },
+        "AWSGlueCuratedDatasetsCrawlerRoleName": {
+            "Description": "Name of AWSGlueCuratedDatasetsCrawlerRole",
+            "Condition": "CreateDemoResources",
+            "Value": {
+                "Ref":  "AWSGlueCuratedDatasetsCrawlerRole"
+            }
+        },
+        "AWSGlueJobRoleName": {
+            "Description": "Name of AWSGlueJobRole",
+            "Condition": "CreateDemoResources",
+            "Value": {
+                "Ref":  "AWSGlueJobRole"
             }
         }
     }

@@ -1,4 +1,4 @@
-var LAST_STEP = 8;
+var LAST_STEP = 9;
 var completedStep = undefined;
 var currentStep = undefined;
 var seenStep = undefined;
@@ -43,7 +43,7 @@ function resetAllButtons() {
 }
 
 function refreshNavigationSteps() {
-    for (var step = 1; step <= 8; step++) {
+    for (var step = 1; step <= LAST_STEP; step++) {
         setNavigationStepClass(step);
     }
 }
@@ -79,6 +79,7 @@ function moveToStep(step) {
             refreshNavigationSteps();
             navigateToTop();
             resetAllButtons();
+            resetErrorBox();
         });
     }
 }
@@ -86,14 +87,16 @@ function moveToStep(step) {
 function registerLoadingButton(buttonId, endpoint, successMessage) {
     $(buttonId).click(function () {
         var btn = $(this);
+        resetErrorBox();
         btn.button('loading');
         $.post(endpoint, function (data) {
             updateState(data);
             changeNextButtonState();
             btn.text(successMessage);
             btn.removeClass('btn-primary').addClass('btn-success');
-        }).fail(function(){
+        }).fail(function(xhr){
             btn.button('reset');
+            updateErrorBox(xhr);
             btn.removeClass('btn-primary').addClass('btn-danger');
         });
     });
@@ -104,12 +107,48 @@ function showAlert(classSelector) {
     $(classSelector).delay(200).addClass("in").fadeOut(4000);
 }
 
+function updateErrorBox(xhr) {
+  var errorMessage = 'Internal error';
+  if (xhr.status === 504) {
+      errorMessage = 'Request timed out';
+  }
+  if (xhr.status === 400) {
+      data = JSON.parse(xhr.responseText);
+      errorMessage = data.message;
+      $('.errorDetails').css({display: "block"});
+      $('.exceptionName').text(data.exception);
+      $('.exceptionDescription').text(data.description);
+      $('.exceptionTraceback').text(data.traceback);
+      $('.errorDetails').css({display: "block"});
+      $('.collapse').collapse('hide');
+  } else {
+      $('.errorDetails').css({display: "none"});
+  }
+  $('.errorTitle').text(errorMessage);
+  $('.errorBox').css({display: "block"});
+}
+
+function resetErrorBox() {
+  $('.errorBox').css({display: "none"});
+
+  $('.exceptionName').text('');
+  $('.exceptionDescription').text('');
+  $('.exceptionTraceback').text('');
+}
+
+function initializeCloseErrorBox() {
+    $('.closeErrorBox').on('click', function() {
+        $('.errorBox').css({display: "none"});
+    });
+}
+
 function initializeButtonEvents() {
     var buttonIdToEndpoint = {
         '#curatedDatasetsButton': '/create_curated_datasets',  // Curated Datasets are created!
         '#kinesisButton': '/configure_kinesis',  // Kinesis applications created and streams are enabled!
         '#spectrumButton': '/run_spectrum_analytics',  // Successfully ran analytics with Spectrum!
         '#athenaRegisterButton': '/run_configure_athena',  // Successfully registered tables in Athena!
+        '#glueCrawlButton': '/run_glue_crawler',  // AWS Glue schema discovery complete!
         '#quicksightPublishButton': '/publish_datasets' //  Successfully published datasets to Published Datasets S3 Bucket.
     };
     Object.keys(buttonIdToEndpoint).forEach(function(buttonId) {
@@ -120,6 +159,13 @@ function initializeButtonEvents() {
             updateState(data);
             changeNextButtonState();
             $('#elasticSearchButton').removeClass('btn-primary').addClass('btn-success');
+        });
+    });
+    $('#amazonAthenaButton').on('click', function() {
+        $.post('/amazon_athena', function(data) {
+            updateState(data);
+            changeNextButtonState();
+            $('#amazonAthenaButton').removeClass('btn-primary').addClass('btn-success');
         });
     });
     $('#beginWalkthroughButton').on('click', function() { moveToStep(2); });
@@ -143,12 +189,15 @@ function initializeButtonEvents() {
         $.post(url, data, function(data){
             updateState(data);
             showAlert('.learn-more-success');
+        }).fail(function(xhr){
+            updateErrorBox(xhr);
         });
     });
 }
 
 $(document).ready(function() {
     initializeButtonEvents();
+    initializeCloseErrorBox();
     $.get('/step', function(data) {
         updateState(data);
         refreshNavigationSteps();

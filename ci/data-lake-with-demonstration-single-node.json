@@ -53,7 +53,7 @@
   },
   {
       "ParameterKey": "DatasetS3KeyPrefix",
-      "ParameterValue": "quickstart-datalake-47lining/ecommco/v1"
+      "ParameterValue": "quickstart-datalake-47lining/ecommco/v2"
   },
   {
       "ParameterKey": "ElasticsearchNodeType",

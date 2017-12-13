@@ -152,38 +152,38 @@ def create_customers_reference_table_config(app_name, current_app_version, bucke
             },
             'ReferenceSchema': {
                 'RecordFormat': {
-                    'RecordFormatType': 'CSV',
-                    'MappingParameters': {
-                        'CSVMappingParameters': {
-                            'RecordRowDelimiter': '\n',
-                            'RecordColumnDelimiter': ','
-                        }
-                    }
+                    'RecordFormatType': 'JSON'
                 },
                 'RecordEncoding': 'UTF-8',
                 'RecordColumns': [
                     {
                         'Name': 'customer_id',
+                        'Mapping': '$.customer_id',
                         'SqlType': 'VARCHAR(64)'
                     },
                     {
                         'Name': 'first_name',
+                        'Mapping': '$.first_name',
                         'SqlType': 'VARCHAR(64)'
                     },
                     {
                         'Name': 'last_name',
+                        'Mapping': '$.last_name',
                         'SqlType': 'VARCHAR(64)'
                     },
                     {
                         'Name': 'region',
+                        'Mapping': '$.region',
                         'SqlType': 'VARCHAR(64)'
                     },
                     {
                         'Name': 'state',
+                        'Mapping': '$.state',
                         'SqlType': 'VARCHAR(64)'
                     },
                     {
                         'Name': 'cbgid',
+                        'Mapping': '$.cbgid',
                         'SqlType': 'VARCHAR(64)'
                     }
                 ]
