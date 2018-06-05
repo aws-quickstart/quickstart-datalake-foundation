@@ -1,15 +1,22 @@
 import argparse
-import os
-
+import functools
+import logging
 import multiprocessing
+import os
+import sys
 from configparser import ConfigParser
 
-import functools
-
-import logging
-
-import sys
-
+from analysis.exceptions import QuickstartException, handle_quickstart_exception
+from analysis.generator import generate_data_to_kinesis
+from analysis.glue import run_aws_glue_crawler
+from analysis.kinesis import create_kinesis_apps
+from analysis.learn_more import learn_more
+from analysis.sagemaker import inference_sales
+from analysis.transformations import (
+    run_redshift_analysis,
+    publish_analysis_results,
+    create_and_load_curated_datasets
+)
 from flask import (
     Flask,
     render_template,
@@ -20,19 +27,7 @@ from flask import (
 )
 from flask import redirect
 from flask import url_for
-
-from analysis.generator import generate_data_to_kinesis
-from analysis.kinesis import create_kinesis_apps
-from analysis.glue import run_aws_glue_crawler
-from analysis.transformations import (
-    run_redshift_analysis,
-    publish_analysis_results,
-    create_and_load_curated_datasets
-)
-from analysis.learn_more import learn_more
-from analysis.exceptions import QuickstartException, handle_quickstart_exception
 from root import PROJECT_DIR
-
 
 app = Flask(
     __name__,
@@ -54,11 +49,12 @@ def login_required(fun):
     return wrapper
 
 
-def make_session_state():
+def make_session_state(result=None):
     return jsonify({
         'current_step': session['current_step'],
         'completed_step': session['completed_step'],
-        'seen_step': session['seen_step']
+        'seen_step': session['seen_step'],
+        'result': result
     })
 
 
@@ -67,10 +63,10 @@ def mark_step_as_done(step):
     def outer(fun):
         @functools.wraps(fun)
         def inner(*args, **kwargs):
-            fun(*args, **kwargs)
+            result = fun(*args, **kwargs)
             if session['completed_step'] < step:
                 session['completed_step'] = step
-            return make_session_state()
+            return make_session_state(result)
 
         return inner
 
@@ -123,6 +119,11 @@ def wizard():
         'wizard.html',
         kibana_url=app.config['kibana_url'],
         region_name=app.config['region_name'],
+        sm_instance_name=app.config['sm_instance_name'],
+        lowercase_sm_instance_name=app.config['sm_instance_name'].lower(),
+        sm_notebook_name=app.config['sm_notebook_name'],
+        sm_model_name=app.config['sm_model_name'],
+        sm_model_endpoint_name=app.config['sm_model_endpoint_name'],
         published_bucket_name=app.config['published_bucket_name'],
         curated_bucket_name=app.config['curated_bucket_name'],
         submissions_bucket_name=app.config['submissions_bucket_name'],
@@ -184,15 +185,24 @@ def amazon_athena():
 @app.route('/publish_datasets', methods=['POST'])
 @handle_quickstart_exception("Error occured while publishing data")
 @login_required
-@mark_step_as_done(step=8)
+@mark_step_as_done(step=9)
 def publish_datasets():
     publish_analysis_results(app.config)
+
+
+@app.route('/run_inference_sales', methods=['POST'])
+@handle_quickstart_exception("Error occured while creating notebook")
+@login_required
+@mark_step_as_done(step=8)
+def run_inference_sales():
+    days = request.form['days']
+    return inference_sales(app.config, days)
 
 
 @app.route('/learn_more', methods=['POST'])
 @handle_quickstart_exception("Error occured while sending form")
 @login_required
-@mark_step_as_done(step=9)
+@mark_step_as_done(step=10)
 def learn_more_form():
     learn_more(app.config, request.form)
 
