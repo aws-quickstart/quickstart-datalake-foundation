@@ -735,7 +735,8 @@ Resources:
               - Effect: Allow
                 Action:
                   - s3:*
-                Resource: arn:aws:s3:::*
+                Resource:
+                  - !Sub '${CuratedDatasetsARN}*'
         - PolicyName: SageMakerS3Access
           PolicyDocument:
             Version: '2012-10-17'
@@ -826,7 +827,8 @@ Resources:
               - Effect: Allow
                 Action:
                   - s3:*
-                Resource: arn:aws:s3:::*
+                Resource:
+                  - !Sub 'arn:aws:s3:::${QSS3BucketName}*'
 Conditions:
   CreateDemoResources: !Equals
     - !Ref 'CreateDemonstration'

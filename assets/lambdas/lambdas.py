@@ -159,10 +159,10 @@ def make_lifecycle_config_name(instance_name):
 
 
 def create_startup_script(event, region):
-    notebook_bucket_name = event['ResourceProperties']['NotebookS3Path']
+    notebook_bucket_dir = event['ResourceProperties']['NotebookS3Path']
+    s3_config_path = os.path.join(notebook_bucket_dir, 'config.py')
+    s3_notebook_path = os.path.join(notebook_bucket_dir, 'Sagemaker Example - Order Analysis.ipynb')
     curated_bucket_name = event['ResourceProperties']['CuratedBucketName']
-    input_s3_path = 'sagemaker_input\/input'
-    output_s3_path = 'sagemaker_output\/outputs'
     model_name = make_model_name(event)
     endpoint_name = make_endpoint_name(event)
     sagemaker_training_instance_type = event['ResourceProperties']['NotebookTrainingInstanceType']
@@ -171,15 +171,13 @@ def create_startup_script(event, region):
     sagemaker_role_arn = event['ResourceProperties']['SageMakerRoleArn'].replace('/', '\/')
     script = [{'Content': prepare_proper_content_format(
                       'cd SageMaker ; mkdir jupyter-notebook ; chmod 777 -R jupyter-notebook; cd jupyter-notebook ; '
-                      f'aws s3 sync s3://{notebook_bucket_name} . ; '
-                      'JUPYTER_FILE=`ls | grep *.ipynb`; chmod 777 "$JUPYTER_FILE"; ls -la ;'
+                      f'aws s3 cp "s3://{s3_config_path}" . ; '
+                      f'aws s3 cp "s3://{s3_notebook_path}" . ; '
+                      'JUPYTER_FILE=`ls | grep *.ipynb`; chmod 777 "$JUPYTER_FILE"; '
                       'CONFIG_FILE=`ls | grep *.py` ; '
                       f'sed -i -re "s/(DATA_S3_PATH = ).*$/\\1 \\\'{data_s3_path}\\\'/" $CONFIG_FILE ; '
                       f'sed -i -re "s/(REGION_NAME = ).*$/\\1 \\\'{region}\\\'/" $CONFIG_FILE ; '
-                      f'sed -i -re "s/(REGION_NAME = ).*$/\\1 \\\'{region}\\\'/" $CONFIG_FILE ; '
                       f'sed -i -re "s/(SAGEMAKER_S3_BUCKET = ).*$/\\1 \\\'{curated_bucket_name}\\\'/" $CONFIG_FILE ; '
-                      f'sed -i -re "s/(INPUT_S3_PATH = ).*$/\\1 \\\'{input_s3_path}\\\'/" $CONFIG_FILE ; '
-                      f'sed -i -re "s/(OUTPUT_S3_PATH = ).*$/\\1 \\\'{output_s3_path}\\\'/" $CONFIG_FILE ; '
                       f'sed -i -re "s/(MODEL_NAME = ).*$/\\1 \\\'{model_name}\\\'/" $CONFIG_FILE ; '
                       f'sed -i -re "s/(ENDPOINT_NAME = ).*$/\\1 \\\'{endpoint_name}\\\'/" $CONFIG_FILE ; '
                       f'sed -i -re "s/(SAGEMAKER_TRAINING_INSTANCE_TYPE = ).*$/\\1 \\\'{sagemaker_training_instance_type}\\\'/" $CONFIG_FILE ; '
@@ -190,6 +188,7 @@ def create_startup_script(event, region):
             'model_name': model_name,
             'endpoint_name': endpoint_name,
             'notebook_name': 'Sagemaker Example - Order Analysis'}
+
 
 def create_lifecycle_config(instance_name, event, region):
     config_name = make_lifecycle_config_name(instance_name)
