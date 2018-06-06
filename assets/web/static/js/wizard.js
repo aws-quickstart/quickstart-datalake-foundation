@@ -1,4 +1,4 @@
-var LAST_STEP = 9;
+var LAST_STEP = 10;
 var completedStep = undefined;
 var currentStep = undefined;
 var seenStep = undefined;
@@ -142,6 +142,14 @@ function initializeCloseErrorBox() {
     });
 }
 
+function toDaysFrom1970(strDate) {
+    var unixFirstDate = new Date("01/01/1970");
+    var date = Date.parse(strDate);
+    var timeDiff = Math.abs(date - unixFirstDate .getTime() - 3600000);
+    var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return diffDays;
+}
+
 function initializeButtonEvents() {
     var buttonIdToEndpoint = {
         '#curatedDatasetsButton': '/create_curated_datasets',  // Curated Datasets are created!
@@ -174,6 +182,24 @@ function initializeButtonEvents() {
     $('.step').on('click', function() {
         var step = parseInt(this.getAttribute('data-wizard-tab'));
         moveToStep(step);
+    });
+    $('#sagemakerInferenceButton').on('click', function() {
+        var btn = $(this);
+        var prevHtml = btn.html();
+        btn.html(`<i class="fa fa-spinner fa-spin"></i> ${btn.html()}`);
+        var date = $('#datePicker')[0].value;
+        var body = {'days': toDaysFrom1970(date)}
+        $.post('/run_inference_sales', body, function(result) {
+            resetErrorBox();
+            $('#sagemakerInferenceButton').removeClass('btn-danger btn-primary').addClass('btn-success').html(prevHtml);
+            $('#sm-score').html(result['result']['score']);
+            $('#sm-score-panel').show();
+            updateState(result);
+            changeNextButtonState();
+        }).fail(function(xhr){
+            btn.html(prevHtml).button('reset').removeClass('btn-primary').addClass('btn-danger');
+            updateErrorBox(xhr);
+        });
     });
     $("#learnMoreForm").submit(function(event) {
         event.preventDefault();

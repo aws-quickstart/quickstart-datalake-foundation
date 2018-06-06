@@ -70,5 +70,17 @@
   {
       "ParameterKey": "VPCDefinition",
       "ParameterValue": "QuickstartDefault"
+  },
+  {
+      "ParameterKey": "NotebookInstanceName",
+      "ParameterValue": "SageMakerNotebookInstanceTestDev"
+  },
+  {
+      "ParameterKey": "NotebookInstanceType",
+      "ParameterValue": "ml.t2.medium"
+  },
+  {
+      "ParameterKey": "NotebookTrainingInstanceType",
+      "ParameterValue": "ml.m5.2xlarge"
   }
 ]
