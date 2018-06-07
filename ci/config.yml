@@ -11,9 +11,9 @@ tests:
     parameter_input: data-lake-without-demonstration-multi-node.json
     template_file: data-lake-master.yaml
     regions:
-      - us-east-1
+      - us-west-2
   single-node-with-wizard:
     parameter_input: data-lake-with-demonstration-single-node.json
     template_file: data-lake-master.yaml
     regions:
-      - us-west-2
+      - us-east-1
