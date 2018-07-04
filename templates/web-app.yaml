@@ -1,3 +1,4 @@
+---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: AWS Cloudformation template to create an EC2 instance, installs Data
   Lake walk-through webapp and creates ELB. **WARNING** This template creates an Amazon
@@ -40,14 +41,14 @@ Parameters:
     Type: String
   WizardInstanceType:
     AllowedValues:
-      - t2.nano
-      - t2.micro
-      - t2.small
-      - t2.medium
-      - t2.large
-      - m3.large
-      - m3.xlarge
-      - m3.2xlarge
+    - t2.nano
+    - t2.micro
+    - t2.small
+    - t2.medium
+    - t2.large
+    - m3.large
+    - m3.xlarge
+    - m3.2xlarge
     ConstraintDescription: must be a valid EC2 instance type.
     Default: t2.micro
     Description: Web server EC2 instance type
@@ -161,27 +162,30 @@ Parameters:
 Mappings:
   AWSAMIRegionMap:
     AMI:
-      AMZNLINUXHVM: amzn-ami-hvm-2018.03.0.20180508-x86_64-gp2
+      AMZNLINUXHVM: amzn-ami-hvm-2018.03.0.20180622-x86_64-gp2
     us-east-1:
       AMI: ami-c58c1dd3
-      AMZNLINUXHVM: ami-14c5486b
+      AMZNLINUXHVM: ami-cfe4b2b0
     us-west-2:
       AMI: ami-4836a428
-      AMZNLINUXHVM: ami-e251209a
+      AMZNLINUXHVM: ami-0ad99772
 Resources:
   CleanupResources:
     Properties:
-      AthenaQueryResultsBucket: !Ref 'AthenaQueryResultsBucketName'
-      CuratedDatasets: !Ref 'CuratedBucketName'
-      PublishedData: !Ref 'PublishedBucketName'
-      ServiceToken: !GetAtt 'CleanupResourcesFunction.Arn'
-      SubmissionsBucket: !Ref 'SubmissionsBucketName'
+      AthenaQueryResultsBucket: !Ref AthenaQueryResultsBucketName
+      CuratedDatasets: !Ref CuratedBucketName
+      PublishedData: !Ref PublishedBucketName
+      ServiceToken: !GetAtt CleanupResourcesFunction.Arn
+      SubmissionsBucket: !Ref SubmissionsBucketName
     Type: AWS::CloudFormation::CustomResource
   CleanupResourcesFunction:
     Properties:
       Code:
-        ZipFile: !Join
-          - "\n"
+        ZipFile:
+          !Join
+          - '
+
+            '
           - - import json
             - import cfnresponse
             - import boto3
@@ -218,7 +222,7 @@ Resources:
             - '        return cfnresponse.send(event, context, cfnresponse.SUCCESS,
               {})'
       Handler: index.handler
-      Role: !Ref 'CleanupResourcesRoleARN'
+      Role: !Ref CleanupResourcesRoleARN
       Runtime: python3.6
       Timeout: 30
     Type: AWS::Lambda::Function
@@ -226,61 +230,61 @@ Resources:
     Properties:
       GroupDescription: Enable Elastic Load Balancer access via port 80
       SecurityGroupIngress:
-        - CidrIp: '0.0.0.0/0'
-          FromPort: '80'
-          IpProtocol: tcp
-          ToPort: '80'
-      VpcId: !Ref 'VpcId'
+      - CidrIp: 0.0.0.0/0
+        FromPort: '80'
+        IpProtocol: tcp
+        ToPort: '80'
+      VpcId: !Ref VpcId
     Type: AWS::EC2::SecurityGroup
   ElasticLoadBalancer:
     Properties:
       ConnectionSettings:
         IdleTimeout: '300'
       Listeners:
-        - InstancePort: '2000'
-          LoadBalancerPort: '80'
-          Protocol: HTTP
+      - InstancePort: '2000'
+        LoadBalancerPort: '80'
+        Protocol: HTTP
       SecurityGroups:
-        - !Ref 'ELBSecurityGroup'
+      - !Ref ELBSecurityGroup
       Subnets:
-        - !Ref 'PublicSubnet1ID'
-        - !Ref 'PublicSubnet2ID'
+      - !Ref PublicSubnet1ID
+      - !Ref PublicSubnet2ID
     Type: AWS::ElasticLoadBalancing::LoadBalancer
   InstanceSecurityGroup:
     Properties:
       GroupDescription: Enable SSH access from Bastion via port 22, and from ELB via
         port range 1024-65535
       SecurityGroupIngress:
-        - CidrIp: !Ref 'VPCCIDR'
-          FromPort: '22'
-          IpProtocol: tcp
-          ToPort: '22'
-        - FromPort: '1024'
-          IpProtocol: tcp
-          SourceSecurityGroupId: !Ref 'ELBSecurityGroup'
-          ToPort: '65535'
-      VpcId: !Ref 'VpcId'
+      - CidrIp: !Ref VPCCIDR
+        FromPort: '22'
+        IpProtocol: tcp
+        ToPort: '22'
+      - FromPort: '1024'
+        IpProtocol: tcp
+        SourceSecurityGroupId: !Ref ELBSecurityGroup
+        ToPort: '65535'
+      VpcId: !Ref VpcId
     Type: AWS::EC2::SecurityGroup
   WebServerAutoScalingGroup:
     CreationPolicy:
       ResourceSignal:
-        Count: !Ref 'NumWebServerInstances'
+        Count: !Ref NumWebServerInstances
         Timeout: PT15M
     Properties:
       Cooldown: '300'
-      DesiredCapacity: !Ref 'NumWebServerInstances'
-      LaunchConfigurationName: !Ref 'WebServerLaunchConfiguration'
+      DesiredCapacity: !Ref NumWebServerInstances
+      LaunchConfigurationName: !Ref WebServerLaunchConfiguration
       LoadBalancerNames:
-        - !Ref 'ElasticLoadBalancer'
-      MaxSize: !Ref 'NumWebServerInstances'
-      MinSize: !Ref 'NumWebServerInstances'
+      - !Ref ElasticLoadBalancer
+      MaxSize: !Ref NumWebServerInstances
+      MinSize: !Ref NumWebServerInstances
       Tags:
-        - Key: Name
-          PropagateAtLaunch: 'true'
-          Value: DataLakeWalkthroughWebapp
+      - Key: Name
+        PropagateAtLaunch: 'true'
+        Value: DataLakeWalkthroughWebapp
       VPCZoneIdentifier:
-        - !Ref 'PrivateSubnet1ID'
-        - !Ref 'PrivateSubnet2ID'
+      - !Ref PrivateSubnet1ID
+      - !Ref PrivateSubnet2ID
     Type: AWS::AutoScaling::AutoScalingGroup
   WebServerLaunchConfiguration:
     Metadata:
@@ -294,8 +298,11 @@ Resources:
                 --config /etc/production.ini > server.log 2>&1 &"
           files:
             /etc/bootstrap.sh:
-              content: !Join
-                - "\n"
+              content:
+                !Join
+                - '
+
+                  '
                 - - '# Install python requirements'
                   - pip-3.4 install flask==0.12.1
                   - pip-3.4 install awscli==1.11.84
@@ -303,43 +310,46 @@ Resources:
                   - pip-3.4 install jinja2==2.9.6
                   - pip-3.4 install boto3==1.7.28
                   - alias aws=/usr/local/bin/aws
-                  - !Sub 'aws s3 cp s3://${SubmissionsBucketName}/metadata/customers_metadata.json
+                  - '!Sub aws s3 cp s3://${SubmissionsBucketName}/metadata/customers_metadata.json
                     /home/ec2-user/'
                   - cd /home/ec2-user
-                  - !Sub 'aws s3 cp s3://${QSS3BucketName}/${QSS3KeyPrefix}assets/assets.zip
+                  - '!Sub aws s3 cp s3://${QSS3BucketName}/${QSS3KeyPrefix}assets/assets.zip
                     .'
                   - unzip assets.zip
                   - rm assets.zip
                   - cd /home/ec2-user/assets
                   - python3.4 setup.py develop
                   - chown -R ec2-user:ec2-user /home/ec2-user
-                  - !Sub 'python3.4 kibana/import_analysis_dashboard.py --elasticsearch-endpoint
+                  - '!Sub python3.4 kibana/import_analysis_dashboard.py --elasticsearch-endpoint
                     ${ElasticsearchEndpoint}'
               group: ec2-user
               mode: '000770'
               owner: ec2-user
             /etc/production.ini:
-              content: !Join
-                - "\n"
+              content:
+                !Join
+                - '
+
+                  '
                 - - '[webapp]'
                   - port=2000
-                  - !Sub 'webapp_username=${ApplicationUsername}'
-                  - !Sub 'webapp_password=${ApplicationPassword}'
+                  - !Sub webapp_username=${ApplicationUsername}
+                  - !Sub webapp_password=${ApplicationPassword}
                   - '[aws]'
-                  - !Sub 'region_name=${AWS::Region}'
-                  - !Sub 'account_number=${AWS::AccountId}'
+                  - !Sub region_name=${AWS::Region}
+                  - !Sub account_number=${AWS::AccountId}
                   - '[redshift]'
-                  - !Sub 'redshift_username=${RedshiftUsername}'
-                  - !Sub 'redshift_password=${RedshiftPassword}'
-                  - !Sub 'redshift_jdbc_url=${RedshiftConnectionURL}'
-                  - !Sub 'redshift_role_arn=${RedshiftRoleARN}'
+                  - !Sub redshift_username=${RedshiftUsername}
+                  - !Sub redshift_password=${RedshiftPassword}
+                  - !Sub redshift_jdbc_url=${RedshiftConnectionURL}
+                  - !Sub redshift_role_arn=${RedshiftRoleARN}
                   - redshift_external_schema_name=data_lake
                   - '[buckets]'
-                  - !Sub 'submissions_bucket_name=${SubmissionsBucketName}'
-                  - !Sub 'submissions_bucket_arn=${SubmissionsBucketARN}'
-                  - !Sub 'curated_bucket_name=${CuratedBucketName}'
-                  - !Sub 'curated_bucket_arn=${CuratedBucketARN}'
-                  - !Sub 'published_bucket_name=${PublishedBucketName}'
+                  - !Sub submissions_bucket_name=${SubmissionsBucketName}
+                  - !Sub submissions_bucket_arn=${SubmissionsBucketARN}
+                  - !Sub curated_bucket_name=${CuratedBucketName}
+                  - !Sub curated_bucket_arn=${CuratedBucketARN}
+                  - !Sub published_bucket_name=${PublishedBucketName}
                   - demographics_submission_path=demographics/2017/06/02/demographics20170520.zip
                   - demographics_curated_path=demographics_20170520_json/dataset=demographics/v=2017-05-20/p=json/dt=2017-06-01/demographics_data.json
                   - demographics_curated_dir=demographics_20170520_json/dataset=demographics/v=2017-05-20/p=json/
@@ -353,31 +363,31 @@ Resources:
                   - products_submission_path=products/2017/06/01/products.json
                   - products_curated_dir=products_20170601_json/dataset=products/v=2017-06-01/p=json/
                   - '[streams]'
-                  - !Sub 'orders_stream_name=${OrdersStreamName}'
-                  - !Sub 'orders_stream_arn=${OrdersStreamARN}'
-                  - !Sub 'clean_orders_stream_arn=${CleanOrdersStreamARN}'
-                  - !Sub 'revenue_by_state_stream_arn=${RevenueByStateStreamARN}'
-                  - !Sub 'top_sku_stream_arn=${TopSKUStreamARN}'
-                  - !Sub 'kinesis_analytics_role_arn=${KinesisAnalyticsRoleARN}'
+                  - !Sub orders_stream_name=${OrdersStreamName}
+                  - !Sub orders_stream_arn=${OrdersStreamARN}
+                  - !Sub clean_orders_stream_arn=${CleanOrdersStreamARN}
+                  - !Sub revenue_by_state_stream_arn=${RevenueByStateStreamARN}
+                  - !Sub top_sku_stream_arn=${TopSKUStreamARN}
+                  - !Sub kinesis_analytics_role_arn=${KinesisAnalyticsRoleARN}
                   - generator_sleep_interval=0.5
                   - generator_chunk_size=5
                   - generator_events_count=30000
                   - generator_customers_path=/home/ec2-user/customers_metadata.json
                   - '[kibana]'
-                  - !Sub 'kibana_url=${KibanaURL}'
+                  - !Sub kibana_url=${KibanaURL}
                   - '[athena]'
-                  - !Sub 'athena_query_results_bucket_name=${AthenaQueryResultsBucketName}'
+                  - !Sub athena_query_results_bucket_name=${AthenaQueryResultsBucketName}
                   - '[sns]'
-                  - !Sub 'sns_learn_more_topic_arn=${SnsLearnMoreTopicArn}'
+                  - !Sub sns_learn_more_topic_arn=${SnsLearnMoreTopicArn}
                   - '[glue]'
-                  - !Sub 'curated_datasets_database_name=${CuratedDatasetsDatabaseName}'
-                  - !Sub 'curated_datasets_crawler_name=${CuratedDatasetsCrawlerName}'
-                  - !Sub 'curated_datasets_job_name=${CuratedDatasetsJobName}'
+                  - !Sub curated_datasets_database_name=${CuratedDatasetsDatabaseName}
+                  - !Sub curated_datasets_crawler_name=${CuratedDatasetsCrawlerName}
+                  - !Sub curated_datasets_job_name=${CuratedDatasetsJobName}
                   - '[sagemaker]'
-                  - !Sub 'sm_instance_name=${SageMakerNotebookInstanceName}'
-                  - !Sub 'sm_notebook_name=${SageMakerNotebookName}'
-                  - !Sub 'sm_model_name=${SageMakerModelName}'
-                  - !Sub 'sm_model_endpoint_name=${SageMakerModelEndpointName}'
+                  - !Sub sm_instance_name=${SageMakerNotebookInstanceName}
+                  - !Sub sm_notebook_name=${SageMakerNotebookName}
+                  - !Sub sm_model_name=${SageMakerModelName}
+                  - !Sub sm_model_endpoint_name=${SageMakerModelEndpointName}
                   - products_parquet_table_name=products_20170601_parquet
                   - demographics_parquet_table_name=demographics_20170520_parquet
               group: ec2-user
@@ -392,29 +402,34 @@ Resources:
               python34-pip: []
       Comment: Install Flask application
     Properties:
-      IamInstanceProfile: !Ref 'InstanceProfileName'
-      ImageId: !FindInMap
+      IamInstanceProfile: !Ref InstanceProfileName
+      ImageId:
+        !FindInMap
         - AWSAMIRegionMap
-        - !Ref 'AWS::Region'
+        - !Ref AWS::Region
         - AMI
-      InstanceType: !Ref 'WizardInstanceType'
-      KeyName: !Ref 'KeyName'
+      InstanceType: !Ref WizardInstanceType
+      KeyName: !Ref KeyName
       SecurityGroups:
-        - !Ref 'InstanceSecurityGroup'
-      UserData: !Base64
-        Fn::Join:
-          - "\n"
+      - !Ref InstanceSecurityGroup
+      UserData:
+        !Base64
+          Fn::Join:
+          - '
+
+            '
           - - '#!/bin/bash'
             - yum update -y
             - yum install -y aws-cfn-bootstrap
             - '# Install the files and packages from the metadata'
-            - !Sub '/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource
+            - '!Sub /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource
               WebServerLaunchConfiguration --region ${AWS::Region}'
             - '# Signal the status from cfn-init'
-            - !Sub '/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource
+            - '!Sub /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource
               WebServerAutoScalingGroup --region ${AWS::Region}'
     Type: AWS::AutoScaling::LaunchConfiguration
 Outputs:
   URL:
-    Value: !GetAtt 'ElasticLoadBalancer.CanonicalHostedZoneName'
+    Value: !GetAtt ElasticLoadBalancer.CanonicalHostedZoneName
     Description: ELB URL
+...
