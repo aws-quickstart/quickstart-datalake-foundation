@@ -1,7 +1,7 @@
 [
   {
       "ParameterKey": "AvailabilityZones",
-      "ParameterValue": "$[alfred_genaz_2]"
+      "ParameterValue": "$[taskcat_genaz_2]"
   },
   {
       "ParameterKey": "CreateDemonstration",
@@ -17,7 +17,7 @@
   },
   {
       "ParameterKey": "RedshiftPassword",
-      "ParameterValue": "$[alfred_genpass_16]"
+      "ParameterValue": "$[taskcat_genpass_16]"
   },
   {
       "ParameterKey": "RedshiftNodeType",
@@ -61,6 +61,6 @@
   },
   {
       "ParameterKey": "WizardPassword",
-      "ParameterValue": "$[alfred_genpass_16]"
+      "ParameterValue": "$[taskcat_genpass_16]"
   }
 ]
