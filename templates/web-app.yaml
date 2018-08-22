@@ -162,13 +162,13 @@ Parameters:
 Mappings:
   AWSAMIRegionMap:
     AMI:
-      AMZNLINUXHVM: amzn-ami-hvm-2018.03.0.20180622-x86_64-gp2
+      AMZNLINUXHVM: amzn-ami-hvm-2018.03.0.20180811-x86_64-gp2
     us-east-1:
       AMI: ami-c58c1dd3
-      AMZNLINUXHVM: ami-cfe4b2b0
+      AMZNLINUXHVM: ami-0ff8a91507f77f867
     us-west-2:
       AMI: ami-4836a428
-      AMZNLINUXHVM: ami-0ad99772
+      AMZNLINUXHVM: ami-a0cfeed8
 Resources:
   CleanupResources:
     Properties:
@@ -310,17 +310,17 @@ Resources:
                   - pip-3.4 install jinja2==2.9.6
                   - pip-3.4 install boto3==1.7.28
                   - alias aws=/usr/local/bin/aws
-                  - !Sub 'aws s3 cp s3://${SubmissionsBucketName}/metadata/customers_metadata.json
+                  - '!Sub aws s3 cp s3://${SubmissionsBucketName}/metadata/customers_metadata.json
                     /home/ec2-user/'
                   - cd /home/ec2-user
-                  - !Sub 'aws s3 cp s3://${QSS3BucketName}/${QSS3KeyPrefix}assets/assets.zip
+                  - '!Sub aws s3 cp s3://${QSS3BucketName}/${QSS3KeyPrefix}assets/assets.zip
                     .'
                   - unzip assets.zip
                   - rm assets.zip
                   - cd /home/ec2-user/assets
                   - python3.4 setup.py develop
                   - chown -R ec2-user:ec2-user /home/ec2-user
-                  - !Sub 'python3.4 kibana/import_analysis_dashboard.py --elasticsearch-endpoint
+                  - '!Sub python3.4 kibana/import_analysis_dashboard.py --elasticsearch-endpoint
                     ${ElasticsearchEndpoint}'
               group: ec2-user
               mode: '000770'
@@ -422,10 +422,10 @@ Resources:
             - yum update -y
             - yum install -y aws-cfn-bootstrap
             - '# Install the files and packages from the metadata'
-            - !Sub '/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource
+            - '!Sub /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource
               WebServerLaunchConfiguration --region ${AWS::Region}'
             - '# Signal the status from cfn-init'
-            - !Sub '/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource
+            - '!Sub /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource
               WebServerAutoScalingGroup --region ${AWS::Region}'
     Type: AWS::AutoScaling::LaunchConfiguration
 Outputs:
