@@ -422,10 +422,10 @@ Resources:
             - yum update -y
             - yum install -y aws-cfn-bootstrap
             - '# Install the files and packages from the metadata'
-            - '!Sub /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource
+            - !Sub '/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource
               WebServerLaunchConfiguration --region ${AWS::Region}'
             - '# Signal the status from cfn-init'
-            - '!Sub /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource
+            - !Sub '/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource
               WebServerAutoScalingGroup --region ${AWS::Region}'
     Type: AWS::AutoScaling::LaunchConfiguration
 Outputs:
