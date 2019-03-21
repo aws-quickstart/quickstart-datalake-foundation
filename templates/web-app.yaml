@@ -298,30 +298,23 @@ Resources:
                 --config /etc/production.ini > server.log 2>&1 &"
           files:
             /etc/bootstrap.sh:
-              content:
-                !Join
-                - '
-
-                  '
-                - - '# Install python requirements'
-                  - pip-3.4 install flask==0.12.1
-                  - pip-3.4 install awscli==1.11.84
-                  - pip-3.4 install psycopg2==2.7.1
-                  - pip-3.4 install jinja2==2.9.6
-                  - pip-3.4 install boto3==1.7.28
-                  - alias aws=/usr/local/bin/aws
-                  - '!Sub aws s3 cp s3://${SubmissionsBucketName}/metadata/customers_metadata.json
-                    /home/ec2-user/'
-                  - cd /home/ec2-user
-                  - '!Sub aws s3 cp s3://${QSS3BucketName}/${QSS3KeyPrefix}assets/assets.zip
-                    .'
-                  - unzip assets.zip
-                  - rm assets.zip
-                  - cd /home/ec2-user/assets
-                  - python3.4 setup.py develop
-                  - chown -R ec2-user:ec2-user /home/ec2-user
-                  - '!Sub python3.4 kibana/import_analysis_dashboard.py --elasticsearch-endpoint
-                    ${ElasticsearchEndpoint}'
+              content: !Sub |
+                # Install python requirements
+                pip-3.4 install flask==0.12.1
+                pip-3.4 install awscli==1.11.84
+                pip-3.4 install psycopg2==2.7.1
+                pip-3.4 install jinja2==2.9.6
+                pip-3.4 install boto3==1.7.28
+                alias aws=/usr/local/bin/aws
+                aws s3 cp s3://${SubmissionsBucketName}/metadata/customers_metadata.json /home/ec2-user/
+                cd /home/ec2-user
+                aws s3 cp s3://${QSS3BucketName}/${QSS3KeyPrefix}assets/assets.zip .
+                unzip assets.zip
+                rm assets.zip
+                cd /home/ec2-user/assets
+                python3.4 setup.py develop
+                chown -R ec2-user:ec2-user /home/ec2-user
+                python3.4 kibana/import_analysis_dashboard.py --elasticsearch-endpoint ${ElasticsearchEndpoint}
               group: ec2-user
               mode: '000770'
               owner: ec2-user
@@ -422,11 +415,9 @@ Resources:
             - yum update -y
             - yum install -y aws-cfn-bootstrap
             - '# Install the files and packages from the metadata'
-            - !Sub '/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource
-              WebServerLaunchConfiguration --region ${AWS::Region}'
+            - !Sub /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerLaunchConfiguration --region ${AWS::Region}
             - '# Signal the status from cfn-init'
-            - !Sub '/opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource
-              WebServerAutoScalingGroup --region ${AWS::Region}'
+            - !Sub /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerAutoScalingGroup --region ${AWS::Region}
     Type: AWS::AutoScaling::LaunchConfiguration
 Outputs:
   URL:
