@@ -82,5 +82,9 @@
   {
       "ParameterKey": "NotebookTrainingInstanceType",
       "ParameterValue": "ml.m5.2xlarge"
+  },
+  {
+      "ParameterKey": "QSS3BucketName",
+      "ParameterValue": "aws-quickstart"
   }
 ]

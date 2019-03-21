@@ -62,5 +62,9 @@
   {
       "ParameterKey": "WizardPassword",
       "ParameterValue": "$[taskcat_genpass_16]"
+  },
+  {
+      "ParameterKey": "QSS3BucketName",
+      "ParameterValue": "aws-quickstart"
   }
 ]
