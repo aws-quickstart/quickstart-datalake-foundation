@@ -2,3 +2,6 @@
 *.egg-info
 .idea
 __pycache__
+.DS_Store
+taskcat_outputs/
+ci/taskcat-dev*
