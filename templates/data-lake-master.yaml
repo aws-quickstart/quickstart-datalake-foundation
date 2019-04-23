@@ -299,16 +299,11 @@ Parameters:
       \ cluster."
     Type: Number
   RedshiftPassword:
-    AllowedPattern: ^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[A-Za-z0-9!#$%&()*+,.:;<=>?\[\]^_`{|}~-]*$
-    ConstraintDescription: 'Password must contain 8 to 64 printable ASCII characters
-      excluding: /, ", \'', \ and @. It must contain 1 uppercase letter, 1 lowercase
-      letter, and 1 number.'
     Description: 'The password that is associated with the master user account for
       the Amazon Redshift cluster. The password must contain 8 to 64 printable ASCII
       characters, excluding: /, ", \'', \ and @. It must contain one uppercase letter,
       one lowercase letter, and one number.'
     MaxLength: '64'
-    MinLength: '8'
     NoEcho: 'true'
     Type: String
   RedshiftUsername:
@@ -343,15 +338,11 @@ Parameters:
       \ setting. For more information, see the Adding VPC Definitions section."
     Type: String
   WizardPassword:
-    AllowedPattern: ^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[\x00-\x7F]*$
-    ConstraintDescription: Password must contain 8 to 64 ASCII characters. It must
-      contain 1 uppercase letter, 1 lowercase letter, and 1 number.
     Description: The password for the wizard, consisting of 8-64 ASCII characters.
       The password must contain one uppercase letter, one lowercase letter, and one
       number.  This password is required, but will only be used only when you launch
       the Quick Start with Create Demonstration set to "yes".
     MaxLength: '64'
-    MinLength: '8'
     NoEcho: 'true'
     Type: String
   WizardUserName:
@@ -394,6 +385,20 @@ Parameters:
       - ml.c5.4xlarge
       - ml.c5.9xlarge
     Default: ml.m5.xlarge
+Rules:
+  ValidateEnableRedshift:
+    RuleCondition: !Equals [!Ref EnableRedshift, "yes"]
+    Assertions:
+      - Assert: !Not [!Equals [!Ref RedshiftPassword, ""]]
+        AssertDescription: 'Password must contain 8 to 64 printable ASCII characters
+      excluding: /, ", \'', \ and @. It must contain 1 uppercase letter, 1 lowercase
+      letter, and 1 number.'
+  ValidateCreateDemonstration:
+    RuleCondition: !Equals [!Ref CreateDemonstration, "yes"]
+    Assertions:
+      - Assert: !Not [!Equals [!Ref WizardPassword, ""]]
+        AssertDescription: 'Password must contain 8 to 64 ASCII characters. It must
+      contain 1 uppercase letter, 1 lowercase letter, and 1 number.'
 Resources:
   BastionStack:
     Properties:
