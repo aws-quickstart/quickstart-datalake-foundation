@@ -17,3 +17,8 @@ tests:
     template_file: data-lake-master.yaml
     regions:
       - us-east-1
+  single-node-no-wizard-no-redshift:
+    parameter_input: data-lake-no-demo-no-redshift.json
+    template_file: data-lake-master.yaml
+    regions:
+      - us-west-2
