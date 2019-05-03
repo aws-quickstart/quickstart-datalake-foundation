@@ -4,15 +4,39 @@ Description:
   be billed for data stored in AWS S3 buckets if you create a stack from this template.
   (qs-1nlkhq1nj)
 Resources:
+  BucketsPrefix:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      GenerateSecretString:
+        SecretStringTemplate: '{"randomstring": "bucketprefix"}'
+        #ExcludeCharacters : String
+        ExcludeLowercase: false
+        ExcludeNumbers: false
+        ExcludePunctuation: true
+        ExcludeUppercase: true
+        GenerateStringKey: "prefix"
+        IncludeSpace: false
+        PasswordLength: 8
+        RequireEachIncludedType: true
+        #SecretStringTemplate : String
   SubmissionsBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Join
-        - "-"
-        - - datalake
-          - submissions
-          - !Ref "AWS::AccountId"
-          - !Ref "AWS::Region"
+      BucketName:
+        Fn::Join:
+          - "-"
+          - - datalake
+            - submissions
+            - !Join [
+                "",
+                [
+                  "{{resolve:secretsmanager:",
+                  !Ref BucketsPrefix,
+                  ":SecretString:prefix}}",
+                ],
+              ]
+            - !Ref "AWS::AccountId"
+            - !Ref "AWS::Region"
       NotificationConfiguration:
         TopicConfigurations:
           - Event: s3:ObjectCreated:*
@@ -27,6 +51,14 @@ Resources:
         - - datalake
           - curated
           - datasets
+          - !Join [
+              "",
+              [
+                "{{resolve:secretsmanager:",
+                !Ref BucketsPrefix,
+                ":SecretString:prefix}}",
+              ],
+            ]
           - !Ref "AWS::AccountId"
           - !Ref "AWS::Region"
       NotificationConfiguration:
@@ -57,6 +89,14 @@ Resources:
                       - - datalake
                         - curated
                         - datasets
+                        - !Join [
+                            "",
+                            [
+                              "{{resolve:secretsmanager:",
+                              !Ref BucketsPrefix,
+                              ":SecretString:prefix}}",
+                            ],
+                          ]
                         - !Ref "AWS::AccountId"
                         - !Ref "AWS::Region"
       Topics:
@@ -83,6 +123,14 @@ Resources:
                       - - datalake
                         - published
                         - data
+                        - !Join [
+                            "",
+                            [
+                              "{{resolve:secretsmanager:",
+                              !Ref BucketsPrefix,
+                              ":SecretString:prefix}}",
+                            ],
+                          ]
                         - !Ref "AWS::AccountId"
                         - !Ref "AWS::Region"
       Topics:
@@ -101,6 +149,14 @@ Resources:
         - - datalake
           - published
           - data
+          - !Join [
+              "",
+              [
+                "{{resolve:secretsmanager:",
+                !Ref BucketsPrefix,
+                ":SecretString:prefix}}",
+              ],
+            ]
           - !Ref "AWS::AccountId"
           - !Ref "AWS::Region"
       NotificationConfiguration:
@@ -133,6 +189,14 @@ Resources:
                       - "-"
                       - - datalake
                         - submissions
+                        - !Join [
+                            "",
+                            [
+                              "{{resolve:secretsmanager:",
+                              !Ref BucketsPrefix,
+                              ":SecretString:prefix}}",
+                            ],
+                          ]
                         - !Ref "AWS::AccountId"
                         - !Ref "AWS::Region"
       Topics:
@@ -140,13 +204,21 @@ Resources:
   RegionalLambdaBucket:
     Type: AWS::S3::Bucket
     Properties:
-      # BucketName: !Join
-      #   - '-'
-      #   - - regional
-      #     - lambda
-      #     - bucket
-      #     - !Ref 'AWS::AccountId'
-      #     - !Ref 'AWS::Region'
+      BucketName: !Join
+        - "-"
+        - - regional
+          - lambda
+          - bucket
+          - !Join [
+              "",
+              [
+                "{{resolve:secretsmanager:",
+                !Ref BucketsPrefix,
+                ":SecretString:prefix}}",
+              ],
+            ]
+          - !Ref "AWS::AccountId"
+          - !Ref "AWS::Region"
   AthenaQueryResultsBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -156,6 +228,14 @@ Resources:
           - athena
           - query
           - results
+          - !Join [
+              "",
+              [
+                "{{resolve:secretsmanager:",
+                !Ref BucketsPrefix,
+                ":SecretString:prefix}}",
+              ],
+            ]
           - !Ref "AWS::AccountId"
           - !Ref "AWS::Region"
 Outputs:
