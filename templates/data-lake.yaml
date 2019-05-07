@@ -659,6 +659,7 @@ Resources:
     Condition: CreateDemoResources
     DependsOn:
       - CopyDataStack
+      - RandomStringStack
     Properties:
       Parameters:
         NotebookInstanceName: !Ref 'NotebookInstanceName'
@@ -666,6 +667,7 @@ Resources:
         NotebookTrainingInstanceType: !Ref 'NotebookTrainingInstanceType'
         CuratedBucketName: !GetAtt 'BucketsStack.Outputs.CuratedBucketName'
         NotebookS3Path: !Sub '${QSS3BucketName}/${QSS3KeyPrefix}assets/analysis/notebooks/'
+        RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
         RegionalLambdaBucketName: !GetAtt 'BucketsStack.Outputs.RegionalLambdaBucketName'
         CreateNotebookFunctionExecuteRoleArn: !GetAtt 'IAMRolesStack.Outputs.CreateNotebookFunctionExecuteRoleARN'
         SageMakerExecutionRoleArn: !GetAtt 'IAMRolesStack.Outputs.SageMakerExecutionRoleARN'
