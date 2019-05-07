@@ -1,5 +1,6 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: AWS CloudFormation templates to create AWS Kinesis Firehose endpoints.
+AWSTemplateFormatVersion: "2010-09-09"
+Description:
+  AWS CloudFormation templates to create AWS Kinesis Firehose endpoints.
   (qs-1nlkhq1oo)
 Parameters:
   ElasticsearchAccessARN:
@@ -19,7 +20,7 @@ Parameters:
     Type: String
   RedshiftPassword:
     Description: Redshift password.
-    NoEcho: 'true'
+    NoEcho: "true"
     Type: String
   RedshiftUsername:
     Description: Redshift username.
@@ -34,32 +35,32 @@ Resources:
   CleanOrdersStream:
     Properties:
       RedshiftDestinationConfiguration:
-        ClusterJDBCURL: !Ref 'RedshiftConnectionURL'
+        ClusterJDBCURL: !Ref "RedshiftConnectionURL"
         CopyCommand:
           CopyOptions: json 'auto'
           DataTableName: orders
-        Password: !Ref 'RedshiftPassword'
-        RoleARN: !Ref 'CuratedBucketAccessARN'
+        Password: !Ref "RedshiftPassword"
+        RoleARN: !Ref "CuratedBucketAccessARN"
         S3Configuration:
-          BucketARN: !Ref 'CuratedBucketARN'
+          BucketARN: !Ref "CuratedBucketARN"
           BufferingHints:
             IntervalInSeconds: 60
             SizeInMBs: 60
           CompressionFormat: UNCOMPRESSED
           Prefix: orders_stream/
-          RoleARN: !Ref 'CuratedBucketAccessARN'
-        Username: !Ref 'RedshiftUsername'
+          RoleARN: !Ref "CuratedBucketAccessARN"
+        Username: !Ref "RedshiftUsername"
     Type: AWS::KinesisFirehose::DeliveryStream
   OrdersStream:
     Properties:
       S3DestinationConfiguration:
-        BucketARN: !Ref 'SubmissionsBucketARN'
+        BucketARN: !Ref "SubmissionsBucketARN"
         BufferingHints:
           IntervalInSeconds: 60
           SizeInMBs: 60
         CompressionFormat: UNCOMPRESSED
         Prefix: orders_stream/
-        RoleARN: !Ref 'SubmissionsBucketAccessARN'
+        RoleARN: !Ref "SubmissionsBucketAccessARN"
     Type: AWS::KinesisFirehose::DeliveryStream
   RevenueByStateStream:
     Properties:
@@ -67,21 +68,21 @@ Resources:
         BufferingHints:
           IntervalInSeconds: 60
           SizeInMBs: 50
-        DomainARN: !Ref 'ElasticsearchDomainARN'
+        DomainARN: !Ref "ElasticsearchDomainARN"
         IndexName: revenue_by_state
         IndexRotationPeriod: NoRotation
         RetryOptions:
-          DurationInSeconds: '60'
-        RoleARN: !Ref 'ElasticsearchAccessARN'
+          DurationInSeconds: 60
+        RoleARN: !Ref "ElasticsearchAccessARN"
         S3BackupMode: AllDocuments
         S3Configuration:
-          BucketARN: !Ref 'CuratedBucketARN'
+          BucketARN: !Ref "CuratedBucketARN"
           BufferingHints:
-            IntervalInSeconds: '60'
-            SizeInMBs: '50'
+            IntervalInSeconds: 60
+            SizeInMBs: 50
           CompressionFormat: UNCOMPRESSED
           Prefix: orders_results/revenueByState
-          RoleARN: !Ref 'CuratedBucketAccessARN'
+          RoleARN: !Ref "CuratedBucketAccessARN"
         TypeName: RevenueByStateStream
     Type: AWS::KinesisFirehose::DeliveryStream
   TopSKUStream:
@@ -90,68 +91,68 @@ Resources:
         BufferingHints:
           IntervalInSeconds: 60
           SizeInMBs: 50
-        DomainARN: !Ref 'ElasticsearchDomainARN'
+        DomainARN: !Ref "ElasticsearchDomainARN"
         IndexName: top_sku
         IndexRotationPeriod: NoRotation
         RetryOptions:
-          DurationInSeconds: '60'
-        RoleARN: !Ref 'ElasticsearchAccessARN'
+          DurationInSeconds: 60
+        RoleARN: !Ref "ElasticsearchAccessARN"
         S3BackupMode: AllDocuments
         S3Configuration:
-          BucketARN: !Ref 'CuratedBucketARN'
+          BucketARN: !Ref "CuratedBucketARN"
           BufferingHints:
-            IntervalInSeconds: '60'
-            SizeInMBs: '50'
+            IntervalInSeconds: 60
+            SizeInMBs: 50
           CompressionFormat: UNCOMPRESSED
           Prefix: orders_results/topSKU
-          RoleARN: !Ref 'CuratedBucketAccessARN'
+          RoleARN: !Ref "CuratedBucketAccessARN"
         TypeName: TopSKU
     Type: AWS::KinesisFirehose::DeliveryStream
 Outputs:
   OrdersStreamName:
     Description: Kinesis orders stream name
-    Value: !Ref 'OrdersStream'
+    Value: !Ref "OrdersStream"
   OrdersStreamARN:
     Description: Kinesis orders stream ARN
     Value: !Join
-      - ':'
+      - ":"
       - - arn:aws:firehose
-        - !Ref 'AWS::Region'
-        - !Ref 'AWS::AccountId'
+        - !Ref "AWS::Region"
+        - !Ref "AWS::AccountId"
         - !Join
-          - ''
+          - ""
           - - deliverystream/
-            - !Ref 'OrdersStream'
+            - !Ref "OrdersStream"
   CleanOrdersStreamARN:
     Description: Kinesis clean orders stream ARN
     Value: !Join
-      - ':'
+      - ":"
       - - arn:aws:firehose
-        - !Ref 'AWS::Region'
-        - !Ref 'AWS::AccountId'
+        - !Ref "AWS::Region"
+        - !Ref "AWS::AccountId"
         - !Join
-          - ''
+          - ""
           - - deliverystream/
-            - !Ref 'CleanOrdersStream'
+            - !Ref "CleanOrdersStream"
   RevenueByStateStreamARN:
     Description: Kinesis revenue by state stream ARN
     Value: !Join
-      - ':'
+      - ":"
       - - arn:aws:firehose
-        - !Ref 'AWS::Region'
-        - !Ref 'AWS::AccountId'
+        - !Ref "AWS::Region"
+        - !Ref "AWS::AccountId"
         - !Join
-          - ''
+          - ""
           - - deliverystream/
-            - !Ref 'RevenueByStateStream'
+            - !Ref "RevenueByStateStream"
   TopSKUStreamARN:
     Description: Kinesis SKU stream ARN
     Value: !Join
-      - ':'
+      - ":"
       - - arn:aws:firehose
-        - !Ref 'AWS::Region'
-        - !Ref 'AWS::AccountId'
+        - !Ref "AWS::Region"
+        - !Ref "AWS::AccountId"
         - !Join
-          - ''
+          - ""
           - - deliverystream/
-            - !Ref 'TopSKUStream'
+            - !Ref "TopSKUStream"

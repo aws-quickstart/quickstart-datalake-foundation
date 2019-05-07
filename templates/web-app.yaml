@@ -231,15 +231,15 @@ Resources:
       GroupDescription: Enable Elastic Load Balancer access via port 80
       SecurityGroupIngress:
       - CidrIp: 0.0.0.0/0
-        FromPort: '80'
+        FromPort: 80
         IpProtocol: tcp
-        ToPort: '80'
+        ToPort: 80
       VpcId: !Ref VpcId
     Type: AWS::EC2::SecurityGroup
   ElasticLoadBalancer:
     Properties:
       ConnectionSettings:
-        IdleTimeout: '300'
+        IdleTimeout: 300
       Listeners:
       - InstancePort: '2000'
         LoadBalancerPort: '80'
@@ -256,13 +256,13 @@ Resources:
         port range 1024-65535
       SecurityGroupIngress:
       - CidrIp: !Ref VPCCIDR
-        FromPort: '22'
+        FromPort: 22
         IpProtocol: tcp
-        ToPort: '22'
-      - FromPort: '1024'
+        ToPort: 22
+      - FromPort: 1024
         IpProtocol: tcp
         SourceSecurityGroupId: !Ref ELBSecurityGroup
-        ToPort: '65535'
+        ToPort: 65535
       VpcId: !Ref VpcId
     Type: AWS::EC2::SecurityGroup
   WebServerAutoScalingGroup:
@@ -280,7 +280,7 @@ Resources:
       MinSize: !Ref NumWebServerInstances
       Tags:
       - Key: Name
-        PropagateAtLaunch: 'true'
+        PropagateAtLaunch: true
         Value: DataLakeWalkthroughWebapp
       VPCZoneIdentifier:
       - !Ref PrivateSubnet1ID

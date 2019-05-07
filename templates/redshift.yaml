@@ -1,5 +1,6 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: Creates a RedShift cluster within a VPC.  **WARNING** This template creates
+AWSTemplateFormatVersion: "2010-09-09"
+Description:
+  Creates a RedShift cluster within a VPC.  **WARNING** This template creates
   an Amazon Redshift cluster of the size and instance type that you specify. You will
   be billed for the AWS resources used if you create a stack from this template. (qs-1nlkhq1p3)
 Parameters:
@@ -7,8 +8,9 @@ Parameters:
     Description: Redshift database name
     Type: String
   DatabasePort:
-    Default: '5439'
-    Description: The port that Amazon Redshift will listen on, which will be allowed
+    Default: "5439"
+    Description:
+      The port that Amazon Redshift will listen on, which will be allowed
       through the security group.
     Type: String
   NodeType:
@@ -28,14 +30,14 @@ Parameters:
     Description: The node type to be provisioned for the redshift cluster
     Type: String
   NumberOfNodes:
-    Default: '1'
+    Default: "1"
     Description: The number of compute nodes in the redshift cluster.
     Type: Number
   PubliclyAccessible:
     AllowedValues:
-      - 'true'
-      - 'false'
-    Default: 'false'
+      - "true"
+      - "false"
+    Default: "false"
     Description: Indicates whether the cluster can be accessed from a public network.
     Type: String
   QSRedshiftRoleARN:
@@ -47,12 +49,14 @@ Parameters:
     Description: CIDR block that gets access to Redshift
     Type: String
   RedshiftPassword:
-    Description: The password that is associated with the master user account for
+    Description:
+      The password that is associated with the master user account for
       the cluster that is being created.
-    NoEcho: 'true'
+    NoEcho: "true"
     Type: String
   RedshiftUsername:
-    Description: The user name that is associated with the master user account for
+    Description:
+      The user name that is associated with the master user account for
       the cluster that is being created
     Type: String
   SubnetId1:
@@ -73,69 +77,69 @@ Mappings:
 Conditions:
   IsMultiNodeCluster: !Not
     - !Equals
-      - !Ref 'NumberOfNodes'
-      - '1'
+      - !Ref "NumberOfNodes"
+      - "1"
   IsPublic: !Equals
-    - !Ref 'PubliclyAccessible'
-    - 'true'
+    - !Ref "PubliclyAccessible"
+    - "true"
 Resources:
   RedshiftCluster:
     Properties:
-      ClusterSubnetGroupName: !Ref 'RedshiftClusterSubnetGroup'
+      ClusterSubnetGroupName: !Ref "RedshiftClusterSubnetGroup"
       ClusterType: !If
         - IsMultiNodeCluster
         - multi-node
         - single-node
-      DBName: !Ref 'DatabaseName'
+      DBName: !Ref "DatabaseName"
       IamRoles:
-        - !Ref 'QSRedshiftRoleARN'
-      MasterUserPassword: !Ref 'RedshiftPassword'
-      MasterUsername: !Ref 'RedshiftUsername'
-      NodeType: !Ref 'NodeType'
+        - !Ref "QSRedshiftRoleARN"
+      MasterUserPassword: !Ref "RedshiftPassword"
+      MasterUsername: !Ref "RedshiftUsername"
+      NodeType: !Ref "NodeType"
       NumberOfNodes: !If
         - IsMultiNodeCluster
-        - !Ref 'NumberOfNodes'
-        - !Ref 'AWS::NoValue'
-      Port: !Ref 'DatabasePort'
+        - !Ref "NumberOfNodes"
+        - !Ref "AWS::NoValue"
+      Port: !Ref "DatabasePort"
       PubliclyAccessible: !If
         - IsPublic
-        - 'true'
-        - !Ref 'AWS::NoValue'
+        - true
+        - !Ref "AWS::NoValue"
       VpcSecurityGroupIds:
-        - !Ref 'RedshiftSecurityGroup'
+        - !Ref "RedshiftSecurityGroup"
     Type: AWS::Redshift::Cluster
   RedshiftClusterSubnetGroup:
     Properties:
       Description: Cluster subnet group
       SubnetIds:
-        - !Ref 'SubnetId1'
-        - !Ref 'SubnetId2'
+        - !Ref "SubnetId1"
+        - !Ref "SubnetId2"
     Type: AWS::Redshift::ClusterSubnetGroup
   RedshiftSecurityGroup:
     Properties:
       GroupDescription: Enable JDBC port
       SecurityGroupIngress:
-        - CidrIp: !Ref 'RedshiftInboundCIDR'
-          FromPort: !Ref 'DatabasePort'
+        - CidrIp: !Ref "RedshiftInboundCIDR"
+          FromPort: !Ref "DatabasePort"
           IpProtocol: tcp
-          ToPort: !Ref 'DatabasePort'
+          ToPort: !Ref "DatabasePort"
         - CidrIp: !FindInMap
             - RegionMap
-            - !Ref 'AWS::Region'
+            - !Ref "AWS::Region"
             - KinesisFirehoseCIDR
-          FromPort: !Ref 'DatabasePort'
+          FromPort: !Ref "DatabasePort"
           IpProtocol: tcp
-          ToPort: !Ref 'DatabasePort'
-      VpcId: !Ref 'VpcId'
+          ToPort: !Ref "DatabasePort"
+      VpcId: !Ref "VpcId"
     Type: AWS::EC2::SecurityGroup
 Outputs:
   ConnectionURL:
     Description: Cluster endpoint
     Value: !Join
-      - ''
+      - ""
       - - jdbc:redshift://
-        - !GetAtt 'RedshiftCluster.Endpoint.Address'
-        - ':'
-        - !GetAtt 'RedshiftCluster.Endpoint.Port'
+        - !GetAtt "RedshiftCluster.Endpoint.Address"
+        - ":"
+        - !GetAtt "RedshiftCluster.Endpoint.Port"
         - /
-        - !Ref 'DatabaseName'
+        - !Ref "DatabaseName"

@@ -439,6 +439,10 @@ Rules:
         AssertDescription: 'Password must contain 8 to 64 ASCII characters. It must
       contain 1 uppercase letter, 1 lowercase letter, and 1 number.'
 Resources:
+  RandomStringStack:
+    Properties:
+      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/random-string.yaml'
+    Type: AWS::CloudFormation::Stack
   BucketsStack:
     Properties:
       TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/buckets.yaml'
@@ -447,6 +451,7 @@ Resources:
     Condition: CreateDemoResources
     DependsOn:
       - ElasticsearchStack
+      - RandomStringStack
     Properties:
       Parameters:
         CopyDataRoleARN: !GetAtt 'IAMRolesStack.Outputs.CopyDataRoleARN'
@@ -598,7 +603,7 @@ Resources:
         KinesisAnalyticsRoleARN: !GetAtt 'IAMRolesStack.Outputs.AnalyticsAccessARN'
         CuratedBucketARN: !GetAtt 'BucketsStack.Outputs.CuratedDatasetsARN'
         CuratedBucketName: !GetAtt 'BucketsStack.Outputs.CuratedBucketName'
-        NumWebServerInstances: 1
+        NumWebServerInstances: '1'
         OrdersStreamARN: !GetAtt 'KinesisDemonstrationStack.Outputs.OrdersStreamARN'
         OrdersStreamName: !GetAtt 'KinesisDemonstrationStack.Outputs.OrdersStreamName'
         PrivateSubnet1ID: !Ref 'PrivateSubnet1ID'
