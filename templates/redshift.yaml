@@ -72,6 +72,8 @@ Mappings:
   RegionMap:
     us-east-1:
       KinesisFirehoseCIDR: 52.70.63.192/27
+    us-east-2:
+      KinesisFirehoseCIDR: 13.58.135.96/27
     us-west-2:
       KinesisFirehoseCIDR: 52.89.255.224/27
 Conditions:
