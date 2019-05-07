@@ -4,6 +4,7 @@ global:
   qsname: quickstart-datalake-47lining
   regions:
     - us-east-1
+    - us-east-2
     - us-west-2
   reporting: true
 tests:
@@ -21,4 +22,4 @@ tests:
     parameter_input: data-lake-no-demo-no-redshift.json
     template_file: data-lake-master.yaml
     regions:
-      - us-west-2
+      - us-east-2
