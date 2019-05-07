@@ -59,6 +59,9 @@ Parameters:
   RegionalLambdaBucketName:
     Description: RegionalLambdaBucket bucket name
     Type: String
+  RandomStringArn:
+    Description: The ARN for the function that will generate the random value to be used in the naming of the S3 Buckets
+    Type: String
   SubmissionsBucketARN:
     Description: SubmissionsBucket bucket ARN
     Type: String
@@ -66,6 +69,11 @@ Parameters:
     Description: SubmissionsTopic ARN
     Type: String
 Resources:
+  RandomString:
+    Type: Custom::RandomString
+    Properties:
+      ServiceToken: !Ref RandomStringArn
+      Number: 8
   CopyLambdaDeployment:
     Properties:
       QSS3BucketName: !Ref "QSS3BucketName"
@@ -136,7 +144,7 @@ Resources:
         Version: "2012-10-17"
       AdvancedOptions:
         rest.action.multi.allow_explicit_index: "true"
-      DomainName: datalake-quickstart
+      DomainName: !Sub datalake-quickstart-${RandomString}
       EBSOptions:
         EBSEnabled: true
         Iops: 0

@@ -445,6 +445,8 @@ Resources:
     Type: AWS::CloudFormation::Stack
   BucketsStack:
     Properties:
+      Parameters:
+        RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
       TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/buckets.yaml'
     Type: AWS::CloudFormation::Stack
   CopyDataStack:
@@ -462,7 +464,8 @@ Resources:
       TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/copy-data.yaml'
     Type: AWS::CloudFormation::Stack
   ElasticsearchStack:
-    DependsOn: []
+    DependsOn: 
+      - RandomStringStack
     Properties:
       Parameters:
         CopyLambdaDeploymentRoleARN: !GetAtt 'IAMRolesStack.Outputs.CopyLambdaDeploymentRoleARN'
@@ -479,6 +482,7 @@ Resources:
         QSS3BucketName: !Ref 'QSS3BucketName'
         QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
         RegionalLambdaBucketName: !GetAtt 'BucketsStack.Outputs.RegionalLambdaBucketName'
+        RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
         SubmissionsBucketARN: !GetAtt 'BucketsStack.Outputs.SubmissionsBucketARN'
         SubmissionsTopicARN: !GetAtt 'BucketsStack.Outputs.SubmissionsTopicARN'
       TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/elasticsearch.yaml'
@@ -540,8 +544,11 @@ Resources:
         KinesisStreamBucketRoleARN: !GetAtt 'IAMRolesStack.Outputs.KinesisStreamBucketRoleARN'
         KinesisStreamKeyPrefix: !Ref 'KinesisDataStreamS3Prefix'
         KinesisStreamName: !Ref 'KinesisDataStreamName'
+        RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
       TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/kinesis.yaml'
     Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - RandomStringStack
   RedshiftStack:
     Condition: CreateRedshift
     DependsOn: []
