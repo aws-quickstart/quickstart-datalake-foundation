@@ -651,6 +651,7 @@ Resources:
         AWSGlueJobRoleName: !GetAtt 'IAMRolesStack.Outputs.AWSGlueJobRoleName'
         SubmissionsBucketName: !GetAtt 'BucketsStack.Outputs.SubmissionsBucketName'
         CuratedBucketName: !GetAtt 'BucketsStack.Outputs.CuratedBucketName'
+        RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
         QSS3BucketName: !Ref 'QSS3BucketName'
         QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
       TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/glue.yaml'
