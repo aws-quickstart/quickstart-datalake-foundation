@@ -23,16 +23,6 @@ Parameters:
   CleanupResourcesRoleARN:
     Description: CleanupResourcesRole ARN
     Type: String
-  DatasetS3BucketName:
-    Description: Dataset bucket name for the Quick Start dataset. Dataset bucket name
-      can include numbers, lowercase letters, uppercase letters, and hyphens (-).
-      It cannot start or end with a hyphen (-).
-    Type: String
-  DatasetS3KeyPrefix:
-    Description: S3 key prefix for the Quick Start dataset. Dataset key prefix can
-      include numbers, lowercase letters, uppercase letters, hyphens (-), and forward
-      slash (/).
-    Type: String
   ElasticsearchEndpoint:
     Description: Elasticsearch endpoint
     Type: String
