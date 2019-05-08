@@ -13,7 +13,6 @@ Metadata:
       - Label:
           default: Network Configuration
         Parameters:
-          - AvailabilityZones
           - VPCID
           - VPCCIDR
           - PrivateSubnet1ID
@@ -65,8 +64,6 @@ Metadata:
           - QSS3KeyPrefix
           - KeyPairName
     ParameterLabels:
-      AvailabilityZones:
-        default: Availability Zones
       KeyPairName:
         default: Key Pair Name
       RemoteAccessCIDR:
@@ -151,11 +148,6 @@ Conditions:
     - !Ref 'CreateDemonstration'
     - 'no'
 Parameters:
-  AvailabilityZones:
-    Description: The list of Availability Zones to use for the subnets in the VPC.
-      You must specify two Availability Zones. By default, the Quick Start preserves
-      the logical order you specify.
-    Type: List<AWS::EC2::AvailabilityZone::Name>
   CreateDemonstration:
     AllowedValues:
       - 'yes'
@@ -464,8 +456,6 @@ Resources:
       TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/copy-data.yaml'
     Type: AWS::CloudFormation::Stack
   ElasticsearchStack:
-    DependsOn: 
-      - RandomStringStack
     Properties:
       Parameters:
         CopyLambdaDeploymentRoleARN: !GetAtt 'IAMRolesStack.Outputs.CopyLambdaDeploymentRoleARN'
@@ -547,8 +537,6 @@ Resources:
         RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
       TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/kinesis.yaml'
     Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - RandomStringStack
   RedshiftStack:
     Condition: CreateRedshift
     DependsOn: []
@@ -592,7 +580,6 @@ Resources:
     Condition: CreateDemoResources
     DependsOn:
       - CopyDataStack
-      - SageMakerStack
     Properties:
       Parameters:
         ApplicationPassword: !Ref 'WizardPassword'
@@ -645,8 +632,6 @@ Resources:
     Type: AWS::CloudFormation::Stack
   GlueStack:
     Condition: CreateDemoResources
-    DependsOn:
-      - RandomStringStack
     Properties:
       Parameters:
         AWSGlueCuratedDatasetsCrawlerRoleName: !GetAtt 'IAMRolesStack.Outputs.AWSGlueCuratedDatasetsCrawlerRoleName'
@@ -662,7 +647,6 @@ Resources:
     Condition: CreateDemoResources
     DependsOn:
       - CopyDataStack
-      - RandomStringStack
     Properties:
       Parameters:
         NotebookInstanceName: !Ref 'NotebookInstanceName'

@@ -416,8 +416,6 @@ Resources:
       TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-linux-bastion/templates/linux-bastion.template'
     Type: AWS::CloudFormation::Stack
   DataLakeFoundationStack:
-    DependsOn:
-      - VPCStack
     Properties:
       Parameters:
         AvailabilityZones: !Join

@@ -7,8 +7,6 @@ Parameters:
     Type: String
   AWSGlueJobRoleName:
     Type: String
-  SubmissionsBucketName:
-    Type: String
   CuratedBucketName:
     Type: String
   RandomStringArn:

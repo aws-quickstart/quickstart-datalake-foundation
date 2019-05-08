@@ -13,9 +13,6 @@ Parameters:
   LambdaRoleARN:
     Description: LambdaRole ARN
     Type: String
-  CuratedDatasetsARN:
-    Description: CuratedDatasets bucket ARN
-    Type: String
   CuratedTopicARN:
     Description: CuratedTopic ARN
     Type: String
@@ -44,9 +41,6 @@ Parameters:
     Default: t2.small.elasticsearch
     Description: EC2 instance type for the Elasticsearch cluster.
     Type: String
-  PublishedDataARN:
-    Description: PublishedData bucket ARN
-    Type: String
   PublishedTopicARN:
     Description: PublishedTopic ARN
     Type: String
@@ -61,9 +55,6 @@ Parameters:
     Type: String
   RandomStringArn:
     Description: The ARN for the function that will generate the random value to be used in the naming of the S3 Buckets
-    Type: String
-  SubmissionsBucketARN:
-    Description: SubmissionsBucket bucket ARN
     Type: String
   SubmissionsTopicARN:
     Description: SubmissionsTopic ARN
