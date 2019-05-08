@@ -645,6 +645,8 @@ Resources:
     Type: AWS::CloudFormation::Stack
   GlueStack:
     Condition: CreateDemoResources
+    DependsOn:
+      - RandomStringStack
     Properties:
       Parameters:
         AWSGlueCuratedDatasetsCrawlerRoleName: !GetAtt 'IAMRolesStack.Outputs.AWSGlueCuratedDatasetsCrawlerRoleName'
