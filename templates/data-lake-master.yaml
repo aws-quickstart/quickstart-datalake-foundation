@@ -418,9 +418,6 @@ Resources:
   DataLakeFoundationStack:
     Properties:
       Parameters:
-        AvailabilityZones: !Join
-          - ','
-          - !Ref 'AvailabilityZones'
         CreateDemonstration: !Ref 'CreateDemonstration'
         DatasetS3BucketName: !Ref 'DatasetS3BucketName'
         DatasetS3KeyPrefix: !Ref 'DatasetS3KeyPrefix'
