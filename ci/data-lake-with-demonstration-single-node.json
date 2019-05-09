@@ -73,7 +73,7 @@
   },
   {
       "ParameterKey": "NotebookInstanceName",
-      "ParameterValue": "SageMakerNotebookInstanceTestDev"
+      "ParameterValue": "SageMakerNotebookInstTestDev"
   },
   {
       "ParameterKey": "NotebookInstanceType",

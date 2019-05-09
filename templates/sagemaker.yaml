@@ -1,16 +1,16 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: 'AWS CloudFormation templates to create SageMaker notebook.'
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AWS CloudFormation templates to create SageMaker notebook."
 
 Parameters:
   NotebookInstanceName:
-    AllowedPattern: '[A-Za-z0-9-]{1,63}'
+    AllowedPattern: "[A-Za-z0-9-]{1,63}"
     ConstraintDescription: Must be unique within your account in an AWS Region.
       Maximum of 63 alphanumeric characters. Can include hyphens (-).
     Type: String
     Default: NotebookInstanceName
     Description: Name of the Amazon SageMaker Notebook instance.
-    MaxLength: '63'
-    MinLength: '1'
+    MaxLength: "63"
+    MinLength: "1"
   NotebookInstanceType:
     Description: The EC2 instance type for the data lake Amazon SageMaker Notebook instance.
     ConstraintDescription: Must select a valid Notebook instance type.
@@ -35,11 +35,15 @@ Parameters:
       - ml.c5.9xlarge
     Default: ml.m5.xlarge
   CuratedBucketName:
-    Description: Name of an existing s3 bucket where data and artifacts will be stored (curated dataset bucket)
+    Description:
+      Name of an existing s3 bucket where data and artifacts will be stored (curated dataset bucket)
       SageMaker will be granted full access to this bucket.
     Type: String
   NotebookS3Path:
     Description: Name of a path that contains jupyter notebook
+    Type: String
+  RandomStringArn:
+    Description: The ARN for the function that will generate the random value to be used in the naming of the S3 Buckets
     Type: String
   RegionalLambdaBucketName:
     Description: RegionalLambdaBucket bucket name
@@ -64,6 +68,11 @@ Metadata:
       - Label:
           default: Optional parameters
 Resources:
+  RandomString:
+    Type: Custom::RandomString
+    Properties:
+      ServiceToken: !Ref RandomStringArn
+      Number: 8
   NotebookCloudWatchLogGroup:
     Type: AWS::Logs::LogGroup
   CreateNotebookFunction:
@@ -72,42 +81,40 @@ Resources:
       Handler: lambdas.lambda_handler
       Runtime: python3.6
       Timeout: 300
-      Role: !Ref 'CreateNotebookFunctionExecuteRoleArn'
+      Role: !Ref "CreateNotebookFunctionExecuteRoleArn"
       Code:
-          S3Bucket: !Ref 'RegionalLambdaBucketName'
-          S3Key: lambdas.zip
+        S3Bucket: !Ref "RegionalLambdaBucketName"
+        S3Key: lambdas.zip
     Type: AWS::Lambda::Function
 
   CreateNotebookInstance:
     Type: Custom::CreateNotebookInstance
     Properties:
-      ServiceToken: !GetAtt 'CreateNotebookFunction.Arn'
-      NotebookInstanceName: !Ref 'NotebookInstanceName'
-      NotebookInstanceType: !Ref 'NotebookInstanceType'
-      NotebookTrainingInstanceType: !Ref 'NotebookTrainingInstanceType'
-      CuratedBucketName: !Ref 'CuratedBucketName'
-      SageMakerRoleArn: !Ref 'SageMakerExecutionRoleArn'
-      NotebookS3Path: !Ref 'NotebookS3Path'
+      ServiceToken: !GetAtt "CreateNotebookFunction.Arn"
+      NotebookInstanceName: !Join
+        - "-"
+        - - !Ref "NotebookInstanceName"
+          - !Sub ${RandomString}
+      NotebookInstanceType: !Ref "NotebookInstanceType"
+      NotebookTrainingInstanceType: !Ref "NotebookTrainingInstanceType"
+      CuratedBucketName: !Ref "CuratedBucketName"
+      SageMakerRoleArn: !Ref "SageMakerExecutionRoleArn"
+      NotebookS3Path: !Ref "NotebookS3Path"
       Version: 1
 
 Outputs:
   SageMakerNotebookURL:
     Description: SageMaker Notebook URL
-    Value:
-      !GetAtt 'CreateNotebookInstance.SageMakerNotebookURL'
+    Value: !GetAtt "CreateNotebookInstance.SageMakerNotebookURL"
   NotebookInstanceName:
     Description: SageMaker Instance Name
-    Value:
-      !Ref 'NotebookInstanceName'
+    Value: !Ref "NotebookInstanceName"
   NotebookName:
     Description: Notebook name
-    Value:
-      !GetAtt 'CreateNotebookInstance.NotebookName'
+    Value: !GetAtt "CreateNotebookInstance.NotebookName"
   ModelName:
     Description: Deployed model name
-    Value:
-      !GetAtt 'CreateNotebookInstance.ModelName'
+    Value: !GetAtt "CreateNotebookInstance.ModelName"
   ModelEndpointName:
     Description: Deployed endpoint name
-    Value:
-      !GetAtt 'CreateNotebookInstance.ModelEndpointName'
+    Value: !GetAtt "CreateNotebookInstance.ModelEndpointName"
