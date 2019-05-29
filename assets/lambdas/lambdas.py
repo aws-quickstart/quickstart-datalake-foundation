@@ -170,7 +170,7 @@ def create_startup_script(event, region):
     data_s3_path = f's3:\/\/{curated_bucket_name}\/orders_20170601_json\/dataset=orders\/v=2017-06-01\/p=json\/dt=2017-06-01\/'
     sagemaker_role_arn = event['ResourceProperties']['SageMakerRoleArn'].replace('/', '\/')
     script = [{'Content': prepare_proper_content_format(
-                      'cd SageMaker ; mkdir jupyter-notebook ; chmod 777 -R jupyter-notebook; cd jupyter-notebook ; '
+                      'cd /home/ec2-user/SageMaker ; mkdir jupyter-notebook ; chmod 777 -R jupyter-notebook; cd jupyter-notebook ; '
                       f'aws s3 cp "s3://{s3_config_path}" . ; '
                       f'aws s3 cp "s3://{s3_notebook_path}" . ; '
                       'JUPYTER_FILE=`ls | grep *.ipynb`; chmod 777 "$JUPYTER_FILE"; '
