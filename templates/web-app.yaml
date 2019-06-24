@@ -152,13 +152,13 @@ Parameters:
 Mappings:
   AWSAMIRegionMap:
     AMI:
-      AMZNLINUXHVM: amzn-ami-hvm-2018.03.0.20190514-x86_64-gp2
+      AMZNLINUXHVM: amzn-ami-hvm-2018.03.0.20190611-x86_64-gp2
     us-east-1:
       AMI: ami-c58c1dd3
-      AMZNLINUXHVM: ami-0756fbca465a59a30
+      AMZNLINUXHVM: ami-035b3c7efe6d061d5
     us-west-2:
       AMI: ami-4836a428
-      AMZNLINUXHVM: ami-07a0c6e669965bb7c
+      AMZNLINUXHVM: ami-0f2176987ee50226e
 Resources:
   CleanupResources:
     Properties:
