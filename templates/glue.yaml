@@ -1,29 +1,23 @@
-AWSTemplateFormatVersion: "2010-09-09"
-Description:
-  Creates AWS Glue resources.  **WARNING**  You will be billed for the
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates AWS Glue resources.  **WARNING**  You will be billed for the
   AWS resources used if you create a stack from this template.
 Parameters:
   CuratedBucketName:
     Type: String
 Resources:
-  RandomString:
-    Type: Custom::RandomString
-    Properties:
-      ServiceToken: !Ref RandomStringArn
-      Number: 8
   DatalakeSubmissionsDatabase:
     Type: AWS::Glue::Database
     Properties:
-      CatalogId: !Ref "AWS::AccountId"
+      CatalogId: !Ref 'AWS::AccountId'
       DatabaseInput:
-        Name: !Sub datalake-submissions-${RandomString}
+        Name: datalake-submissions
         Description: Data Lake Quick Start Submissions
   CuratedDatasetsDatabase:
     Type: AWS::Glue::Database
     Properties:
-      CatalogId: !Ref "AWS::AccountId"
+      CatalogId: !Ref 'AWS::AccountId'
       DatabaseInput:
-        Name: !Sub datalake-curated-datasets-${RandomString}
+        Name: datalake-curated-datasets
         Description: Data Lake Quick Start Curated Datasets
 Outputs:
   CuratedDatasetsDatabaseName:

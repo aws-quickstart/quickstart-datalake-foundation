@@ -333,12 +333,6 @@ Rules:
         AssertDescription: 'Password must contain 8 to 64 printable ASCII characters
       excluding: /, ", \'', \ and @. It must contain 1 uppercase letter, 1 lowercase
       letter, and 1 number.'
-  ValidateCreateDemonstration:
-    RuleCondition: !Equals [!Ref CreateDemonstration, "yes"]
-    Assertions:
-      - Assert: !Not [!Equals [!Ref WizardPassword, ""]]
-        AssertDescription: 'Password must contain 8 to 64 ASCII characters. It must
-      contain 1 uppercase letter, 1 lowercase letter, and 1 number.'
 Resources:
   RandomStringStack:
     Properties:
