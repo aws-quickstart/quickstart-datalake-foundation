@@ -1,11 +1,11 @@
 [
   {
       "ParameterKey": "AvailabilityZones",
-      "ParameterValue": "$[taskcat_genaz_2]"
+      "ParameterValue": "$[alfred_genaz_2]"
   },
   {
-      "ParameterKey": "CreateDemonstration",
-      "ParameterValue": "no"
+      "ParameterKey": "QSS3BucketName",
+      "ParameterValue": "$[alfred_autobucket]"
   },
   {
       "ParameterKey": "KeyPairName",
@@ -17,7 +17,7 @@
   },
   {
       "ParameterKey": "RedshiftPassword",
-      "ParameterValue": "$[taskcat_genpass_16]"
+      "ParameterValue": "$[alfred_genpass_16]"
   },
   {
       "ParameterKey": "RedshiftNodeType",
@@ -61,10 +61,15 @@
   },
   {
       "ParameterKey": "WizardPassword",
+<<<<<<< HEAD:ci/data-lake-without-demonstration-multi-node.json
       "ParameterValue": "$[taskcat_genpass_16]"
   },
   {
       "ParameterKey": "QSS3BucketName",
       "ParameterValue": "aws-quickstart"
+=======
+      "ParameterValue": "$[alfred_genpass_16]"
+
+>>>>>>> pr22:ci/data-lake-multi-node.json
   }
 ]
