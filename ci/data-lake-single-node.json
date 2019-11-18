@@ -8,10 +8,6 @@
       "ParameterValue": "$[alfred_autobucket]"
   },
   {
-      "ParameterKey": "WizardPassword",
-      "ParameterValue": "$[alfred_genpass_16]"
-  },
-  {
       "ParameterKey": "RedshiftUsername",
       "ParameterValue": "datalake"
   },
