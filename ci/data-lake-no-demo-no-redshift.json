@@ -12,18 +12,6 @@
     "ParameterValue": "no"
   },
   {
-    "ParameterKey": "WizardInstanceType",
-    "ParameterValue": "t2.micro"
-  },
-  {
-    "ParameterKey": "WizardUserName",
-    "ParameterValue": "WebAppUser"
-  },
-  {
-    "ParameterKey": "WizardPassword",
-    "ParameterValue": ""
-  },
-  {
     "ParameterKey": "EnableRedshift",
     "ParameterValue": "no"
   },
