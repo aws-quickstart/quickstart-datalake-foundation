@@ -5,7 +5,7 @@
   },
   {
     "ParameterKey": "KeyPairName",
-    "ParameterValue": "override"
+    "ParameterValue": "$[alfred_getkeypair]"
   },
   {
     "ParameterKey": "EnableRedshift",
@@ -18,22 +18,6 @@
   {
     "ParameterKey": "RedshiftPassword",
     "ParameterValue": ""
-  },
-  {
-    "ParameterKey": "RedshiftNodeType",
-    "ParameterValue": "dc1.large"
-  },
-  {
-    "ParameterKey": "RedshiftNumberOfNodes",
-    "ParameterValue": "1"
-  },
-  {
-    "ParameterKey": "RedshiftDatabaseName",
-    "ParameterValue": "testdb"
-  },
-  {
-    "ParameterKey": "RedshiftDatabasePort",
-    "ParameterValue": "5439"
   },
   {
     "ParameterKey": "ElasticsearchNodeType",

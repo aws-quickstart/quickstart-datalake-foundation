@@ -475,6 +475,7 @@ Outputs:
   ElasticsearchStackElasticsearchDomainARN:
     Value: !GetAtt 'ElasticsearchStack.Outputs.ElasticsearchDomainARN'
   RedshiftStackRedshiftConnectionURL:  # used in WebApp too
+    Condition: CreateRedshift
     Value: !GetAtt 'RedshiftStack.Outputs.ConnectionURL'
   CuratedDatasetsDatabaseName:
     Value: !GetAtt 'GlueStack.Outputs.CuratedDatasetsDatabaseName'
