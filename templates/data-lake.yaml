@@ -54,7 +54,10 @@ Metadata:
         Parameters:
           - QSS3BucketName
           - QSS3KeyPrefix
+          - KeyPairName
     ParameterLabels:
+      KeyPairName:
+        default: Key Pair Name
       RemoteAccessCIDR:
         default: Remote Access CIDR
       ElasticsearchNodeType:
@@ -115,6 +118,9 @@ Conditions:
     - !Ref 'EnableRedshift'
     - 'yes'
 Parameters:
+  AvailabilityZones:
+   Description: The list of Availability Zones to use for the subnets in the VPC. You must specify two Availability Zones. By default, the Quick Start preserves the logical order you specify.
+   Type: List<AWS::EC2::AvailabilityZone::Name>
   ElasticsearchNodeCount:
     Default: '1'
     Description: The number of nodes in the Elasticsearch cluster. For guidance, see
@@ -149,10 +155,10 @@ Parameters:
     Description: "Specifies whether Amazon Redshift will be publicly accessible.\
       \ Only applies if EnableRedshift is set to yes."
     Type: String
-  #KeyPairName:
-  #  Description: Public/private key pairs allow you to securely connect to your instance
-  #    after it launches
-  #  Type: AWS::EC2::KeyPair::KeyName
+  KeyPairName:
+    Description: Public/private key pairs allow you to securely connect to your instance
+      after it launches
+    Type: AWS::EC2::KeyPair::KeyName
   KinesisDataStreamName:
     Default: streaming-submissions
     Description: "Name of the Kinesis data stream."
@@ -467,6 +473,7 @@ Outputs:
   ElasticsearchStackElasticsearchDomainARN:
     Value: !GetAtt 'ElasticsearchStack.Outputs.ElasticsearchDomainARN'
   RedshiftStackRedshiftConnectionURL:  # used in WebApp too
+    Condition: CreateRedshift
     Value: !GetAtt 'RedshiftStack.Outputs.ConnectionURL'
   CuratedDatasetsDatabaseName:
     Value: !GetAtt 'GlueStack.Outputs.CuratedDatasetsDatabaseName'
