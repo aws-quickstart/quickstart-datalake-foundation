@@ -5,7 +5,7 @@ Description:
   (qs-1nlkhq1nj)
 Parameters:
   RandomStringArn:
-    Description: The ARN for the function that will generate the random value to be used in the naming of the S3 Buckets
+    Description: 'The ARN for the function that will generate the random value to be used in the naming of the S3 Buckets'
     Type: String
 Resources:
   RandomString:
