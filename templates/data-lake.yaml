@@ -119,10 +119,8 @@ Conditions:
     - 'yes'
 Parameters:
   AvailabilityZones:
-    Description: The list of Availability Zones to use for the subnets in the VPC.
-      You must specify two Availability Zones. By default, the Quick Start preserves
-      the logical order you specify.
-    Type: List<AWS::EC2::AvailabilityZone::Name>
+   Description: The list of Availability Zones to use for the subnets in the VPC. You must specify two Availability Zones. By default, the Quick Start preserves the logical order you specify.
+   Type: List<AWS::EC2::AvailabilityZone::Name>
   ElasticsearchNodeCount:
     Default: '1'
     Description: The number of nodes in the Elasticsearch cluster. For guidance, see
