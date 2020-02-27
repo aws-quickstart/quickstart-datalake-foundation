@@ -17,7 +17,7 @@
   },
   {
       "ParameterKey": "RedshiftNodeType",
-      "ParameterValue": "dc1.large"
+      "ParameterValue": "dc2.large"
   },
   {
       "ParameterKey": "RedshiftNumberOfNodes",
