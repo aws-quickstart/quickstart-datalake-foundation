@@ -231,16 +231,13 @@ Parameters:
     Type: String
   RedshiftNodeType:
     AllowedValues:
-      - dw1.xlarge
-      - dw1.8xlarge
-      - dw2.large
-      - dw2.8xlarge
       - dc1.large
       - dc1.8xlarge
-      - ds1.xlarge
-      - ds1.8xlarge
+      - dc2.large
+      - dc2.8xlarge
       - ds2.xlarge
       - ds2.8xlarge
+      - ra3.16xlarge
     ConstraintDescription: must be a valid Redshift node type.
     Default: dc1.large
     Description: Instance type for the nodes in the Amazon Redshift cluster.

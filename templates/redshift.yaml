@@ -17,8 +17,11 @@ Parameters:
     AllowedValues:
       - dc1.large
       - dc1.8xlarge
+      - dc2.large
+      - dc2.8xlarge
       - ds2.xlarge
       - ds2.8xlarge
+      - ra3.16xlarge
     ConstraintDescription: must be a valid RedShift node type.
     Default: dc1.large
     Description: The node type to be provisioned for the redshift cluster
