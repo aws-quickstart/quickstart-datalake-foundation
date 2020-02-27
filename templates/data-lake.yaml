@@ -231,15 +231,11 @@ Parameters:
     Type: String
   RedshiftNodeType:
     AllowedValues:
-      - dc1.large
-      - dc1.8xlarge
+      - ra3.16xlarge
       - dc2.large
       - dc2.8xlarge
-      - ds2.xlarge
-      - ds2.8xlarge
-      - ra3.16xlarge
     ConstraintDescription: must be a valid Redshift node type.
-    Default: dc1.large
+    Default: dc2.large
     Description: Instance type for the nodes in the Amazon Redshift cluster.
     Type: String
   RedshiftNumberOfNodes:
@@ -357,7 +353,6 @@ Resources:
   IAMRolesStack:
     Properties:
       Parameters:
-        AthenaQueryResultsBucketARN: !GetAtt 'BucketsStack.Outputs.AthenaQueryResultsBucketARN'
         EnableRedshift: !Ref 'EnableRedshift'
         CuratedDatasetsARN: !GetAtt 'BucketsStack.Outputs.CuratedDatasetsARN'
         PublishedDataARN: !GetAtt 'BucketsStack.Outputs.PublishedDataARN'
@@ -417,8 +412,6 @@ Resources:
     Type: AWS::CloudFormation::Stack
   GlueStack:
     Properties:
-      Parameters:
-        CuratedBucketName: !GetAtt 'BucketsStack.Outputs.CuratedBucketName'
       TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/glue.yaml'
     Type: AWS::CloudFormation::Stack
   SageMakerStack:
