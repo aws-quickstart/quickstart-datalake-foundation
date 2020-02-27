@@ -136,8 +136,7 @@ Resources:
           - Sid: StatementId
             Effect: Allow
             Principal:
-               Principal:
-                AWS: !Ref 'AWS::AccountId'
+              AWS: !Ref 'AWS::AccountId'
             Action: sns:Publish
             Resource: !Ref "SubmissionsTopic"
             Condition:
