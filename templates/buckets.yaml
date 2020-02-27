@@ -12,7 +12,7 @@ Resources:
     Type: Custom::RandomString
     Properties:
       ServiceToken: !Ref RandomStringArn
-      Number: 8
+      Number: 7
   SubmissionsBucket:
     Type: AWS::S3::Bucket
     Properties:
