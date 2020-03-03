@@ -55,11 +55,12 @@ Resources:
         Statement:
           - Sid: StatementId
             Effect: Allow
-            Principal:
-              AWS: "*"
+            Principal: "*"
             Action: sns:Publish
             Resource: !Ref "CuratedTopic"
             Condition:
+              StringEquals:
+                AWS:SourceAccount: !Ref "AWS::AccountId"
               ArnLike:
                 AWS:SourceArn: !Sub
                   - arn:aws:s3:::${BucketName}
@@ -82,11 +83,12 @@ Resources:
         Statement:
           - Sid: StatementId
             Effect: Allow
-            Principal:
-              AWS: "*"
+            Principal: "*"
             Action: sns:Publish
             Resource: !Ref "PublishedTopic"
             Condition:
+              StringEquals:
+                AWS:SourceAccount: !Ref "AWS::AccountId"
               ArnLike:
                 AWS:SourceArn: !Sub
                   - arn:aws:s3:::${BucketName}
@@ -135,11 +137,12 @@ Resources:
         Statement:
           - Sid: StatementId
             Effect: Allow
-            Principal:
-              AWS: "*"
+            Principal: "*"
             Action: sns:Publish
             Resource: !Ref "SubmissionsTopic"
             Condition:
+              StringEquals:
+                AWS:SourceAccount: !Ref "AWS::AccountId"
               ArnLike:
                 AWS:SourceArn: !Sub
                   - arn:aws:s3:::${BucketName}
