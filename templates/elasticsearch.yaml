@@ -47,6 +47,9 @@ Parameters:
   QSS3BucketName:
     Description: Quick Start S3 bucket name
     Type: String
+  QSS3BucketRegion:
+    Description: Quick Start S3 bucket region
+    Type: String
   QSS3KeyPrefix:
     Description: Quick Start S3 key prefix
     Type: String
@@ -68,6 +71,7 @@ Resources:
   CopyLambdaDeployment:
     Properties:
       QSS3BucketName: !Ref "QSS3BucketName"
+      QSS3BucketRegion: !Ref 'QSS3BucketRegion'
       QSS3KeyPrefix: !Ref "QSS3KeyPrefix"
       RegionalLambdaBucket: !Ref "RegionalLambdaBucketName"
       ServiceToken: !GetAtt "CopyLambdaDeploymentFunction.Arn"

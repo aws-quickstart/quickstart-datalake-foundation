@@ -42,12 +42,9 @@ Resources:
                   - s3:ListBucket
                   - s3:GetObject
                 Effect: Allow
-                Resource:
-                  - !Join
-                    - ''
-                    - - 'arn:aws:s3:::'
-                      - !Ref 'QSS3BucketName'
-                      - '*'
+                Resource: !Sub
+                  - arn:${AWS::Partition}:s3:::${S3Bucket}*
+                  - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
             Version: '2012-10-17'
           PolicyName: ListGetQSSBucket
     Type: AWS::IAM::Role
@@ -212,12 +209,9 @@ Resources:
               - Action:
                   - s3:GetObject
                 Effect: Allow
-                Resource:
-                  - !Join
-                    - ''
-                    - - 'arn:aws:s3:::'
-                      - !Ref 'QSS3BucketName'
-                      - /*
+                Resource: !Sub
+                  - arn:${AWS::Partition}:s3:::${S3Bucket}/*
+                  - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
             Version: '2012-10-17'
           PolicyName: GetQSS3Bucket
     Type: AWS::IAM::Role
@@ -342,6 +336,7 @@ Conditions:
   CreateRedshiftRole: !Equals
     - !Ref 'EnableRedshift'
     - 'yes'
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Parameters:
   EnableRedshift:
     AllowedValues:
@@ -358,6 +353,9 @@ Parameters:
     Type: String
   QSS3BucketName:
     Description: Quick Start S3 bucket name
+    Type: String
+  QSS3BucketRegion:
+    Description: Quick Start S3 bucket region
     Type: String
   RegionalLambdaBucketARN:
     Description: RegionalLambdaBucket bucket ARN

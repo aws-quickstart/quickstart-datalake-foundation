@@ -53,6 +53,7 @@ Metadata:
           default: AWS Quick Start Configuration
         Parameters:
           - QSS3BucketName
+          - QSS3BucketRegion
           - QSS3KeyPrefix
           - KeyPairName
     ParameterLabels:
@@ -82,6 +83,8 @@ Metadata:
         default: Redshift Database Port
       QSS3BucketName:
         default: Quick Start S3 Bucket Name
+      QSS3BucketRegion:
+        default: Quick Start S3 bucket region
       QSS3KeyPrefix:
         default: Quick Start S3 Key Prefix
       PrivateSubnet1ID:
@@ -117,6 +120,7 @@ Conditions:
   CreateRedshift: !Equals
     - !Ref 'EnableRedshift'
     - 'yes'
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Parameters:
   AvailabilityZones:
    Description: The list of Availability Zones to use for the subnets in the VPC. You must specify two Availability Zones. By default, the Quick Start preserves the logical order you specify.
@@ -205,6 +209,10 @@ Parameters:
       \ copy of Quick Start assets, if you decide to customize or extend the Quick\
       \ Start for your own use. The bucket name can include numbers, lowercase letters,\
       \ uppercase letters, and hyphens, but should not start or end with a hyphen."
+    Type: String
+  QSS3BucketRegion:
+    Default: 'us-east-1'
+    Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.'
     Type: String
   QSS3KeyPrefix:
     AllowedPattern: ^[0-9a-zA-Z-/]*$
@@ -324,13 +332,21 @@ Rules:
 Resources:
   RandomStringStack:
     Properties:
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/random-string.yaml'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/random-string.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
   BucketsStack:
     Properties:
       Parameters:
         RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/buckets.yaml'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/buckets.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
   ElasticsearchStack:
     Properties:
@@ -345,11 +361,16 @@ Resources:
         NodeType: !Ref 'ElasticsearchNodeType'
         PublishedTopicARN: !GetAtt 'BucketsStack.Outputs.PublishedTopicARN'
         QSS3BucketName: !Ref 'QSS3BucketName'
+        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
         QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
         RegionalLambdaBucketName: !GetAtt 'BucketsStack.Outputs.RegionalLambdaBucketName'
         RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
         SubmissionsTopicARN: !GetAtt 'BucketsStack.Outputs.SubmissionsTopicARN'
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/elasticsearch.yaml'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/elasticsearch.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
   IAMRolesStack:
     Properties:
@@ -358,9 +379,14 @@ Resources:
         CuratedDatasetsARN: !GetAtt 'BucketsStack.Outputs.CuratedDatasetsARN'
         PublishedDataARN: !GetAtt 'BucketsStack.Outputs.PublishedDataARN'
         QSS3BucketName: !Ref 'QSS3BucketName'
+        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
         RegionalLambdaBucketARN: !GetAtt 'BucketsStack.Outputs.RegionalLambdaBucketARN'
         SubmissionsBucketARN: !GetAtt 'BucketsStack.Outputs.SubmissionsBucketARN'
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/iam-roles.yaml'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/iam-roles.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
   KinesisSampleStack:
     Properties:
@@ -370,7 +396,11 @@ Resources:
         KinesisStreamKeyPrefix: !Ref 'KinesisDataStreamS3Prefix'
         KinesisStreamName: !Ref 'KinesisDataStreamName'
         RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/kinesis.yaml'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/kinesis.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
   RedshiftStack:
     Condition: CreateRedshift
@@ -398,7 +428,11 @@ Resources:
           - !Ref 'PublicSubnet2ID'
           - !Ref 'PrivateSubnet2ID'
         VpcId: !Ref 'VPCID'
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/redshift.yaml'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/redshift.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
   RegisterKibanaMetadataDashboardLambda:
     DependsOn: []
@@ -406,14 +440,23 @@ Resources:
       Parameters:
         ElasticsearchEndpoint: !GetAtt 'ElasticsearchStack.Outputs.ElasticsearchEndpoint'
         QSS3BucketName: !Ref 'QSS3BucketName'
+        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
         QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
         RegionalLambdaBucketName: !GetAtt 'BucketsStack.Outputs.RegionalLambdaBucketName'
         RegisterDashboardRoleARN: !GetAtt 'IAMRolesStack.Outputs.RegisterKibanaDashboardRoleARN'
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/register-dashboard.yaml'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/register-dashboard.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
   GlueStack:
     Properties:
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/glue.yaml'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/glue.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
   SageMakerStack:
     DependsOn: ElasticsearchStack
@@ -424,7 +467,11 @@ Resources:
         RegionalLambdaBucketName: !GetAtt 'BucketsStack.Outputs.RegionalLambdaBucketName'
         CreateNotebookFunctionExecuteRoleArn: !GetAtt 'IAMRolesStack.Outputs.CreateNotebookFunctionExecuteRoleARN'
         SageMakerExecutionRoleArn: !GetAtt 'IAMRolesStack.Outputs.SageMakerExecutionRoleARN'
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/sagemaker.yaml'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/sagemaker.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
 Outputs:
   SubmissionsBucketName:

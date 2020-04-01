@@ -46,6 +46,7 @@ Metadata:
           default: AWS Quick Start Configuration
         Parameters:
           - QSS3BucketName
+          - QSS3BucketRegion
           - QSS3KeyPrefix
           - KeyPairName
     ParameterLabels:
@@ -77,6 +78,8 @@ Metadata:
         default: Redshift Database Port
       QSS3BucketName:
         default: Quick Start S3 Bucket Name
+      QSS3BucketRegion:
+        default: Quick Start S3 bucket region
       QSS3KeyPrefix:
         default: Quick Start S3 Key Prefix
       VPCDefinition:
@@ -104,6 +107,7 @@ Conditions:
   CreateRedshift: !Equals
     - !Ref 'EnableRedshift'
     - 'yes'
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Parameters:
   AvailabilityZones:
     Description: The list of Availability Zones to use for the subnets in the VPC.
@@ -172,6 +176,10 @@ Parameters:
       \ copy of Quick Start assets, if you decide to customize or extend the Quick\
       \ Start for your own use. The bucket name can include numbers, lowercase letters,\
       \ uppercase letters, and hyphens, but should not start or end with a hyphen."
+    Type: String
+  QSS3BucketRegion:
+    Default: 'us-east-1'
+    Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.'
     Type: String
   QSS3KeyPrefix:
     AllowedPattern: ^[0-9a-zA-Z-/]*$
@@ -299,12 +307,17 @@ Resources:
         PublicSubnet1ID: !GetAtt 'VPCStack.Outputs.PublicSubnet1ID'
         PublicSubnet2ID: !GetAtt 'VPCStack.Outputs.PublicSubnet2ID'
         QSS3BucketName: !Ref 'QSS3BucketName'
+        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
         QSS3KeyPrefix: !Sub
           - ${Prefix}submodules/quickstart-linux-bastion/
           - Prefix: !Ref 'QSS3KeyPrefix'
         RemoteAccessCIDR: !Ref 'RemoteAccessCIDR'
         VPCID: !GetAtt 'VPCStack.Outputs.VPCID'
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-linux-bastion/templates/linux-bastion.template'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-linux-bastion/templates/linux-bastion.template'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
   DataLakeFoundationStack:
     Properties:
@@ -326,6 +339,7 @@ Resources:
         PublicSubnet1ID: !GetAtt 'VPCStack.Outputs.PublicSubnet1ID'
         PublicSubnet2ID: !GetAtt 'VPCStack.Outputs.PublicSubnet2ID'
         QSS3BucketName: !Ref 'QSS3BucketName'
+        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
         QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
         RedshiftDatabaseName: !Ref 'RedshiftDatabaseName'
         RedshiftDatabasePort: !Ref 'RedshiftDatabasePort'
@@ -339,7 +353,11 @@ Resources:
         NotebookInstanceName: !Ref 'NotebookInstanceName'
         NotebookInstanceType: !Ref 'NotebookInstanceType'
         NotebookTrainingInstanceType: !Ref 'NotebookTrainingInstanceType'
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/data-lake.yaml'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/data-lake.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
   VPCStack:
     Properties:
@@ -372,7 +390,11 @@ Resources:
           - VPCDefinitions
           - !Ref 'VPCDefinition'
           - VPCCIDR
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
 Outputs:
   SubmissionsBucketName:

@@ -6,6 +6,7 @@ Resources:
     Properties:
       ElasticsearchEndpoint: !Ref 'ElasticsearchEndpoint'
       QSS3BucketName: !Ref 'QSS3BucketName'
+      QSS3BucketRegion: !Ref 'QSS3BucketRegion'
       QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
       ServiceToken: !GetAtt 'RegisterDashboardLambda.Arn'
     Type: AWS::CloudFormation::CustomResource
@@ -26,6 +27,9 @@ Parameters:
     Type: String
   QSS3BucketName:
     Description: Quickstart bucket name
+    Type: String
+  QSS3BucketRegion:
+    Description: Quick Start S3 bucket region
     Type: String
   QSS3KeyPrefix:
     Description: Quickstart bucket prefix

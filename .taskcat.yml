@@ -1,0 +1,58 @@
+project:
+  name: quickstart-datalake-47lining
+  owner: quickstart@amazon.com
+  package_lambda: false
+  regions:
+  - us-east-1
+  - us-east-2
+  - us-west-2
+  s3_bucket: ''
+tests:
+  multi-node-without-demonstration:
+    parameters:
+      AvailabilityZones: $[alfred_genaz_2]
+      ElasticsearchNodeCount: '2'
+      ElasticsearchNodeType: t2.small.elasticsearch
+      KeyPairName: taskcat-test
+      KinesisDataStreamName: streaming-submissions
+      KinesisDataStreamS3Prefix: streaming-submissions
+      QSS3BucketName: $[taskcat_autobucket]
+      QSS3BucketRegion: $[taskcat_current_region]
+      RedshiftDatabaseName: testdb
+      RedshiftDatabasePort: '5439'
+      RedshiftNodeType: dc2.large
+      RedshiftNumberOfNodes: '2'
+      RedshiftPassword: $[alfred_genpass_16]
+      RedshiftUsername: datalake
+      RemoteAccessCIDR: 89.65.65.154/32
+      VPCDefinition: QuickstartDefault
+    regions:
+    - us-east-2
+    s3_bucket: ''
+    template: templates/data-lake-master.yaml
+  single-node-with-wizard:
+    parameters:
+      AvailabilityZones: $[alfred_genaz_2]
+      ElasticsearchNodeCount: '1'
+      ElasticsearchNodeType: t2.small.elasticsearch
+      KeyPairName: taskcat-test
+      KinesisDataStreamName: streaming-submissions
+      KinesisDataStreamS3Prefix: streaming-submissions
+      NotebookInstanceName: SageMakerNotebookInstTestDev
+      NotebookInstanceType: ml.t2.medium
+      NotebookTrainingInstanceType: ml.m5.2xlarge
+      QSS3BucketName: $[taskcat_autobucket]
+      QSS3BucketRegion: $[taskcat_current_region]
+      RedshiftDatabaseName: testdb
+      RedshiftDatabasePort: '5439'
+      RedshiftNodeType: dc2.large
+      RedshiftNumberOfNodes: '1'
+      RedshiftPassword: $[alfred_genpass_16]
+      RedshiftUsername: datalake
+      RemoteAccessCIDR: 89.65.65.154/32
+      VPCDefinition: QuickstartDefault
+    regions:
+    - us-east-1
+    - us-west-2
+    s3_bucket: ''
+    template: templates/data-lake-master.yaml
