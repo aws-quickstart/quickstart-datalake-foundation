@@ -42,9 +42,7 @@ Resources:
                   - s3:ListBucket
                   - s3:GetObject
                 Effect: Allow
-                Resource: !Sub
-                  - arn:${AWS::Partition}:s3:::${S3Bucket}*
-                  - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+                Resource: "*"
             Version: '2012-10-17'
           PolicyName: ListGetQSSBucket
     Type: AWS::IAM::Role
