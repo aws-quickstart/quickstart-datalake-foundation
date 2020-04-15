@@ -22,6 +22,14 @@ Metadata:
           - NAT1ElasticIP
           - NAT2ElasticIP
       - Label:
+          default: S3 Bucket Configuration
+        Parameters:
+          - SubmissionsBucketName
+          - CuratedDatasetsName
+          - PublishedDataName
+          - RegionalLambdaBucketName
+          - AthenaQueryResultsBucketName
+      - Label:
           default: Elasticsearch Configuration
         Parameters:
           - RemoteAccessCIDR
@@ -40,6 +48,8 @@ Metadata:
           - RedshiftNodeType
           - RedshiftDatabaseName
           - RedshiftDatabasePort
+          - RedshiftEncrypted
+          - RedshiftSnapshotRetention
       - Label:
           default: Kinesis configuration
         Parameters:
@@ -87,6 +97,10 @@ Metadata:
         default: Redshift Database Name
       RedshiftDatabasePort:
         default: Redshift Database Port
+      RedshiftEncrypted:
+        default: Redshift Data Encrypted
+      RedshiftSnapshotRetention:
+        default: Redshift Snapshot Retention in Days
       QSS3BucketName:
         default: Quick Start S3 Bucket Name
       QSS3BucketRegion:
@@ -119,6 +133,16 @@ Metadata:
         default: Notebook Instance Type
       NotebookTrainingInstanceType:
         default: Notebook Training Instance Type
+      SubmissionsBucketName:
+        default: Submissions Bucket Name
+      CuratedDatasetsName:
+        default: Curated Datasets Bucket Name
+      PublishedDataName:
+        default: Published Data Bucket Name
+      RegionalLambdaBucketName:
+        default: Regional Lambda Bucket Name
+      AthenaQueryResultsBucketName:
+        default: Athena Query Results Bucket Name
 Conditions:
   RedshiftPubliclyAccessible: !Equals
     - !Ref 'MakeRedshiftPubliclyAccessible'
@@ -291,10 +315,17 @@ Parameters:
     Description: The port that Amazon Redshift will listen on, which will be allowed
       through the security group.
     Type: String
+  RedshiftEncrypted:
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+    Description: Determines whether the Redshift data is encrypted at rest
+    Type: String
   RedshiftNodeType:
     AllowedValues:
+      - ra3.4xlarge
       - ra3.16xlarge
-      - dc1.large
       - dc2.large
       - dc2.8xlarge
     ConstraintDescription: must be a valid Redshift node type.
@@ -315,6 +346,10 @@ Parameters:
     MaxLength: '64'
     NoEcho: 'true'
     Type: String
+  RedshiftSnapshotRetention:
+    Description: Retention period for Redshift snapshots in days. If set to 0, snapshots are disabled.
+    Default: 1
+    Type: Integer
   RedshiftUsername:
     AllowedPattern: ^[a-z][a-z0-9_]*$
     ConstraintDescription: User name parameter must be lowercase, begin with a letter,
@@ -375,6 +410,26 @@ Parameters:
       - ml.c5.4xlarge
       - ml.c5.9xlarge
     Default: ml.m5.xlarge
+  SubmissionsBucketName:
+    Description: 'The name of the S3 submission bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: datalake-submissions
+  CuratedDatasetsName:
+    Description: 'The name of the S3 curated datasets bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: datalake-curated-datasets
+  PublishedDataName:
+    Description: 'The name of the S3 published data bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: datalake-published-data
+  RegionalLambdaBucketName:
+    Description: 'The name of the S3 regional lambda bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: regional-lambda-bucket
+  AthenaQueryResultsBucketName:
+    Description: 'The name of the S3 Athena query results bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: datalake-athena-query-results
 Rules:
   ValidateEnableRedshift:
     RuleCondition: !Equals [!Ref EnableRedshift, "yes"]
@@ -396,6 +451,11 @@ Resources:
     Properties:
       Parameters:
         RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
+        SubmissionsBucketName: !Ref 'SubmissionsBucketName'
+        CuratedDatasetsName: !Ref 'CuratedDatasetsName'
+        PublishedDataName: !Ref 'PublishedDataName'
+        RegionalLambdaBucketName: !Ref 'RegionalLambdaBucketName'
+        AthenaQueryResultsBucketName: !Ref 'AthenaQueryResultsBucketName'
       TemplateURL:
         !Sub
           - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/buckets.yaml'
@@ -475,6 +535,8 @@ Resources:
         RedshiftInboundCIDR: !Ref 'VPCCIDR'
         RedshiftPassword: !Ref 'RedshiftPassword'
         RedshiftUsername: !Ref 'RedshiftUsername'
+        RedshiftSnapshotRetention: !Ref 'RedshiftSnapshotRetention'
+        RedshiftEncrypted: !Ref 'RedshiftEncrypted'
         SubnetId1: !If
           - RedshiftPubliclyAccessible
           - !Ref 'PublicSubnet1ID'

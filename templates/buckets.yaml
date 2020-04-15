@@ -7,6 +7,26 @@ Parameters:
   RandomStringArn:
     Description: 'The ARN for the function that will generate the random value to be used in the naming of the S3 Buckets'
     Type: String
+  SubmissionsBucketName:
+    Description: 'The name of the S3 submission bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: datalake-submissions
+  CuratedDatasetsName:
+    Description: 'The name of the S3 curated datasets bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: datalake-curated-datasets
+  PublishedDataName:
+    Description: 'The name of the S3 published data bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: datalake-published-data
+  RegionalLambdaBucketName:
+    Description: 'The name of the S3 regional lambda bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: regional-lambda-bucket
+  AthenaQueryResultsBucketName:
+    Description: 'The name of the S3 Athena query results bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: datalake-athena-query-results
 Resources:
   RandomString:
     Type: Custom::RandomString
@@ -18,8 +38,7 @@ Resources:
     Properties:
       BucketName: !Join
         - "-"
-        - - datalake
-          - submissions
+        - - !Ref "SubmissionsBucketName"
           - !Ref "AWS::AccountId"
           - !Ref "AWS::Region"
           - !Sub ${RandomString}
@@ -34,9 +53,7 @@ Resources:
     Properties:
       BucketName: !Join
         - "-"
-        - - datalake
-          - curated
-          - datasets
+        - - !Ref "CuratedDatasetsName"
           - !Ref "AWS::AccountId"
           - !Ref "AWS::Region"
           - !Sub ${RandomString}
@@ -66,9 +83,7 @@ Resources:
                   - arn:aws:s3:::${BucketName}
                   - BucketName: !Join
                       - "-"
-                      - - datalake
-                        - curated
-                        - datasets
+                      - - !Ref "CuratedDatasetsName"
                         - !Ref "AWS::AccountId"
                         - !Ref "AWS::Region"
                         - !Sub ${RandomString}
@@ -94,9 +109,7 @@ Resources:
                   - arn:aws:s3:::${BucketName}
                   - BucketName: !Join
                       - "-"
-                      - - datalake
-                        - published
-                        - data
+                      - - !Ref "PublishedDataName"
                         - !Ref "AWS::AccountId"
                         - !Ref "AWS::Region"
                         - !Sub ${RandomString}
@@ -113,9 +126,7 @@ Resources:
     Properties:
       BucketName: !Join
         - "-"
-        - - datalake
-          - published
-          - data
+        - - !Ref "PublishedDataName"
           - !Ref "AWS::AccountId"
           - !Ref "AWS::Region"
           - !Sub ${RandomString}
@@ -160,9 +171,7 @@ Resources:
     Properties:
       BucketName: !Join
         - "-"
-        - - regional
-          - lambda
-          - bucket
+        - - !Ref "RegionalLambdaBucketName"
           - !Ref "AWS::AccountId"
           - !Ref "AWS::Region"
           - !Sub ${RandomString}
@@ -171,10 +180,7 @@ Resources:
     Properties:
       BucketName: !Join
         - "-"
-        - - datalake
-          - athena
-          - query
-          - results
+        - - !Ref "AthenaQueryResultsBucketName"
           - !Ref "AWS::AccountId"
           - !Ref "AWS::Region"
           - !Sub ${RandomString}
