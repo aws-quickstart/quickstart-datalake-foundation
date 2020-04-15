@@ -16,10 +16,17 @@ Parameters:
     ConstraintDescription: Must select a valid Notebook instance type.
     Type: String
     AllowedValues:
-      - ml.t2.medium
-      - ml.t2.large
-      - ml.t2.xlarge
-    Default: ml.t2.large
+      - ml.t3.medium
+      - ml.t3.large
+      - ml.t3.xlarge
+      - ml.t3.2xlarge
+      - ml.m5.xlarge
+      - ml.m5.2xlarge
+      - ml.c5.xlarge
+      - ml.c5.2xlarge
+      - ml.c5.4large
+      - ml.p3.2xlarge
+    Default: ml.t3.large
   RegionalLambdaBucketName:
     Description: RegionalLambdaBucket bucket name
     Type: String

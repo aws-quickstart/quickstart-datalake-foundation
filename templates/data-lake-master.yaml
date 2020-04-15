@@ -48,12 +48,13 @@ Metadata:
         Parameters:
           - KinesisDataStreamName
           - KinesisDataStreamS3Prefix
+          - KinesisErrorOutputPrefix
+          - KinesisCompressionFormat
       - Label:
           default: SageMaker Configuration
         Parameters:
           - NotebookInstanceName
           - NotebookInstanceType
-          - NotebookTrainingInstanceType
       - Label:
           default: AWS Quick Start Configuration
         Parameters:
@@ -108,12 +109,14 @@ Metadata:
         default: Kinesis Data Stream Name
       KinesisDataStreamS3Prefix:
         default: Kinesis Data Stream S3 Prefix
+      KinesisCompressionFormat:
+        default: Kinesis Data Stream S3 Compression Format
+      KinesisErrorOutputPrefix:
+        default: Kinesis S3 Prefix for Error Objects
       NotebookInstanceName:
         default: Notebook Instance Name
       NotebookInstanceType:
         default: Notebook Instance Type
-      NotebookTrainingInstanceType:
-        default: Notebook Training Instance Type
       SubmissionsBucketName:
         default: Submissions Bucket Name
       CuratedDatasetsName:
@@ -243,6 +246,19 @@ Parameters:
       \ is automatically added. Use this parameter to specify the location for the\
       \ streaming data you\u2019d like to load."
     Type: String
+  KinesisCompressionFormat:
+    Description: Kinesis stream S3 compression format
+    Type: String
+    Default: "UNCOMPRESSED"
+    AllowedValues:
+      - "UNCOMPRESSED"
+      - "GZIP"
+      - "Snappy"
+      - "ZIP"
+  KinesisErrorOutputPrefix:
+    Description: S3 prefix for error objects (optional)
+    Type: String
+    Default: ""
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase
@@ -361,24 +377,17 @@ Parameters:
     ConstraintDescription: Must select a valid Notebook instance type.
     Type: String
     AllowedValues:
-      - ml.t2.medium
-      - ml.t2.large
-      - ml.t2.xlarge
-    Default: ml.t2.large
-  NotebookTrainingInstanceType:
-    Description: The EC2 instance type for the Amazon SageMaker training instance which will be used for model training.
-    ConstraintDescription: Must select a valid Notebook instance type.
-    Type: String
-    AllowedValues:
-      - ml.m5.large
+      - ml.t3.medium
+      - ml.t3.large
+      - ml.t3.xlarge
+      - ml.t3.2xlarge
       - ml.m5.xlarge
       - ml.m5.2xlarge
-      - ml.m5.4xlarge
       - ml.c5.xlarge
       - ml.c5.2xlarge
-      - ml.c5.4xlarge
-      - ml.c5.9xlarge
-    Default: ml.m5.xlarge
+      - ml.c5.4large
+      - ml.p3.2xlarge
+    Default: ml.t3.large
   SubmissionsBucketName:
     Description: 'The name of the S3 submission bucket. A random string will be appended to ensure uniqueness.'
     Type: String
@@ -465,7 +474,6 @@ Resources:
         VPCID: !GetAtt 'VPCStack.Outputs.VPCID'
         NotebookInstanceName: !Ref 'NotebookInstanceName'
         NotebookInstanceType: !Ref 'NotebookInstanceType'
-        NotebookTrainingInstanceType: !Ref 'NotebookTrainingInstanceType'
         SubmissionsBucketName: !Ref 'SubmissionsBucketName'
         CuratedDatasetsName: !Ref 'CuratedDatasetsName'
         PublishedDataName: !Ref 'PublishedDataName'
