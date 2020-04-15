@@ -165,47 +165,47 @@ Parameters:
     Type: Number
   ElasticsearchNodeType:
     AllowedValues:
-      - c5.largeelasticsearch
-      - c5.xlargeelasticsearch
-      - c5.2xlargeelasticsearch
-      - c5.4xlargeelasticsearch
-      - c5.18xlargeelasticsearch
-      - i3.largeelasticsearch
-      - i3.2xlargeelasticsearch
-      - i3.4xlargeelasticsearch
-      - i3.8xlargeelasticsearch
-      - i3.16xlargeelasticsearch
-      - m4.largeelasticsearch
-      - m4.xlargeelasticsearch
-      - m4.2xlargeelasticsearch
-      - m4.4xlargeelasticsearch
-      - m4.10xlargeelasticsearch
-      - m5.largeelasticsearch
-      - m5.xlargeelasticsearch
-      - m5.2xlargeelasticsearch
-      - m5.4xlargeelasticsearch
-      - m5.12xlargeelasticsearch
-      - r3.largeelasticsearch
-      - r3.xlargeelasticsearch
-      - r3.2xlargeelasticsearch
-      - r3.4xlargeelasticsearch
-      - r3.8xlargeelasticsearch
-      - r4.largeelasticsearch
-      - r4.xlargeelasticsearch
-      - r4.2xlargeelasticsearch
-      - r4.4xlargeelasticsearch
-      - r4.8xlargeelasticsearch
-      - r4.16xlargeelasticsearch
-      - r5.largeelasticsearch
-      - r5.xlargeelasticsearch
-      - r5.2xlargeelasticsearch
-      - r5.4xlargeelasticsearch
-      - r5.12xlargeelasticsearch
-      - c4.largeelasticsearch
-      - c4.xlargeelasticsearch
-      - c4.2xlargeelasticsearch
-      - c4.4xlargeelasticsearch
-      - c5.8xlargeelasticsearch
+      - c5.large.elasticsearch
+      - c5.xlarge.elasticsearch
+      - c5.2xlarge.elasticsearch
+      - c5.4xlarge.elasticsearch
+      - c5.18xlarge.elasticsearch
+      - i3.large.elasticsearch
+      - i3.2xlarge.elasticsearch
+      - i3.4xlarge.elasticsearch
+      - i3.8xlarge.elasticsearch
+      - i3.16xlarge.elasticsearch
+      - m4.large.elasticsearch
+      - m4.xlarge.elasticsearch
+      - m4.2xlarge.elasticsearch
+      - m4.4xlarge.elasticsearch
+      - m4.10xlarge.elasticsearch
+      - m5.large.elasticsearch
+      - m5.xlarge.elasticsearch
+      - m5.2xlarge.elasticsearch
+      - m5.4xlarge.elasticsearch
+      - m5.12xlarge.elasticsearch
+      - r3.large.elasticsearch
+      - r3.xlarge.elasticsearch
+      - r3.2xlarge.elasticsearch
+      - r3.4xlarge.elasticsearch
+      - r3.8xlarge.elasticsearch
+      - r4.large.elasticsearch
+      - r4.xlarge.elasticsearch
+      - r4.2xlarge.elasticsearch
+      - r4.4xlarge.elasticsearch
+      - r4.8xlarge.elasticsearch
+      - r4.16xlarge.elasticsearch
+      - r5.large.elasticsearch
+      - r5.xlarge.elasticsearch
+      - r5.2xlarge.elasticsearch
+      - r5.4xlarge.elasticsearch
+      - r5.12xlarge.elasticsearch
+      - c4.large.elasticsearch
+      - c4.xlarge.elasticsearch
+      - c4.2xlarge.elasticsearch
+      - c4.4xlarge.elasticsearch
+      - c5.8xlarge.elasticsearch
     ConstraintDescription: must be a valid Elasticsearch node type.
     Default: r5.large.elasticsearch
     Description: EC2 instance type for the Elasticsearch cluster.
@@ -221,6 +221,7 @@ Parameters:
   ElasticsearchDomainName:
     Description: Elasticsearch Domain Name. Must start with a lowercase letter and contain only letters, numbers, and -
     Type: String
+    Default: "datalake-quickstart"
     AllowedPattern: '[a-z][a-zA-Z0-9\-]+'
     MaxLength: '28'
     MinLength: '3'
@@ -365,7 +366,7 @@ Parameters:
   RedshiftSnapshotRetention:
     Description: Retention period for Redshift snapshots in days. If set to 0, snapshots are disabled.
     Default: 1
-    Type: Integer
+    Type: Number
   RedshiftUsername:
     AllowedPattern: ^[a-z][a-z0-9_]*$
     ConstraintDescription: User name parameter must be lowercase, begin with a letter,
@@ -591,7 +592,6 @@ Resources:
       Parameters:
         NotebookInstanceName: !Ref 'NotebookInstanceName'
         NotebookInstanceType: !Ref 'NotebookInstanceType'
-        RegionalLambdaBucketName: !GetAtt 'BucketsStack.Outputs.RegionalLambdaBucketName'
         CreateNotebookFunctionExecuteRoleArn: !GetAtt 'IAMRolesStack.Outputs.CreateNotebookFunctionExecuteRoleARN'
         SageMakerExecutionRoleArn: !GetAtt 'IAMRolesStack.Outputs.SageMakerExecutionRoleARN'
       TemplateURL:

@@ -58,7 +58,7 @@ Parameters:
   RedshiftSnapshotRetention:
     Description: Retention period for Redshift snapshots in days. If set to 0, snapshots are disabled.
     Default: 1
-    Type: Integer
+    Type: Number
   RedshiftUsername:
     Description:
       The user name that is associated with the master user account for

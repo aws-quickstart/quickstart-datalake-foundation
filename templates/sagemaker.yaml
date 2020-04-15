@@ -51,7 +51,7 @@ Resources:
     Type: AWS::Logs::LogGroup
   CreateNotebookFunction:
     Properties:
-      Description: Create a SageMaker Notebook instance and return it's ARN.
+      Description: Create a SageMaker Notebook instance and return its ARN.
       Handler: lambdas.lambda_handler
       Runtime: python3.6
       Timeout: 300
