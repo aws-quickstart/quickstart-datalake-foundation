@@ -25,6 +25,7 @@ Metadata:
           default: Elasticsearch Configuration
         Parameters:
           - RemoteAccessCIDR
+          - ElasticsearchDomainName
           - ElasticsearchNodeType
           - ElasticsearchNodeCount
           - ElasticsearchEBSVolumeType
@@ -68,6 +69,8 @@ Metadata:
         default: Elasticsearch Node Count
       ElasticsearchEBSVolumeType:
         default: Elasticsearch EBS Volume Type
+      ElasticsearchDomainName:
+        default: Elasticsearch Domain Name
       EnableRedshift:
         default: Enable Redshift
       MakeRedshiftPubliclyAccessible:
@@ -188,6 +191,12 @@ Parameters:
       - io1
       - st1
     Default: gp2
+  ElasticsearchDomainName:
+    Description: Elasticsearch Domain Name. Must start with a lowercase letter and contain only letters, numbers, and -
+    Type: String
+    AllowedPattern: '[a-z][a-zA-Z0-9\-]+'
+    MaxLength: '28'
+    MinLength: '3'
   EnableRedshift:
     AllowedValues:
       - 'yes'
@@ -401,6 +410,7 @@ Resources:
         LambdaRoleARN: !GetAtt 'IAMRolesStack.Outputs.LambdaRoleARN'
         CuratedTopicARN: !GetAtt 'BucketsStack.Outputs.CuratedTopicARN'
         EBSVolumeType: !Ref "ElasticsearchEBSVolumeType"
+        ElasticsearchDomainName: !Ref ElasticsearchDomainName
         NAT1ElasticIP: !Ref 'NAT1ElasticIP'
         NAT2ElasticIP: !Ref 'NAT2ElasticIP'
         NodeCount: !Ref 'ElasticsearchNodeCount'

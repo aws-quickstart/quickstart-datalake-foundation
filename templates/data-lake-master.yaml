@@ -18,6 +18,7 @@ Metadata:
           default: Elasticsearch Configuration
         Parameters:
           - RemoteAccessCIDR
+          - ElasticsearchDomainName
           - ElasticsearchNodeType
           - ElasticsearchNodeCount
           - ElasticsearchEBSVolumeType
@@ -63,6 +64,8 @@ Metadata:
         default: Elasticsearch Node Count
       ElasticsearchEBSVolumeType:
         default: Elasticsearch EBS Volume Type
+      ElasticsearchDomainName:
+        default: ElasticsearchDomainName
       EnableRedshift:
         default: Enable Redshift
       MakeRedshiftPubliclyAccessible:
@@ -177,6 +180,12 @@ Parameters:
       - io1
       - st1
     Default: gp2
+  ElasticsearchDomainName:
+    Description: Elasticsearch Domain Name. Must start with a lowercase letter and contain only letters, numbers, and -
+    Type: String
+    AllowedPattern: '[a-z][a-zA-Z0-9\-]+'
+    MaxLength: '28'
+    MinLength: '3'
   EnableRedshift:
     AllowedValues:
       - 'yes'
@@ -373,6 +382,7 @@ Resources:
         ElasticsearchNodeCount: !Ref 'ElasticsearchNodeCount'
         ElasticsearchNodeType: !Ref 'ElasticsearchNodeType'
         ElasticsearchEBSVolumeType: !Ref 'ElasticsearchEBSVolumeType'
+        ElasticsearchDomainName: !Ref 'ElasticsearchDomainName'
         EnableRedshift: !Ref 'EnableRedshift'
         MakeRedshiftPubliclyAccessible: !Ref 'MakeRedshiftPubliclyAccessible'
         KeyPairName: !Ref 'KeyPairName'

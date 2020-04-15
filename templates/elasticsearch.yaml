@@ -18,6 +18,12 @@ Parameters:
       - io1
       - st1
     Default: gp2
+  ElasticsearchDomainName:
+    Description: Elasticsearch Domain Name
+    Type: String
+    AllowedPattern: '[a-z][a-zA-Z0-9\-]+'
+    MaxLength: '28'
+    MinLength: '3'
   LambdaRoleARN:
     Description: LambdaRole ARN
     Type: String
@@ -182,7 +188,7 @@ Resources:
         Version: "2012-10-17"
       AdvancedOptions:
         rest.action.multi.allow_explicit_index: "true"
-      DomainName: !Sub datalake-quickstart-${RandomString}
+      DomainName: !Ref "ElasticsearchDomainName"
       EBSOptions:
         EBSEnabled: true
         Iops: 0
