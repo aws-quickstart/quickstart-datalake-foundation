@@ -27,6 +27,7 @@ Metadata:
           - RemoteAccessCIDR
           - ElasticsearchNodeType
           - ElasticsearchNodeCount
+          - ElasticsearchEBSVolumeType
       - Label:
           default: Redshift Configuration
         Parameters:
@@ -65,6 +66,8 @@ Metadata:
         default: Elasticsearch Instance Type
       ElasticsearchNodeCount:
         default: Elasticsearch Node Count
+      ElasticsearchEBSVolumeType:
+        default: Elasticsearch EBS Volume Type
       EnableRedshift:
         default: Enable Redshift
       MakeRedshiftPubliclyAccessible:
@@ -132,17 +135,59 @@ Parameters:
     Type: Number
   ElasticsearchNodeType:
     AllowedValues:
-      - t2.small.elasticsearch
-      - m4.large.elasticsearch
-      - m4.xlarge.elasticsearch
-      - c4.large.elasticsearch
-      - c4.xlarge.elasticsearch
-      - r4.large.elasticsearch
-      - r4.xlarge.elasticsearch
+      - c5.largeelasticsearch
+      - c5.xlargeelasticsearch
+      - c5.2xlargeelasticsearch
+      - c5.4xlargeelasticsearch
+      - c5.18xlargeelasticsearch
+      - i3.largeelasticsearch
+      - i3.2xlargeelasticsearch
+      - i3.4xlargeelasticsearch
+      - i3.8xlargeelasticsearch
+      - i3.16xlargeelasticsearch
+      - m4.largeelasticsearch
+      - m4.xlargeelasticsearch
+      - m4.2xlargeelasticsearch
+      - m4.4xlargeelasticsearch
+      - m4.10xlargeelasticsearch
+      - m5.largeelasticsearch
+      - m5.xlargeelasticsearch
+      - m5.2xlargeelasticsearch
+      - m5.4xlargeelasticsearch
+      - m5.12xlargeelasticsearch
+      - r3.largeelasticsearch
+      - r3.xlargeelasticsearch
+      - r3.2xlargeelasticsearch
+      - r3.4xlargeelasticsearch
+      - r3.8xlargeelasticsearch
+      - r4.largeelasticsearch
+      - r4.xlargeelasticsearch
+      - r4.2xlargeelasticsearch
+      - r4.4xlargeelasticsearch
+      - r4.8xlargeelasticsearch
+      - r4.16xlargeelasticsearch
+      - r5.largeelasticsearch
+      - r5.xlargeelasticsearch
+      - r5.2xlargeelasticsearch
+      - r5.4xlargeelasticsearch
+      - r5.12xlargeelasticsearch
+      - c4.largeelasticsearch
+      - c4.xlargeelasticsearch
+      - c4.2xlargeelasticsearch
+      - c4.4xlargeelasticsearch
+      - c5.8xlargeelasticsearch
     ConstraintDescription: must be a valid Elasticsearch node type.
-    Default: t2.small.elasticsearch
+    Default: r5.large.elasticsearch
     Description: EC2 instance type for the Elasticsearch cluster.
     Type: String
+  ElasticsearchEBSVolumeType:
+    Description: EBS Volume Type
+    Type: String
+    AllowedValues:
+      - gp2
+      - io1
+      - st1
+    Default: gp2
   EnableRedshift:
     AllowedValues:
       - 'yes'
@@ -355,6 +400,7 @@ Resources:
         ElasticsearchAccessIP: !Ref 'RemoteAccessCIDR'
         LambdaRoleARN: !GetAtt 'IAMRolesStack.Outputs.LambdaRoleARN'
         CuratedTopicARN: !GetAtt 'BucketsStack.Outputs.CuratedTopicARN'
+        EBSVolumeType: !Ref "ElasticsearchEBSVolumeType"
         NAT1ElasticIP: !Ref 'NAT1ElasticIP'
         NAT2ElasticIP: !Ref 'NAT2ElasticIP'
         NodeCount: !Ref 'ElasticsearchNodeCount'
