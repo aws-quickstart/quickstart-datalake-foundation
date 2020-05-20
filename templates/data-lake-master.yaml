@@ -453,6 +453,8 @@ Resources:
         KeyPairName: !Ref 'KeyPairName'
         KinesisDataStreamName: !Ref 'KinesisDataStreamName'
         KinesisDataStreamS3Prefix: !Ref 'KinesisDataStreamS3Prefix'
+        KinesisCompressionFormat: !Ref 'KinesisCompressionFormat'
+        KinesisErrorOutputPrefix: !Ref 'KinesisErrorOutputPrefix'
         NAT1ElasticIP: !GetAtt 'VPCStack.Outputs.NAT1EIP'
         NAT2ElasticIP: !GetAtt 'VPCStack.Outputs.NAT2EIP'
         PrivateSubnet1ID: !GetAtt 'VPCStack.Outputs.PrivateSubnet1AID'

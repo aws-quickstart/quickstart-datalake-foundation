@@ -521,6 +521,8 @@ Resources:
         KinesisStreamBucketRoleARN: !GetAtt 'IAMRolesStack.Outputs.KinesisStreamBucketRoleARN'
         KinesisStreamKeyPrefix: !Ref 'KinesisDataStreamS3Prefix'
         KinesisStreamName: !Ref 'KinesisDataStreamName'
+        KinesisCompressionFormat: !Ref 'KinesisCompressionFormat'
+        KinesisErrorOutputPrefix: !Ref 'KinesisErrorOutputPrefix'
         RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
       TemplateURL:
         !Sub
