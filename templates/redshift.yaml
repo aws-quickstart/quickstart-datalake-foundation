@@ -15,6 +15,7 @@ Parameters:
     Type: String
   NodeType:
     AllowedValues:
+      - ra3.4xlarge
       - ra3.16xlarge
       - dc2.large
       - dc2.8xlarge
@@ -36,6 +37,13 @@ Parameters:
   QSRedshiftRoleARN:
     Description: QSRedshiftRole ARN
     Type: String
+  RedshiftEncrypted:
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+    Description: Determines whether the Redshift data is encrypted at rest
+    Type: String
   RedshiftInboundCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
@@ -47,6 +55,10 @@ Parameters:
       the cluster that is being created.
     NoEcho: "true"
     Type: String
+  RedshiftSnapshotRetention:
+    Description: Retention period for Redshift snapshots in days. If set to 0, snapshots are disabled.
+    Default: 1
+    Type: Number
   RedshiftUsername:
     Description:
       The user name that is associated with the master user account for
@@ -86,12 +98,14 @@ Conditions:
 Resources:
   RedshiftCluster:
     Properties:
+      AutomatedSnapshotRetentionPeriod: !Ref "RedshiftSnapshotRetention"
       ClusterSubnetGroupName: !Ref "RedshiftClusterSubnetGroup"
       ClusterType: !If
         - IsMultiNodeCluster
         - multi-node
         - single-node
       DBName: !Ref "DatabaseName"
+      Encrypted: !Ref "RedshiftEncrypted"
       IamRoles:
         - !Ref "QSRedshiftRoleARN"
       MasterUserPassword: !Ref "RedshiftPassword"

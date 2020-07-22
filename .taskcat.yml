@@ -26,6 +26,7 @@ tests:
       RedshiftUsername: datalake
       RemoteAccessCIDR: 89.65.65.154/32
       VPCDefinition: QuickstartDefault
+      KeyPairName: $[taskcat_getkeypair]
     regions:
     - us-east-2
     s3_bucket: ''
@@ -51,6 +52,7 @@ tests:
       RedshiftUsername: datalake
       RemoteAccessCIDR: 89.65.65.154/32
       VPCDefinition: QuickstartDefault
+      KeyPairName: $[taskcat_getkeypair]
     regions:
     - us-east-1
     - us-west-2

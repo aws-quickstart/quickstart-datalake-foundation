@@ -15,11 +15,21 @@ Metadata:
           - AvailabilityZones
           - VPCDefinition
       - Label:
+          default: S3 Bucket Configuration
+        Parameters:
+          - SubmissionsBucketName
+          - CuratedDatasetsName
+          - PublishedDataName
+          - RegionalLambdaBucketName
+          - AthenaQueryResultsBucketName
+      - Label:
           default: Elasticsearch Configuration
         Parameters:
           - RemoteAccessCIDR
+          - ElasticsearchDomainName
           - ElasticsearchNodeType
           - ElasticsearchNodeCount
+          - ElasticsearchEBSVolumeType
       - Label:
           default: Redshift Configuration
         Parameters:
@@ -31,17 +41,20 @@ Metadata:
           - RedshiftNodeType
           - RedshiftDatabaseName
           - RedshiftDatabasePort
+          - RedshiftEncrypted
+          - RedshiftSnapshotRetention
       - Label:
           default: Kinesis Configuration
         Parameters:
           - KinesisDataStreamName
           - KinesisDataStreamS3Prefix
+          - KinesisErrorOutputPrefix
+          - KinesisCompressionFormat
       - Label:
           default: SageMaker Configuration
         Parameters:
           - NotebookInstanceName
           - NotebookInstanceType
-          - NotebookTrainingInstanceType
       - Label:
           default: AWS Quick Start Configuration
         Parameters:
@@ -60,6 +73,10 @@ Metadata:
         default: Elasticsearch Node Type
       ElasticsearchNodeCount:
         default: Elasticsearch Node Count
+      ElasticsearchEBSVolumeType:
+        default: Elasticsearch EBS Volume Type
+      ElasticsearchDomainName:
+        default: ElasticsearchDomainName
       EnableRedshift:
         default: Enable Redshift
       MakeRedshiftPubliclyAccessible:
@@ -76,6 +93,10 @@ Metadata:
         default: Redshift Database Name
       RedshiftDatabasePort:
         default: Redshift Database Port
+      RedshiftEncrypted:
+        default: Redshift Data Encrypted
+      RedshiftSnapshotRetention:
+        default: Redshift snapshot retention in days
       QSS3BucketName:
         default: Quick Start S3 Bucket Name
       QSS3BucketRegion:
@@ -88,12 +109,24 @@ Metadata:
         default: Kinesis Data Stream Name
       KinesisDataStreamS3Prefix:
         default: Kinesis Data Stream S3 Prefix
+      KinesisCompressionFormat:
+        default: Kinesis Data Stream S3 Compression Format
+      KinesisErrorOutputPrefix:
+        default: Kinesis S3 Prefix for Error Objects
       NotebookInstanceName:
         default: Notebook Instance Name
       NotebookInstanceType:
         default: Notebook Instance Type
-      NotebookTrainingInstanceType:
-        default: Notebook Training Instance Type
+      SubmissionsBucketName:
+        default: Submissions Bucket Name
+      CuratedDatasetsName:
+        default: Curated Datasets Bucket Name
+      PublishedDataName:
+        default: Published Data Bucket Name
+      RegionalLambdaBucketName:
+        default: Regional Lambda Bucket Name
+      AthenaQueryResultsBucketName:
+        default: Athena Query Results Bucket Name
 Mappings:
   VPCDefinitions:
     QuickstartDefault:
@@ -121,17 +154,66 @@ Parameters:
     Type: Number
   ElasticsearchNodeType:
     AllowedValues:
-      - t2.small.elasticsearch
+      - c5.large.elasticsearch
+      - c5.xlarge.elasticsearch
+      - c5.2xlarge.elasticsearch
+      - c5.4xlarge.elasticsearch
+      - c5.18xlarge.elasticsearch
+      - i3.large.elasticsearch
+      - i3.2xlarge.elasticsearch
+      - i3.4xlarge.elasticsearch
+      - i3.8xlarge.elasticsearch
+      - i3.16xlarge.elasticsearch
       - m4.large.elasticsearch
       - m4.xlarge.elasticsearch
-      - c4.large.elasticsearch
-      - c4.xlarge.elasticsearch
+      - m4.2xlarge.elasticsearch
+      - m4.4xlarge.elasticsearch
+      - m4.10xlarge.elasticsearch
+      - m5.large.elasticsearch
+      - m5.xlarge.elasticsearch
+      - m5.2xlarge.elasticsearch
+      - m5.4xlarge.elasticsearch
+      - m5.12xlarge.elasticsearch
+      - r3.large.elasticsearch
+      - r3.xlarge.elasticsearch
+      - r3.2xlarge.elasticsearch
+      - r3.4xlarge.elasticsearch
+      - r3.8xlarge.elasticsearch
       - r4.large.elasticsearch
       - r4.xlarge.elasticsearch
+      - r4.2xlarge.elasticsearch
+      - r4.4xlarge.elasticsearch
+      - r4.8xlarge.elasticsearch
+      - r4.16xlarge.elasticsearch
+      - r5.large.elasticsearch
+      - r5.xlarge.elasticsearch
+      - r5.2xlarge.elasticsearch
+      - r5.4xlarge.elasticsearch
+      - r5.12xlarge.elasticsearch
+      - c4.large.elasticsearch
+      - c4.xlarge.elasticsearch
+      - c4.2xlarge.elasticsearch
+      - c4.4xlarge.elasticsearch
+      - c5.8xlarge.elasticsearch
     ConstraintDescription: must be a valid Elasticsearch node type.
-    Default: t2.small.elasticsearch
+    Default: r5.large.elasticsearch
     Description: EC2 instance type for the Elasticsearch cluster.
     Type: String
+  ElasticsearchEBSVolumeType:
+    Description: EBS Volume Type
+    Type: String
+    AllowedValues:
+      - gp2
+      - io1
+      - st1
+    Default: gp2
+  ElasticsearchDomainName:
+    Description: Elasticsearch Domain Name. Must start with a lowercase letter and contain only letters, numbers, and -
+    Type: String
+    Default: "datalake-quickstart"
+    AllowedPattern: '[a-z][a-zA-Z0-9\-]+'
+    MaxLength: '28'
+    MinLength: '3'
   EnableRedshift:
     AllowedValues:
       - 'yes'
@@ -165,6 +247,19 @@ Parameters:
       \ is automatically added. Use this parameter to specify the location for the\
       \ streaming data you\u2019d like to load."
     Type: String
+  KinesisCompressionFormat:
+    Description: Kinesis stream S3 compression format
+    Type: String
+    Default: "UNCOMPRESSED"
+    AllowedValues:
+      - "UNCOMPRESSED"
+      - "GZIP"
+      - "Snappy"
+      - "ZIP"
+  KinesisErrorOutputPrefix:
+    Description: S3 prefix for error objects (optional)
+    Type: String
+    Default: ""
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase
@@ -204,10 +299,17 @@ Parameters:
     Description: The port that Amazon Redshift will listen on, which will be allowed
       through the security group.
     Type: String
+  RedshiftEncrypted:
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+    Description: Determines whether the Redshift data is encrypted at rest
+    Type: String
   RedshiftNodeType:
     AllowedValues:
+      - ra3.4xlarge
       - ra3.16xlarge
-      - dc1.large
       - dc2.large
       - dc2.8xlarge
     ConstraintDescription: must be a valid Redshift node type.
@@ -228,6 +330,10 @@ Parameters:
     MaxLength: '64'
     NoEcho: 'true'
     Type: String
+  RedshiftSnapshotRetention:
+    Description: Retention period for Redshift snapshots in days. If set to 0, snapshots are disabled.
+    Default: 1
+    Type: Number
   RedshiftUsername:
     AllowedPattern: ^[a-z][a-z0-9_]*$
     ConstraintDescription: User name parameter must be lowercase, begin with a letter,
@@ -272,24 +378,37 @@ Parameters:
     ConstraintDescription: Must select a valid Notebook instance type.
     Type: String
     AllowedValues:
-      - ml.t2.medium
-      - ml.t2.large
-      - ml.t2.xlarge
-    Default: ml.t2.large
-  NotebookTrainingInstanceType:
-    Description: The EC2 instance type for the Amazon SageMaker training instance which will be used for model training.
-    ConstraintDescription: Must select a valid Notebook instance type.
-    Type: String
-    AllowedValues:
-      - ml.m5.large
+      - ml.t3.medium
+      - ml.t3.large
+      - ml.t3.xlarge
+      - ml.t3.2xlarge
       - ml.m5.xlarge
       - ml.m5.2xlarge
-      - ml.m5.4xlarge
       - ml.c5.xlarge
       - ml.c5.2xlarge
-      - ml.c5.4xlarge
-      - ml.c5.9xlarge
-    Default: ml.m5.xlarge
+      - ml.c5.4large
+      - ml.p3.2xlarge
+    Default: ml.t3.large
+  SubmissionsBucketName:
+    Description: 'The name of the S3 submission bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: datalake-submissions
+  CuratedDatasetsName:
+    Description: 'The name of the S3 curated datasets bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: datalake-curated-datasets
+  PublishedDataName:
+    Description: 'The name of the S3 published data bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: datalake-published-data
+  RegionalLambdaBucketName:
+    Description: 'The name of the S3 regional lambda bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: regional-lambda-bucket
+  AthenaQueryResultsBucketName:
+    Description: 'The name of the S3 Athena query results bucket. A random string will be appended to ensure uniqueness.'
+    Type: String
+    Default: datalake-athena-query-results
 Rules:
   ValidateEnableRedshift:
     RuleCondition: !Equals [!Ref EnableRedshift, "yes"]
@@ -327,11 +446,15 @@ Resources:
           - !Ref 'AvailabilityZones'
         ElasticsearchNodeCount: !Ref 'ElasticsearchNodeCount'
         ElasticsearchNodeType: !Ref 'ElasticsearchNodeType'
+        ElasticsearchEBSVolumeType: !Ref 'ElasticsearchEBSVolumeType'
+        ElasticsearchDomainName: !Ref 'ElasticsearchDomainName'
         EnableRedshift: !Ref 'EnableRedshift'
         MakeRedshiftPubliclyAccessible: !Ref 'MakeRedshiftPubliclyAccessible'
         KeyPairName: !Ref 'KeyPairName'
         KinesisDataStreamName: !Ref 'KinesisDataStreamName'
         KinesisDataStreamS3Prefix: !Ref 'KinesisDataStreamS3Prefix'
+        KinesisCompressionFormat: !Ref 'KinesisCompressionFormat'
+        KinesisErrorOutputPrefix: !Ref 'KinesisErrorOutputPrefix'
         NAT1ElasticIP: !GetAtt 'VPCStack.Outputs.NAT1EIP'
         NAT2ElasticIP: !GetAtt 'VPCStack.Outputs.NAT2EIP'
         PrivateSubnet1ID: !GetAtt 'VPCStack.Outputs.PrivateSubnet1AID'
@@ -343,16 +466,22 @@ Resources:
         QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
         RedshiftDatabaseName: !Ref 'RedshiftDatabaseName'
         RedshiftDatabasePort: !Ref 'RedshiftDatabasePort'
+        RedshiftEncrypted: !Ref 'RedshiftEncrypted'
         RedshiftNodeType: !Ref 'RedshiftNodeType'
         RedshiftNumberOfNodes: !Ref 'RedshiftNumberOfNodes'
         RedshiftPassword: !Ref 'RedshiftPassword'
         RedshiftUsername: !Ref 'RedshiftUsername'
+        RedshiftSnapshotRetention: !Ref 'RedshiftSnapshotRetention'
         RemoteAccessCIDR: !Ref 'RemoteAccessCIDR'
         VPCCIDR: !GetAtt 'VPCStack.Outputs.VPCCIDR'
         VPCID: !GetAtt 'VPCStack.Outputs.VPCID'
         NotebookInstanceName: !Ref 'NotebookInstanceName'
         NotebookInstanceType: !Ref 'NotebookInstanceType'
-        NotebookTrainingInstanceType: !Ref 'NotebookTrainingInstanceType'
+        SubmissionsBucketName: !Ref 'SubmissionsBucketName'
+        CuratedDatasetsName: !Ref 'CuratedDatasetsName'
+        PublishedDataName: !Ref 'PublishedDataName'
+        RegionalLambdaBucketName: !Ref 'RegionalLambdaBucketName'
+        AthenaQueryResultsBucketName: !Ref 'AthenaQueryResultsBucketName'
       TemplateURL:
         !Sub
           - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/data-lake.yaml'

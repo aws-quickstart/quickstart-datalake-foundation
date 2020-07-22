@@ -18,6 +18,19 @@ Parameters:
   RandomStringArn:
     Description: The ARN for the function that will generate the random value to be used in the naming of the S3 Buckets
     Type: String
+  KinesisCompressionFormat:
+    Description: Kinesis stream S3 compression format
+    Type: String
+    Default: "UNCOMPRESSED"
+    AllowedValues:
+      - "UNCOMPRESSED"
+      - "GZIP"
+      - "Snappy"
+      - "ZIP"
+  KinesisErrorOutputPrefix:
+    Description: S3 prefix for error objects (optional)
+    Type: String
+    Default: ""
 Resources:
   RandomString:
     Type: Custom::RandomString
@@ -38,11 +51,12 @@ Resources:
         BufferingHints:
           IntervalInSeconds: 60
           SizeInMBs: 60
-        CompressionFormat: UNCOMPRESSED
+        CompressionFormat: !Ref KinesisCompressionFormat
         Prefix: !Join
           - ""
           - - !Ref "KinesisStreamKeyPrefix"
             - /
+        ErrorOutputPrefix: !Ref "KinesisErrorOutputPrefix"
         RoleARN: !Ref "KinesisStreamBucketRoleARN"
     Type: AWS::KinesisFirehose::DeliveryStream
 Outputs:

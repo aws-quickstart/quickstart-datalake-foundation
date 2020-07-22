@@ -16,13 +16,17 @@ Parameters:
     ConstraintDescription: Must select a valid Notebook instance type.
     Type: String
     AllowedValues:
-      - ml.t2.medium
-      - ml.t2.large
-      - ml.t2.xlarge
-    Default: ml.t2.large
-  RegionalLambdaBucketName:
-    Description: RegionalLambdaBucket bucket name
-    Type: String
+      - ml.t3.medium
+      - ml.t3.large
+      - ml.t3.xlarge
+      - ml.t3.2xlarge
+      - ml.m5.xlarge
+      - ml.m5.2xlarge
+      - ml.c5.xlarge
+      - ml.c5.2xlarge
+      - ml.c5.4large
+      - ml.p3.2xlarge
+    Default: ml.t3.large
   CreateNotebookFunctionExecuteRoleArn:
     Description: ARN of the role - CreateNotebookFunctionExecuteRole
     Type: String
@@ -42,32 +46,24 @@ Metadata:
 Resources:
   NotebookCloudWatchLogGroup:
     Type: AWS::Logs::LogGroup
-  CreateNotebookFunction:
-    Properties:
-      Description: Create a SageMaker Notebook instance and return it's ARN.
-      Handler: lambdas.lambda_handler
-      Runtime: python3.6
-      Timeout: 300
-      Role: !Ref 'CreateNotebookFunctionExecuteRoleArn'
-      Code:
-          S3Bucket: !Ref 'RegionalLambdaBucketName'
-          S3Key: lambdas.zip
-    Type: AWS::Lambda::Function
 
-  CreateNotebookInstance:
-    Type: Custom::CreateNotebookInstance
+  NotebookInstance:
+    Type: "AWS::SageMaker::NotebookInstance"
     Properties:
-      ServiceToken: !GetAtt 'CreateNotebookFunction.Arn'
-      NotebookInstanceName: !Ref 'NotebookInstanceName'
-      NotebookInstanceType: !Ref 'NotebookInstanceType'
-      SageMakerRoleArn: !Ref 'SageMakerExecutionRoleArn'
-      Version: 1
+      InstanceType: !Ref "NotebookInstanceType"
+      NotebookInstanceName: !Ref "NotebookInstanceName"
+      RoleArn: !Ref "SageMakerExecutionRoleArn"
 
 Outputs:
   SageMakerNotebookURL:
     Description: SageMaker Notebook URL
-    Value:
-      !GetAtt 'CreateNotebookInstance.SageMakerNotebookURL'
+    Value: !Join
+      - ""
+      - - "https://"
+        - !Ref "NotebookInstanceName"
+        - ".notebook."
+        - !Ref "AWS::Region"
+        - ".sagemaker.aws/tree?"
   NotebookInstanceName:
     Description: SageMaker Instance Name
     Value:
