@@ -10,21 +10,22 @@ image::../images/architecture_diagram.png[Architecture,width=648,height=439]
 
 As shown in Figure 1, the Quick Start sets up the following:
 
-* A highly available architecture that spans two Availability Zones.*
-* A VPC configured with public and private subnets, according to AWS
-best practices, to provide you with your own virtual network on AWS.*
+The Quick Start sets up the following:
 
-In the public subnets:
+* A virtual private cloud (VPC) that spans two Availability Zones and includes two public and two private subnets.*
+* An internet gateway to allow access to the internet.*
+* In the public subnets, managed NAT gateways to allow outbound internet access for resources in the private subnets.*
+* In the public subnets, Linux bastion hosts in an Auto Scaling group to allow inbound Secure Shell (SSH) access to EC2 instances in public and private subnets.*
+* IAM roles to provide permissions to access AWS resources; for example, to permit Amazon Redshift and Amazon Athena to read and write curated datasets.
+* In the private subnets, Amazon Redshift for data aggregation, analysis, transformation, and creation of curated and published datasets.
+* An Amazon SageMaker instance, which you can access by using AWS authentication.
+* Integration with other Amazon services such as Amazon S3, Amazon Athena, AWS Glue, AWS Lambda, Amazon ES with Kibana, Amazon Kinesis, and Amazon QuickSight.
+* Your choice to create a new VPC or deploy the data lake components into your existing VPC on AWS.
+\* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.
 
-* Managed network address translation (NAT) gateways to allow outbound
-internet access for resources in the private subnets.*
-* A Linux bastion host in an Auto Scaling group to allow inbound Secure
-Shell (SSH) access to EC2 instances in public and private subnets.*
+The following figure shows how these components work together in a typical end-to-end process flow.
 
-In the private subnets:
-// Add bullet points for any additional components that are included in the deployment. Make sure that the additional components are also represented in the architecture diagram.
-* <describe any additional components>.
-
-*The template that deploys the Quick Start into an existing VPC skips
-the components marked by asterisks and prompts you for your existing VPC
-configuration.
+[#architecture2]
+.Data lake foundation process flow
+[link=images/image2.png]
+image::../images/image2.png[Architecture,width=648,height=439]
