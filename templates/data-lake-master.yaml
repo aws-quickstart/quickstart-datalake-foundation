@@ -5,7 +5,7 @@ Description: Data Lake Foundation is a QuickStart that provides a Data Lake arch
   provisions all of the resources that are specific to the Quick Start.  Leveraged
   Quick Starts (VPC, LinuxBastion), if needed, can be provisioned by using the data-lake-foundation-master
   template. **WARNING** You will be billed for the AWS resources used if you create
-  a stack from this template. (qs-1nlkhq1nt)
+  a stack from this template. (qs-1r0ghem11)
 Metadata:
   QuickStartDocumentation:
     EntrypointName: "Launch into a new VPC"
