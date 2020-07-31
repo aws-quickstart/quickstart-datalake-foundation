@@ -1,21 +1,26 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Data Lake Foundation is a QuickStart that provides a Data Lake architecture,
-  Redshift cluster, Elasticsearch domain, SageMaker in the same VPC through Cloudformation templates that provision
+  Redshift cluster, Elasticsearch domain, Data Lake walk-through wizard running on
+  AWS EC2 instance, in the same VPC through Cloudformation templates that provision
   and configure the required resources, including related QuickStarts. This template
   provisions all of the resources that are specific to the Quick Start.  Leveraged
   Quick Starts (VPC, LinuxBastion), if needed, can be provisioned by using the data-lake-foundation-master
   template. **WARNING** You will be billed for the AWS resources used if you create
-  a stack from this template. (qs-1r0ghem11)
+  a stack from this template.(qs-1nlkhq1o3)
 Metadata:
-  QuickStartDocumentation:
-    EntrypointName: "Launch into a new VPC"
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
           default: Network Configuration
         Parameters:
-          - AvailabilityZones
-          - VPCDefinition
+          - VPCID
+          - VPCCIDR
+          - PrivateSubnet1ID
+          - PrivateSubnet2ID
+          - PublicSubnet1ID
+          - PublicSubnet2ID
+          - NAT1ElasticIP
+          - NAT2ElasticIP
       - Label:
           default: S3 Bucket Configuration
         Parameters:
@@ -46,7 +51,7 @@ Metadata:
           - RedshiftEncrypted
           - RedshiftSnapshotRetention
       - Label:
-          default: Kinesis Configuration
+          default: Kinesis configuration
         Parameters:
           - KinesisDataStreamName
           - KinesisDataStreamS3Prefix
@@ -65,20 +70,18 @@ Metadata:
           - QSS3KeyPrefix
           - KeyPairName
     ParameterLabels:
-      AvailabilityZones:
-        default: Availability Zones
       KeyPairName:
         default: Key Pair Name
       RemoteAccessCIDR:
         default: Remote Access CIDR
       ElasticsearchNodeType:
-        default: Elasticsearch Node Type
+        default: Elasticsearch Instance Type
       ElasticsearchNodeCount:
         default: Elasticsearch Node Count
       ElasticsearchEBSVolumeType:
         default: Elasticsearch EBS Volume Type
       ElasticsearchDomainName:
-        default: ElasticsearchDomainName
+        default: Elasticsearch Domain Name
       EnableRedshift:
         default: Enable Redshift
       MakeRedshiftPubliclyAccessible:
@@ -98,15 +101,29 @@ Metadata:
       RedshiftEncrypted:
         default: Redshift Data Encrypted
       RedshiftSnapshotRetention:
-        default: Redshift snapshot retention in days
+        default: Redshift Snapshot Retention in Days
       QSS3BucketName:
         default: Quick Start S3 Bucket Name
       QSS3BucketRegion:
         default: Quick Start S3 bucket region
       QSS3KeyPrefix:
         default: Quick Start S3 Key Prefix
-      VPCDefinition:
-        default: VPC Definition
+      PrivateSubnet1ID:
+        default: Existing VPC Private Subnet 1 ID
+      PrivateSubnet2ID:
+        default: Existing VPC Private Subnet 2 ID
+      PublicSubnet1ID:
+        default: Existing VPC Public Subnet 1 ID
+      PublicSubnet2ID:
+        default: Existing VPC Public Subnet 2 ID
+      NAT1ElasticIP:
+        default: NAT 1 IP address
+      NAT2ElasticIP:
+        default: NAT 2 IP address
+      VPCID:
+        default: Existing VPC ID
+      VPCCIDR:
+        default: Existing VPC CIDR
       KinesisDataStreamName:
         default: Kinesis Data Stream Name
       KinesisDataStreamS3Prefix:
@@ -129,26 +146,18 @@ Metadata:
         default: Regional Lambda Bucket Name
       AthenaQueryResultsBucketName:
         default: Athena Query Results Bucket Name
-Mappings:
-  VPCDefinitions:
-    QuickstartDefault:
-      VPCCIDR: 10.0.0.0/16
-      PublicSubnet1CIDR: 10.0.128.0/20
-      PrivateSubnet1CIDR: 10.0.0.0/19
-      PublicSubnet2CIDR: 10.0.144.0/20
-      PrivateSubnet2CIDR: 10.0.32.0/19
-      NumberOfAZs: '2'
 Conditions:
+  RedshiftPubliclyAccessible: !Equals
+    - !Ref 'MakeRedshiftPubliclyAccessible'
+    - 'yes'
   CreateRedshift: !Equals
     - !Ref 'EnableRedshift'
     - 'yes'
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Parameters:
   AvailabilityZones:
-    Description: The list of Availability Zones to use for the subnets in the VPC.
-      You must specify two Availability Zones. By default, the Quick Start preserves
-      the logical order you specify.
-    Type: List<AWS::EC2::AvailabilityZone::Name>
+   Description: The list of Availability Zones to use for the subnets in the VPC. You must specify two Availability Zones. By default, the Quick Start preserves the logical order you specify.
+   Type: List<AWS::EC2::AvailabilityZone::Name>
   ElasticsearchNodeCount:
     Default: '1'
     Description: The number of nodes in the Elasticsearch cluster. For guidance, see
@@ -230,7 +239,7 @@ Parameters:
     - 'no'
     Default: 'yes'
     Description: "Specifies whether Amazon Redshift will be publicly accessible.\
-        \ Only applies if EnableRedshift is set to yes."
+      \ Only applies if EnableRedshift is set to yes."
     Type: String
   KeyPairName:
     Description: Public/private key pairs allow you to securely connect to your instance
@@ -262,6 +271,28 @@ Parameters:
     Description: S3 prefix for error objects (optional)
     Type: String
     Default: ""
+  NAT1ElasticIP:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])
+    Description: Elastic IP address for the first NAT gateway instance that will be
+      allowed access to Amazon ES.
+    Type: String
+  NAT2ElasticIP:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])
+    Description: Elastic IP address for the second NAT gateway instance that will
+      be allowed access to Amazon ES.
+    Type: String
+  PrivateSubnet1ID:
+    Description: ID of the private subnet 1 in Availability Zone 1 (e.g., subnet-a0246dcd)
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet2ID:
+    Description: ID of the private subnet 2 in Availability Zone 2 (e.g., subnet-a0246dcd)
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnet1ID:
+    Description: ID of the public subnet 1 in Availability Zone 1 (e.g., subnet-a0246dcd)
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnet2ID:
+    Description: ID of the public subnet 2 in Availability Zone 2 (e.g., subnet-a0246dcd)
+    Type: AWS::EC2::Subnet::Id
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase
@@ -283,7 +314,7 @@ Parameters:
     ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
       uppercase letters, hyphens (-), and forward slash (/). It cannot start or end
       with forward slash (/) because they are automatically appended.
-    Default: quickstart-datalake-foundation/
+    Default: quickstart-datalake-47lining/
     Description: S3 key prefix used to simulate a folder for your copy of Quick Start
       assets, if you decide to customize or extend the Quick Start for your own use.
       This prefix can include numbers, lowercase letters, uppercase letters, hyphens,
@@ -357,16 +388,14 @@ Parameters:
       address. This parameter must be in the form x.x.x.x/x (e.g., 96.127.8.12/32,
       YOUR_IP/32).
     Type: String
-  VPCDefinition:
-    Default: QuickstartDefault
-    Description: "VPC definition name from the Mappings section of the template. Each\
-      \ definition specifies a VPC configuration, including the number of Availability\
-      \ Zones to be used for the deployment and the CIDR blocks for the VPC, public\
-      \ subnets, and private subnets. You can support multiple VPC configurations\
-      \  by extending the map with additional definitions and choosing the appropriate\
-      \ name. If you don\u2019t want to change the VPC configuration, keep the default\
-      \ setting. For more information, see the Adding VPC Definitions section."
+  VPCCIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Description: CIDR block for the VPC.
     Type: String
+  VPCID:
+    Description: ID of your existing VPC (e.g., vpc-0343606e).
+    Type: AWS::EC2::VPC::Id
   NotebookInstanceName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
     ConstraintDescription: Must be unique within your account in an AWS Region.
@@ -420,65 +449,18 @@ Rules:
       excluding: /, ", \'', \ and @. It must contain 1 uppercase letter, 1 lowercase
       letter, and 1 number.'
 Resources:
-  BastionStack:
+  RandomStringStack:
     Properties:
-      Parameters:
-        EnableTCPForwarding: 'true'
-        KeyPairName: !Ref 'KeyPairName'
-        PublicSubnet1ID: !GetAtt 'VPCStack.Outputs.PublicSubnet1ID'
-        PublicSubnet2ID: !GetAtt 'VPCStack.Outputs.PublicSubnet2ID'
-        QSS3BucketName: !Ref 'QSS3BucketName'
-        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
-        QSS3KeyPrefix: !Sub
-          - ${Prefix}submodules/quickstart-linux-bastion/
-          - Prefix: !Ref 'QSS3KeyPrefix'
-        RemoteAccessCIDR: !Ref 'RemoteAccessCIDR'
-        VPCID: !GetAtt 'VPCStack.Outputs.VPCID'
       TemplateURL:
         !Sub
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-linux-bastion/templates/linux-bastion.template'
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/random-string.yaml'
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
-  DataLakeFoundationStack:
+  BucketsStack:
     Properties:
       Parameters:
-        AvailabilityZones: !Join
-          - ','
-          - !Ref 'AvailabilityZones'
-        ElasticsearchNodeCount: !Ref 'ElasticsearchNodeCount'
-        ElasticsearchNodeType: !Ref 'ElasticsearchNodeType'
-        ElasticsearchEBSVolumeType: !Ref 'ElasticsearchEBSVolumeType'
-        ElasticsearchDomainName: !Ref 'ElasticsearchDomainName'
-        EnableRedshift: !Ref 'EnableRedshift'
-        MakeRedshiftPubliclyAccessible: !Ref 'MakeRedshiftPubliclyAccessible'
-        KeyPairName: !Ref 'KeyPairName'
-        KinesisDataStreamName: !Ref 'KinesisDataStreamName'
-        KinesisDataStreamS3Prefix: !Ref 'KinesisDataStreamS3Prefix'
-        KinesisCompressionFormat: !Ref 'KinesisCompressionFormat'
-        KinesisErrorOutputPrefix: !Ref 'KinesisErrorOutputPrefix'
-        NAT1ElasticIP: !GetAtt 'VPCStack.Outputs.NAT1EIP'
-        NAT2ElasticIP: !GetAtt 'VPCStack.Outputs.NAT2EIP'
-        PrivateSubnet1ID: !GetAtt 'VPCStack.Outputs.PrivateSubnet1AID'
-        PrivateSubnet2ID: !GetAtt 'VPCStack.Outputs.PrivateSubnet2AID'
-        PublicSubnet1ID: !GetAtt 'VPCStack.Outputs.PublicSubnet1ID'
-        PublicSubnet2ID: !GetAtt 'VPCStack.Outputs.PublicSubnet2ID'
-        QSS3BucketName: !Ref 'QSS3BucketName'
-        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
-        QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
-        RedshiftDatabaseName: !Ref 'RedshiftDatabaseName'
-        RedshiftDatabasePort: !Ref 'RedshiftDatabasePort'
-        RedshiftEncrypted: !Ref 'RedshiftEncrypted'
-        RedshiftNodeType: !Ref 'RedshiftNodeType'
-        RedshiftNumberOfNodes: !Ref 'RedshiftNumberOfNodes'
-        RedshiftPassword: !Ref 'RedshiftPassword'
-        RedshiftUsername: !Ref 'RedshiftUsername'
-        RedshiftSnapshotRetention: !Ref 'RedshiftSnapshotRetention'
-        RemoteAccessCIDR: !Ref 'RemoteAccessCIDR'
-        VPCCIDR: !GetAtt 'VPCStack.Outputs.VPCCIDR'
-        VPCID: !GetAtt 'VPCStack.Outputs.VPCID'
-        NotebookInstanceName: !Ref 'NotebookInstanceName'
-        NotebookInstanceType: !Ref 'NotebookInstanceType'
+        RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
         SubmissionsBucketName: !Ref 'SubmissionsBucketName'
         CuratedDatasetsName: !Ref 'CuratedDatasetsName'
         PublishedDataName: !Ref 'PublishedDataName'
@@ -486,67 +468,189 @@ Resources:
         AthenaQueryResultsBucketName: !Ref 'AthenaQueryResultsBucketName'
       TemplateURL:
         !Sub
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/data-lake.template.yaml'
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/buckets.yaml'
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
-  VPCStack:
+  ElasticsearchStack:
     Properties:
       Parameters:
-        AvailabilityZones: !Join
-          - ','
-          - !Ref 'AvailabilityZones'
-        KeyPairName: !Ref 'KeyPairName'
-        NumberOfAZs: !FindInMap
-          - VPCDefinitions
-          - !Ref 'VPCDefinition'
-          - NumberOfAZs
-        PrivateSubnet1ACIDR: !FindInMap
-          - VPCDefinitions
-          - !Ref 'VPCDefinition'
-          - PrivateSubnet1CIDR
-        PrivateSubnet2ACIDR: !FindInMap
-          - VPCDefinitions
-          - !Ref 'VPCDefinition'
-          - PrivateSubnet2CIDR
-        PublicSubnet1CIDR: !FindInMap
-          - VPCDefinitions
-          - !Ref 'VPCDefinition'
-          - PublicSubnet1CIDR
-        PublicSubnet2CIDR: !FindInMap
-          - VPCDefinitions
-          - !Ref 'VPCDefinition'
-          - PublicSubnet2CIDR
-        VPCCIDR: !FindInMap
-          - VPCDefinitions
-          - !Ref 'VPCDefinition'
-          - VPCCIDR
+        CopyLambdaDeploymentRoleARN: !GetAtt 'IAMRolesStack.Outputs.CopyLambdaDeploymentRoleARN'
+        ElasticsearchAccessIP: !Ref 'RemoteAccessCIDR'
+        LambdaRoleARN: !GetAtt 'IAMRolesStack.Outputs.LambdaRoleARN'
+        CuratedTopicARN: !GetAtt 'BucketsStack.Outputs.CuratedTopicARN'
+        EBSVolumeType: !Ref "ElasticsearchEBSVolumeType"
+        ElasticsearchDomainName: !Ref ElasticsearchDomainName
+        NAT1ElasticIP: !Ref 'NAT1ElasticIP'
+        NAT2ElasticIP: !Ref 'NAT2ElasticIP'
+        NodeCount: !Ref 'ElasticsearchNodeCount'
+        NodeType: !Ref 'ElasticsearchNodeType'
+        PublishedTopicARN: !GetAtt 'BucketsStack.Outputs.PublishedTopicARN'
+        QSS3BucketName: !Ref 'QSS3BucketName'
+        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
+        QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
+        RegionalLambdaBucketName: !GetAtt 'BucketsStack.Outputs.RegionalLambdaBucketName'
+        RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
+        SubmissionsTopicARN: !GetAtt 'BucketsStack.Outputs.SubmissionsTopicARN'
       TemplateURL:
         !Sub
-          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template.yaml'
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/elasticsearch.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+    Type: AWS::CloudFormation::Stack
+  IAMRolesStack:
+    Properties:
+      Parameters:
+        EnableRedshift: !Ref 'EnableRedshift'
+        CuratedDatasetsARN: !GetAtt 'BucketsStack.Outputs.CuratedDatasetsARN'
+        PublishedDataARN: !GetAtt 'BucketsStack.Outputs.PublishedDataARN'
+        QSS3BucketName: !Ref 'QSS3BucketName'
+        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
+        RegionalLambdaBucketARN: !GetAtt 'BucketsStack.Outputs.RegionalLambdaBucketARN'
+        SubmissionsBucketARN: !GetAtt 'BucketsStack.Outputs.SubmissionsBucketARN'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/iam-roles.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+    Type: AWS::CloudFormation::Stack
+  KinesisSampleStack:
+    Properties:
+      Parameters:
+        KinesisStreamBucketName: !GetAtt 'BucketsStack.Outputs.SubmissionsBucketName'
+        KinesisStreamBucketRoleARN: !GetAtt 'IAMRolesStack.Outputs.KinesisStreamBucketRoleARN'
+        KinesisStreamKeyPrefix: !Ref 'KinesisDataStreamS3Prefix'
+        KinesisStreamName: !Ref 'KinesisDataStreamName'
+        KinesisCompressionFormat: !Ref 'KinesisCompressionFormat'
+        KinesisErrorOutputPrefix: !Ref 'KinesisErrorOutputPrefix'
+        RandomStringArn: !GetAtt 'RandomStringStack.Outputs.RandomStringArn'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/kinesis.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+    Type: AWS::CloudFormation::Stack
+  RedshiftStack:
+    Condition: CreateRedshift
+    DependsOn: []
+    Properties:
+      Parameters:
+        DatabaseName: !Ref 'RedshiftDatabaseName'
+        DatabasePort: !Ref 'RedshiftDatabasePort'
+        NodeType: !Ref 'RedshiftNodeType'
+        NumberOfNodes: !Ref 'RedshiftNumberOfNodes'
+        PubliclyAccessible: !If
+          - RedshiftPubliclyAccessible
+          - 'true'
+          - 'false'
+        QSRedshiftRoleARN: !GetAtt 'IAMRolesStack.Outputs.QSRedshiftRoleARN'
+        RedshiftInboundCIDR: !Ref 'VPCCIDR'
+        RedshiftPassword: !Ref 'RedshiftPassword'
+        RedshiftUsername: !Ref 'RedshiftUsername'
+        RedshiftSnapshotRetention: !Ref 'RedshiftSnapshotRetention'
+        RedshiftEncrypted: !Ref 'RedshiftEncrypted'
+        SubnetId1: !If
+          - RedshiftPubliclyAccessible
+          - !Ref 'PublicSubnet1ID'
+          - !Ref 'PrivateSubnet1ID'
+        SubnetId2: !If
+          - RedshiftPubliclyAccessible
+          - !Ref 'PublicSubnet2ID'
+          - !Ref 'PrivateSubnet2ID'
+        VpcId: !Ref 'VPCID'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/redshift.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+    Type: AWS::CloudFormation::Stack
+  RegisterKibanaMetadataDashboardLambda:
+    DependsOn: []
+    Properties:
+      Parameters:
+        ElasticsearchEndpoint: !GetAtt 'ElasticsearchStack.Outputs.ElasticsearchEndpoint'
+        QSS3BucketName: !Ref 'QSS3BucketName'
+        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
+        QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
+        RegionalLambdaBucketName: !GetAtt 'BucketsStack.Outputs.RegionalLambdaBucketName'
+        RegisterDashboardRoleARN: !GetAtt 'IAMRolesStack.Outputs.RegisterKibanaDashboardRoleARN'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/register-dashboard.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+    Type: AWS::CloudFormation::Stack
+  GlueStack:
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/glue.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+    Type: AWS::CloudFormation::Stack
+  SageMakerStack:
+    DependsOn: ElasticsearchStack
+    Properties:
+      Parameters:
+        NotebookInstanceName: !Ref 'NotebookInstanceName'
+        NotebookInstanceType: !Ref 'NotebookInstanceType'
+        CreateNotebookFunctionExecuteRoleArn: !GetAtt 'IAMRolesStack.Outputs.CreateNotebookFunctionExecuteRoleARN'
+        SageMakerExecutionRoleArn: !GetAtt 'IAMRolesStack.Outputs.SageMakerExecutionRoleARN'
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/sagemaker.yaml'
           - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
             S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
     Type: AWS::CloudFormation::Stack
 Outputs:
   SubmissionsBucketName:
     Description: Bucket name for submissions
-    Value: !GetAtt 'DataLakeFoundationStack.Outputs.SubmissionsBucketName'
+    Value: !GetAtt 'BucketsStack.Outputs.SubmissionsBucketName'
   CuratedBucketName:
-    Description: Bucket name for Curated Datasets
-    Value: !GetAtt 'DataLakeFoundationStack.Outputs.CuratedBucketName'
+    Description: Bucked name for Curated Datasets
+    Value: !GetAtt 'BucketsStack.Outputs.CuratedBucketName'
   PublishedBucketName:
     Description: Bucket name for Published Data
-    Value: !GetAtt 'DataLakeFoundationStack.Outputs.PublishedBucketName'
+    Value: !GetAtt 'BucketsStack.Outputs.PublishedBucketName'
   RedshiftJDBCEndpoint:
     Description: Redshift JDBC Endpoint
     Condition: CreateRedshift
-    Value: !GetAtt 'DataLakeFoundationStack.Outputs.RedshiftJDBCEndpoint'
+    Value: !GetAtt 'RedshiftStack.Outputs.ConnectionURL'
   ElasticsearchEndpoint:
     Description: Elasticsearch endpoint
-    Value: !GetAtt 'DataLakeFoundationStack.Outputs.ElasticsearchEndpoint'
+    Value: !GetAtt 'ElasticsearchStack.Outputs.ElasticsearchEndpoint'
   KinesisDataStreamName:
-    Description: Kinesis data stream name
-    Value: !GetAtt 'DataLakeFoundationStack.Outputs.KinesisDataStreamName'
+    Description: KinesisDataStreamName
+    Value: !GetAtt 'KinesisSampleStack.Outputs.KinesisDataStreamName'
   SageMakerNotebookURL:
     Description: SageMaker Notebook Instance URL
-    Value: !GetAtt 'DataLakeFoundationStack.Outputs.SageMakerNotebookURL'
+    Value: !GetAtt 'SageMakerStack.Outputs.SageMakerNotebookURL'
+  BucketsStackAthenaQueryResultsBucketARN:
+    Value: !GetAtt 'BucketsStack.Outputs.AthenaQueryResultsBucketARN'
+  BucketsStackCuratedDatasetsARN:  # used in Kinesis Demonstration and WebApp too
+    Value: !GetAtt 'BucketsStack.Outputs.CuratedDatasetsARN'
+  BucketsStackPublishedDataARN:
+    Value: !GetAtt 'BucketsStack.Outputs.PublishedDataARN'
+  BucketsStackRegionalLambdaBucketARN:
+    Value: !GetAtt 'BucketsStack.Outputs.RegionalLambdaBucketARN'
+  RegionalLambdaBucketName:
+    Value: !GetAtt 'BucketsStack.Outputs.RegionalLambdaBucketName'
+  BucketsStackSubmissionsBucketARN:  # used in Kinesis Demonstration and WebApp too
+    Value: !GetAtt 'BucketsStack.Outputs.SubmissionsBucketARN'
+  ElasticsearchStackElasticsearchDomainARN:
+    Value: !GetAtt 'ElasticsearchStack.Outputs.ElasticsearchDomainARN'
+  RedshiftStackRedshiftConnectionURL:  # used in WebApp too
+    Condition: CreateRedshift
+    Value: !GetAtt 'RedshiftStack.Outputs.ConnectionURL'
+  CuratedDatasetsDatabaseName:
+    Value: !GetAtt 'GlueStack.Outputs.CuratedDatasetsDatabaseName'
+  DatalakeSubmissionsDatabaseName:
+    Value: !GetAtt 'GlueStack.Outputs.DatalakeSubmissionsDatabaseName'
+  BucketsStackAthenaQueryResultsBucketName:
+    Value: !GetAtt 'BucketsStack.Outputs.AthenaQueryResultsBucketName'
+  ElasticsearchStackKibanaURL:
+    Value: !GetAtt 'ElasticsearchStack.Outputs.KibanaURL'
+  QSRedshiftRoleARN:
+    Description: ARN of QSRedshiftRole
+    Condition: CreateRedshift
+    Value: !GetAtt 'IAMRolesStack.Outputs.QSRedshiftRoleARN'

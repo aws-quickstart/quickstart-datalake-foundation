@@ -6,8 +6,10 @@ Description: Data Lake Foundation is a QuickStart that provides a Data Lake arch
   provisions all of the resources that are specific to the Quick Start.  Leveraged
   Quick Starts (VPC, LinuxBastion), if needed, can be provisioned by using the data-lake-foundation-master
   template. **WARNING** You will be billed for the AWS resources used if you create
-  a stack from this template.(qs-1nlkhq1o3)
+  a stack from this template.(qs-1r0gheltc)
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into an existing VPC"
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
@@ -314,7 +316,7 @@ Parameters:
     ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
       uppercase letters, hyphens (-), and forward slash (/). It cannot start or end
       with forward slash (/) because they are automatically appended.
-    Default: quickstart-datalake-47lining/
+    Default: quickstart-datalake-foundation/
     Description: S3 key prefix used to simulate a folder for your copy of Quick Start
       assets, if you decide to customize or extend the Quick Start for your own use.
       This prefix can include numbers, lowercase letters, uppercase letters, hyphens,
