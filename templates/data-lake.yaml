@@ -8,6 +8,8 @@ Description: Data Lake Foundation is a QuickStart that provides a Data Lake arch
   template. **WARNING** You will be billed for the AWS resources used if you create
   a stack from this template.(qs-1nlkhq1o3)
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into an existing VPC"
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
