@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS CloudFormation templates to create SageMaker notebook.'
+
+Parameters:
+  NotebookInstanceName:
+    AllowedPattern: '[A-Za-z0-9-]{1,63}'
+    ConstraintDescription: Must be unique within your account in an AWS Region.
+      Maximum of 63 alphanumeric characters. Can include hyphens (-).
+    Type: String
+    Default: NotebookInstanceName
+    Description: Name of the Amazon SageMaker Notebook instance.
+    MaxLength: '63'
+    MinLength: '1'
+  NotebookInstanceType:
+    Description: The EC2 instance type for the data lake Amazon SageMaker Notebook instance.
+    ConstraintDescription: Must select a valid Notebook instance type.
+    Type: String
+    AllowedValues:
+      - ml.t3.medium
+      - ml.t3.large
+      - ml.t3.xlarge
+      - ml.t3.2xlarge
+      - ml.m5.xlarge
+      - ml.m5.2xlarge
+      - ml.c5.xlarge
+      - ml.c5.2xlarge
+      - ml.c5.4large
+      - ml.p3.2xlarge
+    Default: ml.t3.large
+  CreateNotebookFunctionExecuteRoleArn:
+    Description: ARN of the role - CreateNotebookFunctionExecuteRole
+    Type: String
+  SageMakerExecutionRoleArn:
+    Description: ARN of the role - SageMakerExecutionRole
+    Type: String
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Required parameters
+        Parameters:
+          - NotebookInstanceName
+          - NotebookInstanceType
+      - Label:
+          default: Optional parameters
+Resources:
+  NotebookCloudWatchLogGroup:
+    Type: AWS::Logs::LogGroup
+
+  NotebookInstance:
+    Type: "AWS::SageMaker::NotebookInstance"
+    Properties:
+      InstanceType: !Ref "NotebookInstanceType"
+      NotebookInstanceName: !Ref "NotebookInstanceName"
+      RoleArn: !Ref "SageMakerExecutionRoleArn"
+
+Outputs:
+  SageMakerNotebookURL:
+    Description: SageMaker Notebook URL
+    Value: !Join
+      - ""
+      - - "https://"
+        - !Ref "NotebookInstanceName"
+        - ".notebook."
+        - !Ref "AWS::Region"
+        - ".sagemaker.aws/tree?"
+  NotebookInstanceName:
+    Description: SageMaker Instance Name
+    Value:
+      !Ref 'NotebookInstanceName'
