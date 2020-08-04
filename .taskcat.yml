@@ -31,4 +31,4 @@ tests:
     - us-east-1
     - us-west-2
     s3_bucket: ''
-    template: templates/data-lake-master.yaml
+    template: templates/data-lake-master.template.yaml
