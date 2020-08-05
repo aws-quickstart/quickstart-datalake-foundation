@@ -1,5 +1,5 @@
 project:
-  name: quickstart-datalake-47lining
+  name: quickstart-datalake-foundation
   owner: quickstart@amazon.com
   package_lambda: false
   regions:
@@ -10,9 +10,9 @@ project:
 tests:
   single-node-with-wizard:
     parameters:
-      AvailabilityZones: $[alfred_genaz_2]
+      AvailabilityZones: $[taskcat_getaz_2]
       ElasticsearchNodeCount: '1'
-      KeyPairName: taskcat-test
+      KeyPairName: $[taskcat_getkeypair]
       KinesisDataStreamName: streaming-submissions
       KinesisDataStreamS3Prefix: streaming-submissions
       NotebookInstanceName: SageMakerNotebookInstTestDev
@@ -26,9 +26,7 @@ tests:
       RedshiftUsername: datalake
       RemoteAccessCIDR: 89.65.65.154/32
       VPCDefinition: QuickstartDefault
-      KeyPairName: $[taskcat_getkeypair]
     regions:
     - us-east-1
-    - us-west-2
     s3_bucket: ''
     template: templates/data-lake-master.template.yaml
