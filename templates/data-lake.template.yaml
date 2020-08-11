@@ -1,11 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Data Lake Foundation is a QuickStart that provides a Data Lake architecture,
-  Redshift cluster, Elasticsearch domain, Data Lake walk-through wizard running on
-  AWS EC2 instance, in the same VPC through Cloudformation templates that provision
-  and configure the required resources, including related QuickStarts. This template
-  provisions all of the resources that are specific to the Quick Start.  Leveraged
-  Quick Starts (VPC, LinuxBastion), if needed, can be provisioned by using the data-lake-foundation-master
-  template. **WARNING** You will be billed for the AWS resources used if you create
+Description: This Data Lake Foundation deployment is a Quick Start to create a VPC that provides a data lake architecture,
+  Redshift cluster, and Elasticsearch domain. It also provides SageMaker in the same VPC through AWS CloudFormation
+  templates that provision and configure the required resources, which includes related Quick Starts. This template
+  provisions all of the resources that are specific to the Quick Start. Other Quick Starts (e.g., VPC and LinuxBastion)
+  can be provisioned by using this data-lake-foundation-master
+  template. **WARNING** You are billed for the AWS resources used if you create
   a stack from this template.(qs-1r0gheltc)
 Metadata:
   QuickStartDocumentation:
@@ -13,7 +12,7 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: Network Configuration
+          default: Network configuration
         Parameters:
           - VPCID
           - VPCCIDR
@@ -24,7 +23,7 @@ Metadata:
           - NAT1ElasticIP
           - NAT2ElasticIP
       - Label:
-          default: S3 Bucket Configuration
+          default: S3 bucket configuration
         Parameters:
           - SubmissionsBucketName
           - CuratedDatasetsName
@@ -32,7 +31,7 @@ Metadata:
           - RegionalLambdaBucketName
           - AthenaQueryResultsBucketName
       - Label:
-          default: Elasticsearch Configuration
+          default: Elasticsearch configuration
         Parameters:
           - RemoteAccessCIDR
           - ElasticsearchDomainName
@@ -40,7 +39,7 @@ Metadata:
           - ElasticsearchNodeCount
           - ElasticsearchEBSVolumeType
       - Label:
-          default: Redshift Configuration
+          default: Redshift configuration
         Parameters:
           - EnableRedshift
           - MakeRedshiftPubliclyAccessible
@@ -60,12 +59,12 @@ Metadata:
           - KinesisErrorOutputPrefix
           - KinesisCompressionFormat
       - Label:
-          default: SageMaker Configuration
+          default: SageMaker configuration
         Parameters:
           - NotebookInstanceName
           - NotebookInstanceType
       - Label:
-          default: AWS Quick Start Configuration
+          default: AWS Quick Start configuration
         Parameters:
           - QSS3BucketName
           - QSS3BucketRegion
@@ -73,51 +72,51 @@ Metadata:
           - KeyPairName
     ParameterLabels:
       KeyPairName:
-        default: Key Pair Name
+        default: Key pair name
       RemoteAccessCIDR:
-        default: Remote Access CIDR
+        default: Remote access CIDR
       ElasticsearchNodeType:
-        default: Elasticsearch Instance Type
+        default: Elasticsearch instance type
       ElasticsearchNodeCount:
-        default: Elasticsearch Node Count
+        default: Elasticsearch node count
       ElasticsearchEBSVolumeType:
-        default: Elasticsearch EBS Volume Type
+        default: Elasticsearch EBS volume type
       ElasticsearchDomainName:
-        default: Elasticsearch Domain Name
+        default: Elasticsearch domain name
       EnableRedshift:
         default: Enable Redshift
       MakeRedshiftPubliclyAccessible:
         default: Make Redshift publicly accessible
       RedshiftUsername:
-        default: Redshift User Name
+        default: Redshift user name
       RedshiftPassword:
-        default: Redshift Password
+        default: Redshift password
       RedshiftNumberOfNodes:
-        default: Redshift Number of Nodes
+        default: Redshift number of nodes
       RedshiftNodeType:
-        default: Redshift Node Type
+        default: Redshift node type
       RedshiftDatabaseName:
-        default: Redshift Database Name
+        default: Redshift database name
       RedshiftDatabasePort:
-        default: Redshift Database Port
+        default: Redshift database port
       RedshiftEncrypted:
-        default: Redshift Data Encrypted
+        default: Redshift data encrypted
       RedshiftSnapshotRetention:
-        default: Redshift Snapshot Retention in Days
+        default: Redshift Ssnapshot retention (in Days)
       QSS3BucketName:
-        default: Quick Start S3 Bucket Name
+        default: Quick Start S3 bucket name
       QSS3BucketRegion:
-        default: Quick Start S3 bucket region
+        default: Quick Start S3 bucket Region
       QSS3KeyPrefix:
-        default: Quick Start S3 Key Prefix
+        default: Quick Start S3 key prefix
       PrivateSubnet1ID:
-        default: Existing VPC Private Subnet 1 ID
+        default: Existing VPC private subnet 1 ID
       PrivateSubnet2ID:
-        default: Existing VPC Private Subnet 2 ID
+        default: Existing VPC private subnet 2 ID
       PublicSubnet1ID:
-        default: Existing VPC Public Subnet 1 ID
+        default: Existing VPC public subnet 1 ID
       PublicSubnet2ID:
-        default: Existing VPC Public Subnet 2 ID
+        default: Existing VPC public subnet 2 ID
       NAT1ElasticIP:
         default: NAT 1 IP address
       NAT2ElasticIP:
@@ -127,27 +126,27 @@ Metadata:
       VPCCIDR:
         default: Existing VPC CIDR
       KinesisDataStreamName:
-        default: Kinesis Data Stream Name
+        default: Kinesis Data Stream name
       KinesisDataStreamS3Prefix:
-        default: Kinesis Data Stream S3 Prefix
+        default: Kinesis Data Stream S3 prefix
       KinesisCompressionFormat:
-        default: Kinesis Data Stream S3 Compression Format
+        default: Kinesis Data Stream S3 compression format
       KinesisErrorOutputPrefix:
-        default: Kinesis S3 Prefix for Error Objects
+        default: Kinesis S3 prefix for error objects
       NotebookInstanceName:
-        default: Notebook Instance Name
+        default: Notebook instance name
       NotebookInstanceType:
-        default: Notebook Instance Type
+        default: Notebook instance type
       SubmissionsBucketName:
-        default: Submissions Bucket Name
+        default: Submissions bucket name
       CuratedDatasetsName:
-        default: Curated Datasets Bucket Name
+        default: Curated Datasets bucket name
       PublishedDataName:
-        default: Published Data Bucket Name
+        default: Published Data bucket name
       RegionalLambdaBucketName:
-        default: Regional Lambda Bucket Name
+        default: Regional Lambda bucket name
       AthenaQueryResultsBucketName:
-        default: Athena Query Results Bucket Name
+        default: Athena query results bucket name
 Conditions:
   RedshiftPubliclyAccessible: !Equals
     - !Ref 'MakeRedshiftPubliclyAccessible'
@@ -158,11 +157,11 @@ Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Parameters:
   AvailabilityZones:
-   Description: The list of Availability Zones to use for the subnets in the VPC. You must specify two Availability Zones. By default, the Quick Start preserves the logical order you specify.
+   Description: List of Availability Zones to use for the VPC subnets. You must specify two Availability Zones.
    Type: List<AWS::EC2::AvailabilityZone::Name>
   ElasticsearchNodeCount:
     Default: '1'
-    Description: The number of nodes in the Elasticsearch cluster. For guidance, see
+    Description: Number of nodes in the Elasticsearch cluster. For guidance, see
       the Amazon ES documentation.
     Type: Number
   ElasticsearchNodeType:
@@ -208,12 +207,12 @@ Parameters:
       - c4.2xlarge.elasticsearch
       - c4.4xlarge.elasticsearch
       - c5.8xlarge.elasticsearch
-    ConstraintDescription: must be a valid Elasticsearch node type.
+    ConstraintDescription: Must be a valid Elasticsearch node type.
     Default: r5.large.elasticsearch
     Description: EC2 instance type for the Elasticsearch cluster.
     Type: String
   ElasticsearchEBSVolumeType:
-    Description: EBS Volume Type
+    Description: EBS volume type.
     Type: String
     AllowedValues:
       - gp2
@@ -221,7 +220,7 @@ Parameters:
       - st1
     Default: gp2
   ElasticsearchDomainName:
-    Description: Elasticsearch Domain Name. Must start with a lowercase letter and contain only letters, numbers, and -
+    Description: Elasticsearch domain name. Must start with a lowercase letter and contain only letters, numbers, and hyphens (-).
     Type: String
     Default: "datalake-quickstart"
     AllowedPattern: '[a-z][a-zA-Z0-9\-]+'
@@ -232,7 +231,7 @@ Parameters:
       - 'yes'
       - 'no'
     Default: 'yes'
-    Description: "Specifies whether Amazon Redshift will be provisioned\
+    Description: "Specifies whether Amazon Redshift is provisioned.\
       \  Set to no if you don\u2019t want to provision the Amazon Redshift cluster."
     Type: String
   MakeRedshiftPubliclyAccessible:
@@ -240,28 +239,28 @@ Parameters:
     - 'yes'
     - 'no'
     Default: 'yes'
-    Description: "Specifies whether Amazon Redshift will be publicly accessible.\
-      \ Only applies if EnableRedshift is set to yes."
+    Description: "Specifies whether Amazon Redshift is publicly accessible.\
+      \ This only applies if EnableRedshift is set to yes."
     Type: String
   KeyPairName:
-    Description: Public/private key pairs allow you to securely connect to your instance
-      after it launches
+    Description: Key pairs allow you to securely connect to your instance
+      after it launches.
     Type: AWS::EC2::KeyPair::KeyName
   KinesisDataStreamName:
     Default: streaming-submissions
-    Description: "Name of the Kinesis data stream."
+    Description: "Name of the Kinesis Data Stream."
     Type: String
   KinesisDataStreamS3Prefix:
     AllowedPattern: ^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$
     Default: streaming-submissions
-    Description: "S3 key prefix for your streaming data stored in the S3 submissions\
+    Description: "S3 key prefix for your streaming data that is stored in the S3 submissions\
       \ bucket. This prefix can include numbers, lowercase letters, uppercase letters,\
-      \ hyphens, and forward slashes, but should not start with a forward slash, which\
+      \ hyphens (-), and forward slashes (/), but should not start with a forward slash, which\
       \ is automatically added. Use this parameter to specify the location for the\
-      \ streaming data you\u2019d like to load."
+      \ streaming data that you want to load."
     Type: String
   KinesisCompressionFormat:
-    Description: Kinesis stream S3 compression format
+    Description: Kinesis stream S3 compression format.
     Type: String
     Default: "UNCOMPRESSED"
     AllowedValues:
@@ -270,30 +269,30 @@ Parameters:
       - "Snappy"
       - "ZIP"
   KinesisErrorOutputPrefix:
-    Description: S3 prefix for error objects (optional)
+    Description: (Optional) S3 prefix for error objects.
     Type: String
     Default: ""
   NAT1ElasticIP:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])
-    Description: Elastic IP address for the first NAT gateway instance that will be
+    Description: Elastic IP address for the first NAT gateway instance that is
       allowed access to Amazon ES.
     Type: String
   NAT2ElasticIP:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])
-    Description: Elastic IP address for the second NAT gateway instance that will
-      be allowed access to Amazon ES.
+    Description: Elastic IP address for the second NAT gateway instance that is
+      allowed access to Amazon ES.
     Type: String
   PrivateSubnet1ID:
-    Description: ID of the private subnet 1 in Availability Zone 1 (e.g., subnet-a0246dcd)
+    Description: ID of the private subnet 1, located in Availability Zone 1 (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   PrivateSubnet2ID:
-    Description: ID of the private subnet 2 in Availability Zone 2 (e.g., subnet-a0246dcd)
+    Description: ID of the private subnet 2, located in Availability Zone 2 (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   PublicSubnet1ID:
-    Description: ID of the public subnet 1 in Availability Zone 1 (e.g., subnet-a0246dcd)
+    Description: ID of the public subnet 1, located in Availability Zone 1 (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   PublicSubnet2ID:
-    Description: ID of the public subnet 2 in Availability Zone 2 (e.g., subnet-a0246dcd)
+    Description: ID of the public subnet 2, located in Availability Zone 2 (e.g., subnet-a0246dcd).
     Type: AWS::EC2::Subnet::Id
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
@@ -302,36 +301,36 @@ Parameters:
       (-).
     Default: aws-quickstart
     Description: "S3 bucket where the Quick Start templates and scripts are installed.\
-      \ Use this parameter to specify the S3 bucket name you\u2019ve created for your\
-      \ copy of Quick Start assets, if you decide to customize or extend the Quick\
-      \ Start for your own use. The bucket name can include numbers, lowercase letters,\
-      \ uppercase letters, and hyphens, but should not start or end with a hyphen."
+      \ If you decide to customize or extend the Quick Start for your own purposes,\
+      \ use this parameter to specify the S3 bucket name you created for your\
+      \ Quick Start assets. The bucket name can include numbers, lowercase letters,\
+      \ uppercase letters, and hyphens (-), but should not start or end with a hyphen."
     Type: String
   QSS3BucketRegion:
     Default: 'us-east-1'
-    Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.'
+    Description: 'AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. If you use your own bucket, you must specify this value.'
     Type: String
   QSS3KeyPrefix:
     AllowedPattern: ^[0-9a-zA-Z-/]*$
     ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
-      uppercase letters, hyphens (-), and forward slash (/). It cannot start or end
-      with forward slash (/) because they are automatically appended.
+      uppercase letters, hyphens (-), and forward slashes (/). It cannot start or end
+      with a forward slash (/) because they are automatically appended.
     Default: quickstart-datalake-foundation/
     Description: S3 key prefix used to simulate a folder for your copy of Quick Start
-      assets, if you decide to customize or extend the Quick Start for your own use.
+      assets. Specify a value if you decide to customize or extend the Quick Start for your own purposes.
       This prefix can include numbers, lowercase letters, uppercase letters, hyphens,
       and forward slashes.
     Type: String
   RedshiftDatabaseName:
     AllowedPattern: ([a-z]|[0-9])+
-    ConstraintDescription: must contain a-z or 0-9 only.
+    ConstraintDescription: Must contain a-z or 0-9 only.
     Default: quickstart
-    Description: The name of the first database to be created when the Amazon Redshift
+    Description: Name of the first database to create when the Amazon Redshift
       cluster is provisioned.
     Type: String
   RedshiftDatabasePort:
     Default: '5439'
-    Description: The port that Amazon Redshift will listen on, which will be allowed
+    Description: Port that Amazon Redshift listens on, which is allowed
       through the security group.
     Type: String
   RedshiftEncrypted:
@@ -339,7 +338,7 @@ Parameters:
       - "true"
       - "false"
     Default: "false"
-    Description: Determines whether the Redshift data is encrypted at rest
+    Description: Determines whether the Redshift data is encrypted at rest.
     Type: String
   RedshiftNodeType:
     AllowedValues:
@@ -347,52 +346,52 @@ Parameters:
       - ra3.16xlarge
       - dc2.large
       - dc2.8xlarge
-    ConstraintDescription: must be a valid Redshift node type.
+    ConstraintDescription: Must be a valid Redshift node type.
     Default: dc2.large
     Description: Instance type for the nodes in the Amazon Redshift cluster.
     Type: String
   RedshiftNumberOfNodes:
     Default: '1'
-    Description: "The number of nodes in the Amazon Redshift cluster. If you specify\
-      \ a number that\u2019s larger than 1, the Quick Start will launch a multi-node\
+    Description: "Number of nodes in the Amazon Redshift cluster. If you specify\
+      \ a number that\u2019s greater than 1, the Quick Start launches a multinode\
       \ cluster."
     Type: Number
   RedshiftPassword:
-    Description: 'The password that is associated with the master user account for
-      the Amazon Redshift cluster. The password must contain 8 to 64 printable ASCII
+    Description: 'Password that is associated with the master user account for
+      the Amazon Redshift cluster. The password must contain 8–64 printable ASCII
       characters, excluding: /, ", \'', \ and @. It must contain one uppercase letter,
       one lowercase letter, and one number.'
     MaxLength: '64'
     NoEcho: 'true'
     Type: String
   RedshiftSnapshotRetention:
-    Description: Retention period for Redshift snapshots in days. If set to 0, snapshots are disabled.
+    Description: Retention period for Redshift snapshots (in days). If this is set to 0, snapshots are disabled.
     Default: 1
     Type: Number
   RedshiftUsername:
     AllowedPattern: ^[a-z][a-z0-9_]*$
     ConstraintDescription: User name parameter must be lowercase, begin with a letter,
-      contain only alphanumeric characters or underscores, and be less than 128 characters.
+      contain only alphanumeric characters or underscores, and have fewer than 128 characters.
     Default: datalake
-    Description: 'The user name that is associated with the master user account for
+    Description: 'User name that is associated with the master user account for
       the Amazon Redshift cluster. The user name must contain fewer than 128 alphanumeric
-      characters or underscores, and must be lowercase and begin with a letter. '
+      characters or underscores, be lowercase, and begin with a letter.'
     MaxLength: '128'
     MinLength: '1'
     Type: String
   RemoteAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to SSH into the bastion host
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x.
+    Description: CIDR IP range that is permitted to connect through SSH into the bastion host
       instance and access Amazon ES. We recommend that you set this value to a trusted
-      IP range. For example, you might want to grant only your corporate network access
-      to the software. You can use http://checkip.amazonaws.com/  to check your IP
+      IP range (e.g., you might grant software access to only your corporate network).
+      You can use http://checkip.amazonaws.com/ to check your IP
       address. This parameter must be in the form x.x.x.x/x (e.g., 96.127.8.12/32,
       YOUR_IP/32).
     Type: String
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16–28.
     Description: CIDR block for the VPC.
     Type: String
   VPCID:
@@ -403,12 +402,12 @@ Parameters:
     ConstraintDescription: Must be unique within your account in an AWS Region.
     Type: String
     Default: NotebookInstanceName
-    Description: Name of the Amazon SageMaker Notebook instance.
+    Description: Name of the Amazon SageMaker notebook instance.
     MaxLength: '30'
     MinLength: '1'
   NotebookInstanceType:
-    Description: The EC2 instance type for the data lake Amazon SageMaker Notebook instance.
-    ConstraintDescription: Must select a valid Notebook instance type.
+    Description: EC2 instance type for the data-lake Amazon SageMaker notebook instance.
+    ConstraintDescription: Select a valid notebook instance type.
     Type: String
     AllowedValues:
       - ml.t3.medium
@@ -423,23 +422,23 @@ Parameters:
       - ml.p3.2xlarge
     Default: ml.t3.large
   SubmissionsBucketName:
-    Description: 'The name of the S3 submission bucket. A random string will be appended to ensure uniqueness.'
+    Description: 'Name of the S3 submission bucket. A random string is appended to ensure uniqueness.'
     Type: String
     Default: datalake-submissions
   CuratedDatasetsName:
-    Description: 'The name of the S3 curated datasets bucket. A random string will be appended to ensure uniqueness.'
+    Description: 'Name of the S3 curated datasets bucket. A random string is appended to ensure uniqueness.'
     Type: String
     Default: datalake-curated-datasets
   PublishedDataName:
-    Description: 'The name of the S3 published data bucket. A random string will be appended to ensure uniqueness.'
+    Description: 'Name of the S3 published data bucket. A random string is appended to ensure uniqueness.'
     Type: String
     Default: datalake-published-data
   RegionalLambdaBucketName:
-    Description: 'The name of the S3 regional lambda bucket. A random string will be appended to ensure uniqueness.'
+    Description: 'Name of the S3 Regional lambda bucket. A random string is appended to ensure uniqueness.'
     Type: String
     Default: regional-lambda-bucket
   AthenaQueryResultsBucketName:
-    Description: 'The name of the S3 Athena query results bucket. A random string will be appended to ensure uniqueness.'
+    Description: 'Name of the S3 Athena query results bucket. A random string is appended to ensure uniqueness.'
     Type: String
     Default: datalake-athena-query-results
 Rules:
@@ -447,7 +446,7 @@ Rules:
     RuleCondition: !Equals [!Ref EnableRedshift, "yes"]
     Assertions:
       - Assert: !Not [!Equals [!Ref RedshiftPassword, ""]]
-        AssertDescription: 'Password must contain 8 to 64 printable ASCII characters
+        AssertDescription: 'Password must contain 8–64 printable ASCII characters,
       excluding: /, ", \'', \ and @. It must contain 1 uppercase letter, 1 lowercase
       letter, and 1 number.'
 Resources:
@@ -606,26 +605,26 @@ Resources:
     Type: AWS::CloudFormation::Stack
 Outputs:
   SubmissionsBucketName:
-    Description: Bucket name for submissions
+    Description: Bucket name for submissions.
     Value: !GetAtt 'BucketsStack.Outputs.SubmissionsBucketName'
   CuratedBucketName:
-    Description: Bucked name for Curated Datasets
+    Description: Bucked name for curated datasets.
     Value: !GetAtt 'BucketsStack.Outputs.CuratedBucketName'
   PublishedBucketName:
-    Description: Bucket name for Published Data
+    Description: Bucket name for published data.
     Value: !GetAtt 'BucketsStack.Outputs.PublishedBucketName'
   RedshiftJDBCEndpoint:
-    Description: Redshift JDBC Endpoint
+    Description: Redshift JDBC endpoint.
     Condition: CreateRedshift
     Value: !GetAtt 'RedshiftStack.Outputs.ConnectionURL'
   ElasticsearchEndpoint:
-    Description: Elasticsearch endpoint
+    Description: Elasticsearch endpoint.
     Value: !GetAtt 'ElasticsearchStack.Outputs.ElasticsearchEndpoint'
   KinesisDataStreamName:
-    Description: KinesisDataStreamName
+    Description: Kinesis Data Stream name.
     Value: !GetAtt 'KinesisSampleStack.Outputs.KinesisDataStreamName'
   SageMakerNotebookURL:
-    Description: SageMaker Notebook Instance URL
+    Description: SageMaker notebook instance URL.
     Value: !GetAtt 'SageMakerStack.Outputs.SageMakerNotebookURL'
   BucketsStackAthenaQueryResultsBucketARN:
     Value: !GetAtt 'BucketsStack.Outputs.AthenaQueryResultsBucketARN'
@@ -653,6 +652,6 @@ Outputs:
   ElasticsearchStackKibanaURL:
     Value: !GetAtt 'ElasticsearchStack.Outputs.KibanaURL'
   QSRedshiftRoleARN:
-    Description: ARN of QSRedshiftRole
+    Description: ARN of Quick Start Redshift role.
     Condition: CreateRedshift
     Value: !GetAtt 'IAMRolesStack.Outputs.QSRedshiftRoleARN'

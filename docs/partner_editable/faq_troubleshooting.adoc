@@ -1,13 +1,13 @@
 // Add any tips or answers to anticipated questions. This could include the following troubleshooting information. If you don’t have any other Q&A to add, change “FAQ” to “Troubleshooting.”
 
 == FAQ
-
+D
 *Q.* I encountered a *CREATE_FAILED* error when I launched the Quick Start.
 
-*A.* If AWS CloudFormation fails to create the stack, we recommend that you relaunch the template with *Rollback on failure* set to *No*. (This setting is under *Advanced* in the AWS CloudFormation console, *Options* page.) With this setting, the stack’s state is retained and the instance is left running, so you can troubleshoot the issue. (For Windows, look at the log files in %ProgramFiles%\Amazon\EC2ConfigService and C:\cfn\log.)
+*A.* If AWS CloudFormation fails to create the stack, we recommend that you relaunch the template with *Rollback on failure* set to *Disabled*. (This setting is under *Advanced* in the AWS CloudFormation console, *Options* page.) With this setting, the stack’s state is retained, and the instance remains running so you can troubleshoot the issue. (For Windows, look at the log files in `%ProgramFiles%\Amazon\EC2ConfigService` and `C:\cfn\log`.)
 // If you’re deploying on Linux instances, provide the location for log files on Linux, or omit this sentence.
 
-WARNING: When you set *Rollback on failure* to *Disabled*, you continue to incur AWS charges for this stack. Please make sure to delete the stack when you finish troubleshooting.
+WARNING: When you set *Rollback on failure* to *Disabled*, you continue to incur AWS charges for the stack. Ensure to delete the stack when you finish troubleshooting.
 
 For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html[Troubleshooting AWS CloudFormation^] on the AWS website.
 
@@ -23,7 +23,10 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 
 *A.* Yes, you can.
 
-The data lake foundation provides a solid base for your processes. Using this infrastructure, you can:
+// [dbmccoy] The following text is already located in the additional_info file. If you want to repeat it here, I suggest inserting an anchor to the Additional info section.
+
+////
+The data lake foundation provides a base for your processes. Using this infrastructure, you can:
 
 * Ingest batch submissions, resulting in curated datasets in Amazon S3. You can then use your own SQL scripts to load curated datasets to Amazon Redshift.
 * Ingest streaming submissions provided through Amazon Kinesis Data Firehose.
@@ -33,5 +36,4 @@ The data lake foundation provides a solid base for your processes. Using this in
 * Publish the results of analytics to the published datasets bucket.
 * Get a high-level picture of your data lake by using Amazon ES, which indexes the metadata of S3 objects.
 * Use Amazon Athena to run ad hoc analytics over your curated datasets, and Amazon QuickSight to visualize the datasets in the published datasets bucket. You can also use Amazon Athena or Amazon Redshift as data sources in Amazon QuickSight.
-
-
+////

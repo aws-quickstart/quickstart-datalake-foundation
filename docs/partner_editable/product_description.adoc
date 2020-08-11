@@ -2,7 +2,7 @@
 // Briefly describe the software. Use consistent and clear branding. 
 // Include the benefits of using the software on AWS, and provide details on usage scenarios.
 
-A data lake is a repository that holds a large amount of raw data in its native (structured or unstructured) format until the data is needed. Storing data in its native format enables you to accommodate any future schema requirements or design changes.
+A data lake is a repository that holds a large amount of raw data in its native (structured or unstructured) format until the data is needed. Storing data in its native format lets you accommodate any future schema requirements or design changes.
 
 Increasingly, customer data sources are dispersed among on-premises data centers, software-as-a-service (SaaS) providers, APN Partners, third-party data providers, and public datasets. Building a data lake on AWS offers a foundation for storing on-premises, third-party, public datasets at low prices and high performance. A portfolio of descriptive, predictive, and real-time agile analytics built on this foundation can help answer important business aspects, such as predicting customer churn and propensity to buy, detecting fraud, optimizing industrial processes, and content recommendations.
 
@@ -14,21 +14,21 @@ The Quick Start builds a data lake foundation that integrates AWS services such 
 * Ingest processing, including data validation, metadata extraction, and indexing via Amazon S3 events, Amazon Simple Notification Service (Amazon SNS), AWS Lambda, Amazon Kinesis Data Analytics, and Amazon ES.
 * Dataset management through Amazon Redshift transformations and Kinesis Data Analytics.
 * Data transformation, aggregation, and analysis through Amazon Athena, Amazon Redshift Spectrum, and AWS Glue.
-* Building and deploying machine learning models with Amazon SageMaker.
-* Search, by indexing metadata in Amazon ES and exposing it through Kibana dashboards.
+* Building and deploying machine learning models using Amazon SageMaker.
+* Search by indexing metadata in Amazon ES and displaying it on Kibana dashboards.
 * Publishing into an S3 bucket for use by visualization tools.
 * Visualization with Amazon QuickSight.
 
-The usage model diagram in the following figure illustrates key actors and use cases that the data lake enables, in context with the key component areas that comprise the data lake. This Quick Start provisions foundational data lake capabilities and optionally demonstrates key use cases for each type of actor in the usage model.
+The usage model diagram in the following figure illustrates key actors and use cases that data lake enables, in the context of key component areas that comprise the data lake. This Quick Start provisions foundational data lake capabilities and optionally demonstrates key use cases for each type of actor in the usage model.
 
 [#architecture3]
 .Usage model for Data Lake Foundation Quick Start
 [link=images/image3.png]
 image::../images/image3.png[Architecture3,width=474,height=297]
 
-The following figure illustrates the foundational solution components of the data lake and how they relate to the usage model. The solution components interact through recurring and repeatable data lake patterns using your data and business flow.
+The following figure illustrates the foundational components of the data lake and how they relate to the usage model. Using your data and business flow, the components interact through recurring and repeatable data lake patterns.
 
 [#architecture4]
-.Capabilities and solution components in the Data Lake foundation Quick Start
+.Capabilities and components in the Data Lake foundation Quick Start
 [link=images/image4.png]
 image::../images/image4.png[Architecture4,width=648,height=439]
