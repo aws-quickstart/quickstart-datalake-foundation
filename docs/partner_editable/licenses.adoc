@@ -1,6 +1,8 @@
 // Include details about the license and how they can sign up. If no license is required, clarify that. 
 
 You are responsible for the cost of the AWS services used while running this Quick Start reference deployment. There is no additional cost for using the Quick Start.
+
 The AWS CloudFormation template for this Quick Start includes configuration parameters that you can customize. Some of these settings, such as instance type, affect the cost of deployment. For cost estimates, see the pricing pages for each AWS service you use. Prices are subject to change.
+
 Because this Quick Start uses AWS-native solution components, there are no costs or license requirements beyond AWS infrastructure costs. This Quick Start also deploys Kibana, which is an open-source tool that’s included with Amazon ES.
 
