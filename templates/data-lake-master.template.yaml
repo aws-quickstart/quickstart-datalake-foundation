@@ -493,7 +493,6 @@ Resources:
         AvailabilityZones: !Join
           - ','
           - !Ref 'AvailabilityZones'
-        KeyPairName: !Ref 'KeyPairName'
         NumberOfAZs: !FindInMap
           - VPCDefinitions
           - !Ref 'VPCDefinition'
