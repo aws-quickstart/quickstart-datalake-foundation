@@ -65,6 +65,13 @@ Resources:
       - CuratedTopicPolicy
   CuratedTopicPolicy:
     Type: AWS::SNS::TopicPolicy
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - EPolicyWildcardPrincipal
+          ignore_reasons:
+            - EPolicyWildcardPrincipal: "Scope limited by condition"
     Properties:
       PolicyDocument:
         Id: TopicPolicy
@@ -91,6 +98,13 @@ Resources:
         - !Ref "CuratedTopic"
   PublishedTopicPolicy:
     Type: AWS::SNS::TopicPolicy
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - EPolicyWildcardPrincipal
+          ignore_reasons:
+            - EPolicyWildcardPrincipal: "Scope limited by condition"
     Properties:
       PolicyDocument:
         Id: TopicPolicy
@@ -141,6 +155,13 @@ Resources:
     Properties: {}
   SubmissionsTopicPolicy:
     Type: AWS::SNS::TopicPolicy
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - EPolicyWildcardPrincipal
+          ignore_reasons:
+            - EPolicyWildcardPrincipal: "Scope limited by condition"
     Properties:
       PolicyDocument:
         Id: TopicPolicy

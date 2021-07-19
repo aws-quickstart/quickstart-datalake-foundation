@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates AWS Glue resources.  **WARNING**  You will be billed for the
-  AWS resources used if you create a stack from this template.
+  AWS resources used if you create a stack from this template. (qs-1s3s1d5n6)
 Resources:
   DatalakeSubmissionsDatabase:
     Type: AWS::Glue::Database

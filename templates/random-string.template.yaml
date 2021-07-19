@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: AWS CloudFormation template to create Random Strings.
+Description: AWS CloudFormation template to create Random Strings. (qs-1s3s20d5c)
 Resources:
   RandomString:
     Type: AWS::Lambda::Function
@@ -71,7 +71,7 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource:
-                  - "arn:aws:logs:*:*:*"
+                  - !Sub 'arn:${AWS::Partition}:logs:*:*:*'
 Outputs:
   RandomStringArn:
     Description: The ARN for the lambda function that was created

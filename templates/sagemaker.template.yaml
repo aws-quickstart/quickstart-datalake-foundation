@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'AWS CloudFormation templates to create SageMaker notebook.'
+Description: 'AWS CloudFormation templates to create SageMaker notebook. (qs-1s3s21nag)'
 
 Parameters:
   NotebookInstanceName:

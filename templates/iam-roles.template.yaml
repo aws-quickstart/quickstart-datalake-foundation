@@ -20,7 +20,7 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Effect: Allow
-                Resource: arn:aws:logs:*:*:*
+                Resource: !Sub 'arn:${AWS::Partition}:logs:*:*:*'
             Version: '2012-10-17'
           PolicyName: LambdaLogging
         - PolicyDocument:
@@ -46,6 +46,13 @@ Resources:
             Version: '2012-10-17'
           PolicyName: ListGetQSSBucket
     Type: AWS::IAM::Role
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - EIAMPolicyWildcardResource
+          ignore_reasons:
+            - EIAMPolicyWildcardResource: "Scope is limited to least privilege"
   ElasticSearchLambdaIAMPolicy:
     Properties:
       PolicyDocument:
@@ -122,7 +129,7 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Effect: Allow
-                Resource: arn:aws:logs:*:*:*
+                Resource: !Sub 'arn:${AWS::Partition}:logs:*:*:*'
             Version: '2012-10-17'
           PolicyName: LambdaLogging
         - PolicyDocument:
@@ -157,7 +164,7 @@ Resources:
               Service: redshift.amazonaws.com
         Version: '2012-10-17'
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AWSGlueConsoleFullAccess'
       Path: /
       Policies:
         - PolicyDocument:
@@ -199,7 +206,7 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Effect: Allow
-                Resource: arn:aws:logs:*:*:*
+                Resource: !Sub 'arn:${AWS::Partition}:logs:*:*:*'
             Version: '2012-10-17'
           PolicyName: LambdaLogging
         - PolicyDocument:
@@ -213,8 +220,24 @@ Resources:
             Version: '2012-10-17'
           PolicyName: GetQSS3Bucket
     Type: AWS::IAM::Role
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - EIAMPolicyWildcardResource
+          ignore_reasons:
+            - EIAMPolicyWildcardResource: "Scope is limited to least privilege"
   SageMakerExecutionRole:
     Type: AWS::IAM::Role
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - EIAMPolicyWildcardResource
+            - EIAMPolicyActionWildcard
+          ignore_reasons:
+            - EIAMPolicyWildcardResource: "Scope is limited to least privilege"
+            - EIAMPolicyActionWildcard: "Scope is limited to appropriate resource"
     Properties:
       AssumeRolePolicyDocument:
         Statement:
@@ -225,9 +248,9 @@ Resources:
             Action:
               - sts:AssumeRole
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
-        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
-        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonSageMakerFullAccess'
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/CloudWatchLogsFullAccess'
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/AmazonS3ReadOnlyAccess'
       Path: /service-role/
       Policies:
         - PolicyName: CuratedBucketS3BucketAccess
@@ -246,7 +269,7 @@ Resources:
               - Sid: 'VisualEditor0'
                 Effect: Allow
                 Action: s3:ListBucket
-                Resource: arn:aws:s3:::SageMaker
+                Resource: !Sub 'arn:${AWS::Partition}:s3:::SageMaker'
               - Sid: 'VisualEditor1'
                 Effect: Allow
                 Action:
@@ -282,7 +305,7 @@ Resources:
                   - s3:GetObjectVersionForReplication
                   - s3:GetBucketLocation
                   - s3:GetObjectVersio
-                Resource: arn:aws:s3:::SageMaker/*
+                Resource: !Sub 'arn:${AWS::Partition}:s3:::SageMaker/*'
               - Sid: 'VisualEditor2'
                 Effect: Allow
                 Action:
@@ -291,6 +314,13 @@ Resources:
                 Resource: '*'
   CreateNotebookFunctionExecuteRole:
     Type: AWS::IAM::Role
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - EIAMPolicyActionWildcard
+          ignore_reasons:
+            - EIAMPolicyActionWildcard: "Scope limited by resource"
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -312,7 +342,7 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: arn:aws:logs:*:*:*
+                Resource: !Sub 'arn:${AWS::Partition}:logs:*:*:*'
               - Effect: Allow
                 Action:
                   - sagemaker:*
@@ -329,7 +359,7 @@ Resources:
                 Action:
                   - s3:*
                 Resource:
-                  - !Sub 'arn:aws:s3:::${QSS3BucketName}*'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${QSS3BucketName}*'
 Conditions:
   CreateRedshiftRole: !Equals
     - !Ref 'EnableRedshift'

@@ -184,7 +184,7 @@ Resources:
                   - !Ref "NAT2ElasticIP"
             Effect: Allow
             Principal: "*"
-            Resource: !Sub arn:aws:es:${AWS::Region}:${AWS::AccountId}:*
+            Resource: !Sub 'arn:${AWS::Partition}:es:${AWS::Region}:${AWS::AccountId}:*'
         Version: "2012-10-17"
       AdvancedOptions:
         rest.action.multi.allow_explicit_index: "true"
@@ -206,6 +206,13 @@ Resources:
       SnapshotOptions:
         AutomatedSnapshotStartHour: 0
     Type: AWS::Elasticsearch::Domain
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - EPolicyWildcardPrincipal
+          ignore_reasons:
+            - EPolicyWildcardPrincipal: "Scope limited by condition"
   CuratedDatasetLambdaPermissions:
     Properties:
       Action: lambda:invokeFunction
