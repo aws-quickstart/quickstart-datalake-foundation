@@ -43,7 +43,7 @@ Resources:
       Handler: "index.lambda_handler"
       Timeout: 30
       Role: !GetAtt "LambdaRole.Arn"
-      Runtime: python3.6
+      Runtime: python3.9
   # The LambdaRole is very simple for this use case, because it only need to have access to write logs
   # If the lambda is going to access AWS services using boto3, this role must be
   # extended to give lambda the appropriate permissions.

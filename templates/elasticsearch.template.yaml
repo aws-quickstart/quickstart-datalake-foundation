@@ -164,7 +164,7 @@ Resources:
       Description: Copy deployment package to the regional bucket
       Handler: index.handler
       Role: !Ref "CopyLambdaDeploymentRoleARN"
-      Runtime: python3.6
+      Runtime: python3.9
       Timeout: 30
     Type: AWS::Lambda::Function
   ElasticsearchDomain:
@@ -239,7 +239,7 @@ Resources:
           ELASTICSEARCH_ENDPOINT: !GetAtt "ElasticsearchDomain.DomainEndpoint"
       Handler: lambdas.handle_bucket_event
       Role: !Ref "LambdaRoleARN"
-      Runtime: python3.6
+      Runtime: python3.9
       Timeout: 30
     Type: AWS::Lambda::Function
   PublishedDatasetLambdaPermissions:
