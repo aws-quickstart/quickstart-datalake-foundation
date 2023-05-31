@@ -89,7 +89,8 @@ def create_metadata_visualizations(elasticsearch_endpoint):
 def register_metadata_dashboard(event, context):
     if event['RequestType'] != 'Create':
         return send_cfnresponse(event, context, CFN_SUCCESS, {})
-    quickstart_bucket = s3_resource.Bucket(event['ResourceProperties']['QSS3BucketName'])
+    QSS3_bucket_name = "{}-{}".format(event['ResourceProperties']['QSS3BucketName'], event['ResourceProperties']['QSS3BucketRegion'])
+    quickstart_bucket = s3_resource.Bucket(QSS3_bucket_name)
     print("quickstart_bucket: ", quickstart_bucket)
     kibana_dashboards_key = os.path.join(
         event['ResourceProperties']['QSS3KeyPrefix'],
@@ -98,7 +99,7 @@ def register_metadata_dashboard(event, context):
     
     elasticsearch_endpoint = event['ResourceProperties']['ElasticsearchEndpoint']
     try:
-        s3_resource.meta.client.head_object(Bucket=event['ResourceProperties']['QSS3BucketName'],Key=kibana_dashboards_key)
+        s3_resource.meta.client.head_object(Bucket=QSS3_bucket_name, Key=kibana_dashboards_key)
         quickstart_bucket.download_file(kibana_dashboards_key, TMP_KIBANA_JSON_PATH)
         print("kibana_dashboards_key file download completed")
         create_metadata_visualizations(elasticsearch_endpoint)
