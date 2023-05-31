@@ -215,7 +215,7 @@ Resources:
                   - s3:GetObject
                 Effect: Allow
                 Resource:
-                  - arn:aws:s3:aws-quicksart*/*
+                  - !Sub arn:${AWS::Partition}:s3:::aws-quickstart*/*
                   - !Sub
                     - arn:${AWS::Partition}:s3:::${S3Bucket}/*
                     - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
