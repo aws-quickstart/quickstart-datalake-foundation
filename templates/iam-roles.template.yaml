@@ -216,7 +216,7 @@ Resources:
                 Effect: Allow
                 Resource: !Sub
                   - arn:${AWS::Partition}:s3:::${S3Bucket}/*
-                  - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+                  - S3Bucket: !If [UsingDefaultBucket, !Ref QSS3BucketName, !Sub '${QSS3BucketName}-${QSS3BucketRegion}']
             Version: '2012-10-17'
           PolicyName: GetQSS3Bucket
     Type: AWS::IAM::Role

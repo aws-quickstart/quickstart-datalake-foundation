@@ -8,7 +8,7 @@ import urllib.parse
 import boto3
 from aws_requests_auth.aws_auth import AWSRequestsAuth
 from botocore.exceptions import ClientError
-from botocore.vendored import requests
+import requests
 from elasticsearch import Elasticsearch, RequestsHttpConnection, ElasticsearchException
 
 CFN_SUCCESS = 'SUCCESS'
@@ -90,13 +90,17 @@ def register_metadata_dashboard(event, context):
     if event['RequestType'] != 'Create':
         return send_cfnresponse(event, context, CFN_SUCCESS, {})
     quickstart_bucket = s3_resource.Bucket(event['ResourceProperties']['QSS3BucketName'])
+    print("quickstart_bucket: ", quickstart_bucket)
     kibana_dashboards_key = os.path.join(
         event['ResourceProperties']['QSS3KeyPrefix'],
         'assets/kibana/kibana_metadata_visualizations.json'
     )
+    
     elasticsearch_endpoint = event['ResourceProperties']['ElasticsearchEndpoint']
     try:
+        s3_resource.meta.client.head_object(Bucket=event['ResourceProperties']['QSS3BucketName'],Key=kibana_dashboards_key)
         quickstart_bucket.download_file(kibana_dashboards_key, TMP_KIBANA_JSON_PATH)
+        print("kibana_dashboards_key file download completed")
         create_metadata_visualizations(elasticsearch_endpoint)
         return send_cfnresponse(event, context, CFN_SUCCESS, {})
     except (ClientError, ElasticsearchException) as e:
