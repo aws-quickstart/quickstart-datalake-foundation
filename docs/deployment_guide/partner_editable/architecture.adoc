@@ -1,0 +1,33 @@
+:xrefstyle: short
+
+Deploying this Partner Solution with default parameters builds the following {partner-product-short-name} environment in the
+AWS Cloud.
+
+// Replace this example diagram with your own. Follow our wiki guidelines: https://w.amazon.com/bin/view/AWS_Quick_Starts/Process_for_PSAs/#HPrepareyourarchitecturediagram. Upload your source PowerPoint file to the GitHub {deployment name}/docs/images/ directory in its repository.
+
+[#architecture1]
+.Partner Solution architecture for {partner-product-short-name} on AWS
+image::../docs/deployment_guide/images/architecture_diagram.png[Architecture]
+
+As shown in <<architecture1>>, this Partner Solution sets up the following:
+
+* A virtual private cloud (VPC) that spans two Availability Zones and includes two public and two private subnets.*
+* An internet gateway to allow access to the internet.*
+* In the public subnets:
+    - Managed network address translation (NAT) gateways to allow outbound internet access for resources in the private subnets.*
+    - Linux bastion hosts in an Auto Scaling group to allow inbound Secure Shell (SSH) access to Amazon Elastic Compute Cloud (Amazon EC2) instances in public and private subnets.*
+    - Amazon Redshift and Redshift Spectrum for data aggregation, analysis, transformation, and creation of curated and published datasets.
+* In the private subnets:
+    - An Amazon S3 endpoint.
+    - The Data Lake wizard.
+* AWS Identity and Access Management (IAM) roles to provide permissions to access AWS resources (for example, to permit Amazon Redshift and Amazon Athena to read and write curated datasets).
+* An Amazon SageMaker instance, which you can access by using AWS authentication.
+* Integration with other Amazon services, such as Amazon S3, Amazon Athena, AWS Glue, AWS Lambda, Amazon ES with Kibana, Amazon Kinesis, and Amazon QuickSight.
+
+[.small]#* The template that deploys this Partner Solution into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
+
+The following figure shows how these components work together in a typical end-to-end process flow.
+
+[#architecture2]
+.Data lake foundation process flow
+image::../docs/deployment_guide/images/image2.png[Architecture]

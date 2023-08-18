@@ -1,0 +1,19 @@
+//Include any predeployment steps here, such as signing up for a Marketplace AMI or making any changes to a partner account. If there are no predeployment steps, leave this file empty.
+
+== Predeployment steps
+
+Ensure that the domain name in the DHCP options is configured, as explained in the http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_DHCP_Options.html[Amazon VPC documentation^]. Provide your VPC settings when you launch the Quick Start.
+
+Before you deploy this Partner Solution, we recommend that you become familiar with the following AWS services. (If you are new to AWS, see the https://aws.amazon.com/getting-started/[Getting Started Resource Center].)
+
+* https://aws.amazon.com/documentation/athena/[Amazon Athena]
+* https://aws.amazon.com/documentation/ec2/[Amazon EC2]
+* https://aws.amazon.com/documentation/elasticsearch-service/[Amazon ES]
+* https://aws.amazon.com/documentation/kinesis/[Amazon Kinesis]
+* https://aws.amazon.com/documentation/quicksight/[Amazon QuickSight]
+* https://aws.amazon.com/documentation/redshift/[Amazon Redshift]
+* http://docs.aws.amazon.com/redshift/latest/dg/c-using-spectrum.html[Amazon Redshift Spectrum]
+* https://aws.amazon.com/documentation/s3/[Amazon S3]
+* https://aws.amazon.com/documentation/sagemaker/[Amazon SageMaker]
+* https://aws.amazon.com/documentation/vpc/[Amazon VPC]
+* https://aws.amazon.com/documentation/glue/[AWS Glue]
